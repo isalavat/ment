@@ -18,3 +18,27 @@ model Message {
   text      String
   createdAt DateTime @default(now())
 }
+
+model User {
+  id            Int  @id @default(autoincrement())
+  email         String @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id  Int @id @default(autoincrement())
+  token String @unique
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+  
+  @@index([userId], map: "idx_refresh_token_userId")
+}
+
+
+
