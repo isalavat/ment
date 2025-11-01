@@ -31,13 +31,14 @@ model User {
 
 model RefreshToken {
   id  Int @id @default(autoincrement())
-  token String @unique
+  token String @db.VarChar(500)
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   revokedAt DateTime?
   
-  @@index([userId], map: "idx_refresh_token_userId")
+  @@unique([token])
+  @@map("refreshtoken")
 }
 
 

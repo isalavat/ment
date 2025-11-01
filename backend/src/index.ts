@@ -1,16 +1,20 @@
+
 import express, { Request, Response, NextFunction } from "express";
+import { requireAuth } from "./middleware/auth";
+import authRouter from "./routes/auth";
 import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
+app.use("/auth", authRouter);
 
-app.get("/health", (req: Request, res: Response) => {
+app.get("/health", requireAuth, (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
-app.post("/hello", async (req: Request, res: Response, next: NextFunction) => {
+app.post("/hello", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const text: string = req.body?.text ?? "Hello, World!!";
     const msg = await prisma.message.create({ data: { text } });
@@ -18,6 +22,7 @@ app.post("/hello", async (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     next(err);
   }
+  
 });
 
 app.get("/hello", async(req: Request, res: Response, next: NextFunction) => {

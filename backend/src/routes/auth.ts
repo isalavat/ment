@@ -2,11 +2,13 @@ import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
+import logger from "../lib/logger";
 
 const prisma = new PrismaClient();
 const router = Router();
 
 router.post("/register", async (req, res) => {
+    try {
     const { email, password } = req.body ?? {};
     if (typeof email !== "string" || typeof password !== "string") {
         return res.status(400).json({ error: "email and password required"});
@@ -26,7 +28,33 @@ router.post("/register", async (req, res) => {
     await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id} });
 
     return res.status(201).json({ accessToken, refreshToken });
+    } catch (error) {
+        console.error("Register error:", error);
+        return res.status(500).json({ error: (error as Error).message });
+    }
 
+});
+
+// ...existing code...
+router.post("/login", async (req, res) => {
+  logger.info("Salavat");
+  const { email, password } = req.body ?? {};
+  if (typeof email !== "string" || typeof password !== "string") {
+    return res.status(400).json({ error: "email and password required" });
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) return res.status(401).json({ error: "Invalid credentials" });
+
+  const accessToken = signAccessToken({ sub: user.id, email: user.email });
+  const refreshToken = signRefreshToken({ sub: user.id, email: user.email });
+
+  await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id } });
+
+  return res.json({ accessToken, refreshToken });
 });
 
 /** Refresh */
