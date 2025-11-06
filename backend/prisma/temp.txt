@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,12 +5,6 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-}
-
-model Message {
-  id        Int      @id @default(autoincrement())
-  text      String
-  createdAt DateTime @default(now())
 }
 
 // ---------- Enums ----------
@@ -40,7 +28,6 @@ enum SlotStatus {
   UNAVAILABLE
 }
 
-
 // ---------- Auth & Core User ----------
 model User {
   id            Int      @id @default(autoincrement())
@@ -58,6 +45,19 @@ model User {
   menteeProfile MenteeProfile?
 }
 
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @db.VarChar(500)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+  
+  @@unique([token])
+  @@map("refreshtoken")
+}
+
+// ---------- Mentor Profile ----------
 model MentorProfile {
   id              Int      @id @default(autoincrement())
   userId          Int      @unique
@@ -85,6 +85,7 @@ model MentorProfile {
   @@index([avgRating])
   @@index([hourlyRate])
 }
+
 // ---------- Mentee Profile ----------
 model MenteeProfile {
   id        Int      @id @default(autoincrement())
@@ -252,17 +253,9 @@ model FavoriteMentor {
   @@index([menteeId])
 }
 
-model RefreshToken {
-  id  Int @id @default(autoincrement())
-  token String @db.VarChar(500)
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+// ---------- Messages (optional) ----------
+model Message {
+  id        Int      @id @default(autoincrement())
+  text      String
   createdAt DateTime @default(now())
-  revokedAt DateTime?
-  
-  @@unique([token])
-  @@map("refreshtoken")
 }
-
-
-
