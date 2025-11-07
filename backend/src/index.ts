@@ -2,6 +2,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { requireAuth } from "./middleware/auth";
 import authRouter from "./routes/auth";
+import profileRouter from "./routes/profiles"
 import { PrismaClient } from "@prisma/client";
 
 const app = express();
@@ -9,6 +10,7 @@ const prisma = new PrismaClient();
 
 app.use(express.json());
 app.use("/auth", authRouter);
+app.use("/profiles", profileRouter);
 
 app.get("/health", requireAuth, (req: Request, res: Response) => {
   res.json({ status: "ok" });
