@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Mentor Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); padding: var(--space-lg);">
+    <div class="card" style="max-width: 420px; width: 100%; margin: 0;">
+      <div style="text-align: center; margin-bottom: var(--space-xl);">
+        <div style="font-size: 48px; margin-bottom: var(--space-md);">🎓</div>
+        <h1 style="font-size: var(--font-size-xxl); margin-bottom: var(--space-xs);">MentorHub</h1>
+        <p style="color: var(--neutral-600);">Sign in to your account</p>
+      </div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-input" 
+            placeholder="you@example.com"
+            required
+          >
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-input" 
+            placeholder="••••••••"
+            required
+          >
+        </div>
+        
+        <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+          <label style="display: flex; align-items: center; gap: var(--space-xs); cursor: pointer;">
+            <input type="checkbox" name="remember">
+            <span style="font-size: var(--font-size-sm);">Remember me</span>
+          </label>
+          <a href="#" style="font-size: var(--font-size-sm);">Forgot password?</a>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; margin-top: var(--space-md);">
+          Sign In
+        </button>
+      </form>
+      
+      <div style="margin-top: var(--space-lg); padding-top: var(--space-lg); border-top: 1px solid var(--neutral-200); text-align: center;">
+        <p style="color: var(--neutral-600); font-size: var(--font-size-sm);">
+          Don't have an account? 
+          <a href="register.html" style="font-weight: 600;">Sign up</a>
+        </p>
+      </div>
+      
+      <div style="margin-top: var(--space-md); text-align: center;">
+        <div style="position: relative; margin-bottom: var(--space-md);">
+          <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--neutral-200);"></div>
+          <span style="position: relative; background: white; padding: 0 var(--space-md); color: var(--neutral-500); font-size: var(--font-size-sm);">Or continue with</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm);">
+          <button class="btn btn-outline">
+            <span style="font-size: 20px;">G</span>
+            Google
+          </button>
+          <button class="btn btn-outline">
+            <span style="font-size: 20px;">M</span>
+            Microsoft
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Simulate login - in real app, this would call the backend API
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      console.log('Login attempt:', { email, password });
+      
+      // Redirect to dashboard
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

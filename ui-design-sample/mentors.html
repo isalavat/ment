@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Mentors - Mentor Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span>🎓</span>
+          <span>MentorHub</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="index.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="mentors.html" class="nav-item active">
+            <span class="nav-icon">👥</span>
+            <span>Find Mentors</span>
+          </a>
+          <a href="bookings.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span>My Bookings</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Profile</div>
+          <a href="profile-edit.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" class="nav-item">
+            <span class="nav-icon">⭐</span>
+            <span>Favorites</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <a href="login.html" class="nav-item">
+            <span class="nav-icon">🚪</span>
+            <span>Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">☰</button>
+          <div class="header-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search mentors, skills...">
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="icon-button">🔔</button>
+            <button class="icon-button">💬</button>
+          </div>
+          
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+            <span class="user-name">John Smith</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <main class="content-area">
+        <div class="page-header">
+          <h1 class="page-title">Find Your Perfect Mentor</h1>
+          <p class="page-subtitle">Browse experienced professionals ready to help you grow</p>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="categoryFilter">
+              <option value="">All Categories</option>
+              <option value="software">Software Development</option>
+              <option value="data">Data Science</option>
+              <option value="design">Design</option>
+              <option value="product">Product Management</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+          
+          <div class="filter-item">
+            <label class="form-label">Skills</label>
+            <select class="form-select" id="skillFilter">
+              <option value="">All Skills</option>
+              <option value="react">React</option>
+              <option value="python">Python</option>
+              <option value="aws">AWS</option>
+              <option value="figma">Figma</option>
+              <option value="ml">Machine Learning</option>
+            </select>
+          </div>
+          
+          <div class="filter-item">
+            <label class="form-label">Min Rating</label>
+            <select class="form-select" id="ratingFilter">
+              <option value="">Any Rating</option>
+              <option value="4.5">4.5+ ⭐</option>
+              <option value="4.0">4.0+ ⭐</option>
+              <option value="3.5">3.5+ ⭐</option>
+            </select>
+          </div>
+          
+          <div class="filter-item">
+            <label class="form-label">Price Range</label>
+            <select class="form-select" id="priceFilter">
+              <option value="">Any Price</option>
+              <option value="0-50">$0 - $50/hr</option>
+              <option value="50-100">$50 - $100/hr</option>
+              <option value="100+">$100+/hr</option>
+            </select>
+          </div>
+          
+          <div class="filter-item" style="display: flex; align-items: flex-end;">
+            <button class="btn btn-outline" style="width: 100%;" id="clearFilters">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+        
+        <!-- Results Info -->
+        <div class="flex-between mb-md">
+          <div style="color: var(--neutral-600);">
+            Showing <strong>12 mentors</strong>
+          </div>
+          <div>
+            <select class="form-select" style="width: auto;" id="sortFilter">
+              <option value="rating">Sort by: Rating</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="reviews">Most Reviews</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Mentor Grid -->
+        <div class="grid grid-3">
+          <!-- Mentor Card 1 -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">SA</div>
+              <div class="mentor-info">
+                <h3>Sarah Anderson</h3>
+                <div class="mentor-title">Senior Frontend Developer</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.9</strong> <span style="color: var(--neutral-500);">(127 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                10+ years building scalable web applications. Specialized in React, TypeScript, and modern frontend architecture.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">React</span>
+                <span class="skill-tag">TypeScript</span>
+                <span class="skill-tag">Next.js</span>
+                <span class="skill-tag">CSS</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$75/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <!-- Mentor Card 2 -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">MJ</div>
+              <div class="mentor-info">
+                <h3>Michael Johnson</h3>
+                <div class="mentor-title">Data Scientist</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.8</strong> <span style="color: var(--neutral-500);">(93 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                PhD in ML, helping professionals transition into data science. Expert in Python, TensorFlow, and statistical analysis.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">ML</span>
+                <span class="skill-tag">TensorFlow</span>
+                <span class="skill-tag">Statistics</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$95/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <!-- Mentor Card 3 -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">EW</div>
+              <div class="mentor-info">
+                <h3>Emily Williams</h3>
+                <div class="mentor-title">Senior UX Designer</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>5.0</strong> <span style="color: var(--neutral-500);">(156 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                Award-winning designer with 12 years experience. Passionate about creating user-centered designs that drive business results.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Figma</span>
+                <span class="skill-tag">UX Research</span>
+                <span class="skill-tag">Prototyping</span>
+                <span class="skill-tag">Design Systems</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$85/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <!-- Mentor Card 4 -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">DC</div>
+              <div class="mentor-info">
+                <h3>David Chen</h3>
+                <div class="mentor-title">DevOps Engineer</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.7</strong> <span style="color: var(--neutral-500);">(84 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                Cloud infrastructure expert. Helping teams implement CI/CD pipelines and scale their applications on AWS and Azure.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">AWS</span>
+                <span class="skill-tag">Docker</span>
+                <span class="skill-tag">Kubernetes</span>
+                <span class="skill-tag">Terraform</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$90/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <!-- Mentor Card 5 -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">JM</div>
+              <div class="mentor-info">
+                <h3>Jennifer Martinez</h3>
+                <div class="mentor-title">Product Manager</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.9</strong> <span style="color: var(--neutral-500);">(112 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                Led product teams at Fortune 500 companies. Teaching product strategy, roadmapping, and stakeholder management.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Product Strategy</span>
+                <span class="skill-tag">Agile</span>
+                <span class="skill-tag">Analytics</span>
+                <span class="skill-tag">Roadmapping</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$100/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <!-- Mentor Card 6 -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">RT</div>
+              <div class="mentor-info">
+                <h3>Robert Taylor</h3>
+                <div class="mentor-title">Backend Architect</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.8</strong> <span style="color: var(--neutral-500);">(98 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                15 years designing scalable backend systems. Expert in microservices, databases, and distributed systems architecture.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Node.js</span>
+                <span class="skill-tag">PostgreSQL</span>
+                <span class="skill-tag">Redis</span>
+                <span class="skill-tag">Microservices</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$110/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <!-- More mentor cards... -->
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">AM</div>
+              <div class="mentor-info">
+                <h3>Anna Miller</h3>
+                <div class="mentor-title">Mobile Developer</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.9</strong> <span style="color: var(--neutral-500);">(145 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                iOS and Android expert. Published 20+ apps with millions of downloads. Teaching Swift, Kotlin, and React Native.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Swift</span>
+                <span class="skill-tag">Kotlin</span>
+                <span class="skill-tag">React Native</span>
+                <span class="skill-tag">Firebase</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$80/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">KB</div>
+              <div class="mentor-info">
+                <h3>Kevin Brown</h3>
+                <div class="mentor-title">Security Engineer</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>4.7</strong> <span style="color: var(--neutral-500);">(76 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                Cybersecurity specialist with focus on application security, penetration testing, and secure coding practices.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Security</span>
+                <span class="skill-tag">Pentesting</span>
+                <span class="skill-tag">OWASP</span>
+                <span class="skill-tag">Compliance</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$105/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+          
+          <div class="mentor-card" onclick="window.location.href='mentor-profile.html'">
+            <div class="mentor-card-header">
+              <div class="mentor-avatar-lg">LG</div>
+              <div class="mentor-info">
+                <h3>Lisa Garcia</h3>
+                <div class="mentor-title">Technical Writer</div>
+                <div class="mentor-rating">
+                  ⭐ <strong>5.0</strong> <span style="color: var(--neutral-500);">(89 reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mentor-card-body">
+              <p class="mentor-bio">
+                Creating clear, comprehensive documentation for technical products. Expert in API docs, user guides, and content strategy.
+              </p>
+              
+              <div class="mentor-skills">
+                <span class="skill-tag">Documentation</span>
+                <span class="skill-tag">API Docs</span>
+                <span class="skill-tag">Markdown</span>
+                <span class="skill-tag">Content</span>
+              </div>
+            </div>
+            
+            <div class="mentor-card-footer">
+              <div class="mentor-rate">$65/hr</div>
+              <button class="btn btn-primary btn-sm">View Profile</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div style="display: flex; justify-content: center; margin-top: var(--space-xl); gap: var(--space-sm);">
+          <button class="btn btn-outline">← Previous</button>
+          <button class="btn btn-primary">1</button>
+          <button class="btn btn-outline">2</button>
+          <button class="btn btn-outline">3</button>
+          <button class="btn btn-outline">Next →</button>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script>
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    });
+    
+    // Filter handlers
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('skillFilter').value = '';
+      document.getElementById('ratingFilter').value = '';
+      document.getElementById('priceFilter').value = '';
+    });
+  </script>
+</body>
+</html>

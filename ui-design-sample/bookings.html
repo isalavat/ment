@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - Mentor Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span>🎓</span>
+          <span>MentorHub</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="index.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="mentors.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Find Mentors</span>
+          </a>
+          <a href="bookings.html" class="nav-item active">
+            <span class="nav-icon">📅</span>
+            <span>My Bookings</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Profile</div>
+          <a href="profile-edit.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" class="nav-item">
+            <span class="nav-icon">⭐</span>
+            <span>Favorites</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <a href="login.html" class="nav-item">
+            <span class="nav-icon">🚪</span>
+            <span>Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">☰</button>
+          <div class="header-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search mentors, skills...">
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="icon-button">🔔</button>
+            <button class="icon-button">💬</button>
+          </div>
+          
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+            <span class="user-name">John Smith</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <main class="content-area">
+        <div class="page-header">
+          <h1 class="page-title">My Bookings</h1>
+          <p class="page-subtitle">Manage your mentorship sessions</p>
+        </div>
+        
+        <!-- Tabs -->
+        <div style="display: flex; gap: var(--space-sm); margin-bottom: var(--space-lg); border-bottom: 1px solid var(--neutral-200);">
+          <button class="btn btn-outline" id="tabAll" style="border-radius: 0; border: none; border-bottom: 3px solid var(--primary-blue);">
+            All
+          </button>
+          <button class="btn btn-outline" id="tabUpcoming" style="border-radius: 0; border: none; border-bottom: 3px solid transparent;">
+            Upcoming
+          </button>
+          <button class="btn btn-outline" id="tabPending" style="border-radius: 0; border: none; border-bottom: 3px solid transparent;">
+            Pending
+          </button>
+          <button class="btn btn-outline" id="tabCompleted" style="border-radius: 0; border: none; border-bottom: 3px solid transparent;">
+            Completed
+          </button>
+          <button class="btn btn-outline" id="tabCancelled" style="border-radius: 0; border: none; border-bottom: 3px solid transparent;">
+            Cancelled
+          </button>
+        </div>
+        
+        <!-- Bookings List -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+          <!-- Booking Card 1 - Confirmed -->
+          <div class="card" style="cursor: pointer;" onclick="window.location.href='booking-details.html'">
+            <div style="display: flex; gap: var(--space-lg); align-items: start; flex-wrap: wrap;">
+              <div style="display: flex; gap: var(--space-md); flex: 1; min-width: 300px;">
+                <div class="user-avatar" style="width: 48px; height: 48px; font-size: 18px;">SA</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
+                    <h3 style="font-size: var(--font-size-lg); font-weight: 500;">Sarah Anderson</h3>
+                    <span class="badge badge-success">Confirmed</span>
+                  </div>
+                  <p style="color: var(--neutral-600); margin-bottom: var(--space-xs);">Senior Frontend Developer</p>
+                  <p style="color: var(--neutral-700); font-weight: 500; margin-bottom: var(--space-sm);">
+                    React Advanced Patterns
+                  </p>
+                  <div style="display: flex; gap: var(--space-lg); flex-wrap: wrap; color: var(--neutral-600); font-size: var(--font-size-sm);">
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      📅 Nov 25, 2025
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      🕐 10:00 AM - 11:00 AM
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      ⏱️ 1 hour
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      💰 $75.00
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="event.stopPropagation(); alert('Joining meeting...')">
+                  Join Meeting
+                </button>
+                <button class="btn btn-outline" onclick="event.stopPropagation(); alert('Rescheduling...')">
+                  Reschedule
+                </button>
+                <button class="btn btn-outline" onclick="event.stopPropagation(); if(confirm('Cancel booking?')) alert('Booking cancelled')">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Booking Card 2 - Pending -->
+          <div class="card" style="cursor: pointer;" onclick="window.location.href='booking-details.html'">
+            <div style="display: flex; gap: var(--space-lg); align-items: start; flex-wrap: wrap;">
+              <div style="display: flex; gap: var(--space-md); flex: 1; min-width: 300px;">
+                <div class="user-avatar" style="width: 48px; height: 48px; font-size: 18px;">MJ</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
+                    <h3 style="font-size: var(--font-size-lg); font-weight: 500;">Michael Johnson</h3>
+                    <span class="badge badge-warning">Pending</span>
+                  </div>
+                  <p style="color: var(--neutral-600); margin-bottom: var(--space-xs);">Data Scientist</p>
+                  <p style="color: var(--neutral-700); font-weight: 500; margin-bottom: var(--space-sm);">
+                    Machine Learning Basics
+                  </p>
+                  <div style="display: flex; gap: var(--space-lg); flex-wrap: wrap; color: var(--neutral-600); font-size: var(--font-size-sm);">
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      📅 Nov 26, 2025
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      🕐 2:00 PM - 3:00 PM
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      ⏱️ 1 hour
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      💰 $95.00
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="event.stopPropagation(); alert('Viewing details...')">
+                  View Details
+                </button>
+                <button class="btn btn-outline" onclick="event.stopPropagation(); if(confirm('Cancel booking?')) alert('Booking cancelled')">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Booking Card 3 - Confirmed -->
+          <div class="card" style="cursor: pointer;" onclick="window.location.href='booking-details.html'">
+            <div style="display: flex; gap: var(--space-lg); align-items: start; flex-wrap: wrap;">
+              <div style="display: flex; gap: var(--space-md); flex: 1; min-width: 300px;">
+                <div class="user-avatar" style="width: 48px; height: 48px; font-size: 18px;">EW</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
+                    <h3 style="font-size: var(--font-size-lg); font-weight: 500;">Emily Williams</h3>
+                    <span class="badge badge-success">Confirmed</span>
+                  </div>
+                  <p style="color: var(--neutral-600); margin-bottom: var(--space-xs);">Senior UX Designer</p>
+                  <p style="color: var(--neutral-700); font-weight: 500; margin-bottom: var(--space-sm);">
+                    Design System Review
+                  </p>
+                  <div style="display: flex; gap: var(--space-lg); flex-wrap: wrap; color: var(--neutral-600); font-size: var(--font-size-sm);">
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      📅 Nov 28, 2025
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      🕐 4:00 PM - 5:00 PM
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      ⏱️ 1 hour
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      💰 $85.00
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="event.stopPropagation(); alert('Viewing details...')">
+                  View Details
+                </button>
+                <button class="btn btn-outline" onclick="event.stopPropagation(); alert('Rescheduling...')">
+                  Reschedule
+                </button>
+                <button class="btn btn-outline" onclick="event.stopPropagation(); if(confirm('Cancel booking?')) alert('Booking cancelled')">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Booking Card 4 - Completed -->
+          <div class="card" style="cursor: pointer; opacity: 0.8;" onclick="window.location.href='booking-details.html'">
+            <div style="display: flex; gap: var(--space-lg); align-items: start; flex-wrap: wrap;">
+              <div style="display: flex; gap: var(--space-md); flex: 1; min-width: 300px;">
+                <div class="user-avatar" style="width: 48px; height: 48px; font-size: 18px;">DC</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
+                    <h3 style="font-size: var(--font-size-lg); font-weight: 500;">David Chen</h3>
+                    <span class="badge badge-neutral">Completed</span>
+                  </div>
+                  <p style="color: var(--neutral-600); margin-bottom: var(--space-xs);">DevOps Engineer</p>
+                  <p style="color: var(--neutral-700); font-weight: 500; margin-bottom: var(--space-sm);">
+                    CI/CD Pipeline Setup
+                  </p>
+                  <div style="display: flex; gap: var(--space-lg); flex-wrap: wrap; color: var(--neutral-600); font-size: var(--font-size-sm);">
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      📅 Nov 20, 2025
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      🕐 3:00 PM - 4:00 PM
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      ⏱️ 1 hour
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      💰 $90.00
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="event.stopPropagation(); alert('Leaving review...')">
+                  Leave Review
+                </button>
+                <button class="btn btn-outline" onclick="event.stopPropagation(); window.location.href='mentor-profile.html'">
+                  Book Again
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Booking Card 5 - Cancelled -->
+          <div class="card" style="cursor: pointer; opacity: 0.6;" onclick="window.location.href='booking-details.html'">
+            <div style="display: flex; gap: var(--space-lg); align-items: start; flex-wrap: wrap;">
+              <div style="display: flex; gap: var(--space-md); flex: 1; min-width: 300px;">
+                <div class="user-avatar" style="width: 48px; height: 48px; font-size: 18px;">JM</div>
+                <div style="flex: 1;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-xs);">
+                    <h3 style="font-size: var(--font-size-lg); font-weight: 500;">Jennifer Martinez</h3>
+                    <span class="badge badge-danger">Cancelled</span>
+                  </div>
+                  <p style="color: var(--neutral-600); margin-bottom: var(--space-xs);">Product Manager</p>
+                  <p style="color: var(--neutral-700); font-weight: 500; margin-bottom: var(--space-sm);">
+                    Product Strategy Session
+                  </p>
+                  <div style="display: flex; gap: var(--space-lg); flex-wrap: wrap; color: var(--neutral-600); font-size: var(--font-size-sm);">
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      📅 Nov 18, 2025
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      🕐 1:00 PM - 2:00 PM
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      ⏱️ 1 hour
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      💰 $100.00 (Refunded)
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="event.stopPropagation(); window.location.href='mentor-profile.html'">
+                  Book Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    });
+    
+    // Tab functionality
+    const tabs = ['All', 'Upcoming', 'Pending', 'Completed', 'Cancelled'];
+    tabs.forEach(tab => {
+      document.getElementById(`tab${tab}`).addEventListener('click', function() {
+        tabs.forEach(t => {
+          const el = document.getElementById(`tab${t}`);
+          el.style.borderBottomColor = 'transparent';
+        });
+        this.style.borderBottomColor = 'var(--primary-blue)';
+      });
+    });
+  </script>
+</body>
+</html>

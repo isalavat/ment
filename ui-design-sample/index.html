@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Mentor Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span>🎓</span>
+          <span>MentorHub</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="index.html" class="nav-item active">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="mentors.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Find Mentors</span>
+          </a>
+          <a href="bookings.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span>My Bookings</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Profile</div>
+          <a href="profile-edit.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" class="nav-item">
+            <span class="nav-icon">⭐</span>
+            <span>Favorites</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <a href="login.html" class="nav-item">
+            <span class="nav-icon">🚪</span>
+            <span>Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">
+            ☰
+          </button>
+          <div class="header-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search mentors, skills...">
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="icon-button">🔔</button>
+            <button class="icon-button">💬</button>
+          </div>
+          
+          <div class="user-menu">
+            <div class="user-avatar">
+              JS
+            </div>
+            <span class="user-name">John Smith</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <main class="content-area">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Welcome back, John! Here's what's happening with your mentorship journey.</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Sessions</div>
+            <div class="stat-value">24</div>
+            <div class="stat-change positive">↑ 12% from last month</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-label">Upcoming Bookings</div>
+            <div class="stat-value">3</div>
+            <div class="stat-change">This week</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-label">Favorite Mentors</div>
+            <div class="stat-value">8</div>
+            <div class="stat-change">Active connections</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-label">Hours Learned</div>
+            <div class="stat-value">42</div>
+            <div class="stat-change positive">↑ 8 hours this month</div>
+          </div>
+        </div>
+        
+        <!-- Upcoming Sessions -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Upcoming Sessions</h2>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Mentor</th>
+                    <th>Topic</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="flex gap-sm">
+                        <div class="user-avatar">SA</div>
+                        <div>
+                          <div style="font-weight: 500;">Sarah Anderson</div>
+                          <div style="font-size: 12px; color: var(--neutral-600);">Senior Frontend Developer</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>React Advanced Patterns</td>
+                    <td>Nov 25, 2025 - 10:00 AM</td>
+                    <td><span class="badge badge-success">Confirmed</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-primary">Join Meeting</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="flex gap-sm">
+                        <div class="user-avatar">MJ</div>
+                        <div>
+                          <div style="font-weight: 500;">Michael Johnson</div>
+                          <div style="font-size: 12px; color: var(--neutral-600);">Data Scientist</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Machine Learning Basics</td>
+                    <td>Nov 26, 2025 - 2:00 PM</td>
+                    <td><span class="badge badge-warning">Pending</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline">View Details</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="flex gap-sm">
+                        <div class="user-avatar">EW</div>
+                        <div>
+                          <div style="font-weight: 500;">Emily Williams</div>
+                          <div style="font-size: 12px; color: var(--neutral-600);">UX Designer</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Design System Review</td>
+                    <td>Nov 28, 2025 - 4:00 PM</td>
+                    <td><span class="badge badge-success">Confirmed</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline">View Details</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Activity</h2>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); border-left: 3px solid var(--success-green);">
+                  <div style="color: var(--success-green);">✓</div>
+                  <div>
+                    <div style="font-weight: 500;">Session Completed</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">React Performance Optimization with Sarah Anderson</div>
+                    <div style="font-size: 11px; color: var(--neutral-500); margin-top: 4px;">2 hours ago</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); border-left: 3px solid var(--primary-blue);">
+                  <div style="color: var(--primary-blue);">📅</div>
+                  <div>
+                    <div style="font-weight: 500;">New Booking</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">Scheduled session with Michael Johnson</div>
+                    <div style="font-size: 11px; color: var(--neutral-500); margin-top: 4px;">1 day ago</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); border-left: 3px solid var(--warning-yellow);">
+                  <div style="color: var(--warning-yellow);">⭐</div>
+                  <div>
+                    <div style="font-weight: 500;">Review Posted</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">You reviewed David Chen - 5 stars</div>
+                    <div style="font-size: 11px; color: var(--neutral-500); margin-top: 4px;">3 days ago</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); border-left: 3px solid var(--primary-blue);">
+                  <div style="color: var(--primary-blue);">❤️</div>
+                  <div>
+                    <div style="font-weight: 500;">Added to Favorites</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">Emily Williams added to your favorites</div>
+                    <div style="font-size: 11px; color: var(--neutral-500); margin-top: 4px;">5 days ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recommended Mentors -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recommended for You</h2>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                  <div class="user-avatar">DL</div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 500;">David Lee</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">Cloud Architect</div>
+                    <div style="display: flex; gap: 4px; margin-top: 4px;">
+                      <span class="skill-tag">AWS</span>
+                      <span class="skill-tag">Kubernetes</span>
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 600; color: var(--neutral-900);">$85/hr</div>
+                    <div style="font-size: 12px; color: var(--warning-yellow);">★ 4.9</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                  <div class="user-avatar">LK</div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 500;">Lisa Kim</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">Product Manager</div>
+                    <div style="display: flex; gap: 4px; margin-top: 4px;">
+                      <span class="skill-tag">Strategy</span>
+                      <span class="skill-tag">Agile</span>
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 600; color: var(--neutral-900);">$90/hr</div>
+                    <div style="font-size: 12px; color: var(--warning-yellow);">★ 5.0</div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); padding: var(--space-sm); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                  <div class="user-avatar">RP</div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 500;">Robert Patel</div>
+                    <div style="font-size: 12px; color: var(--neutral-600);">Security Engineer</div>
+                    <div style="display: flex; gap: 4px; margin-top: 4px;">
+                      <span class="skill-tag">Security</span>
+                      <span class="skill-tag">DevSecOps</span>
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 600; color: var(--neutral-900);">$95/hr</div>
+                    <div style="font-size: 12px; color: var(--warning-yellow);">★ 4.8</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-md">
+                <a href="mentors.html" class="btn btn-outline" style="width: 100%; justify-content: center;">
+                  Browse All Mentors
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script>
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    });
+  </script>
+</body>
+</html>

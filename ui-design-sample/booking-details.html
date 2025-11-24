@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Details - Mentor Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span>🎓</span>
+          <span>MentorHub</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="index.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="mentors.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Find Mentors</span>
+          </a>
+          <a href="bookings.html" class="nav-item active">
+            <span class="nav-icon">📅</span>
+            <span>My Bookings</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Profile</div>
+          <a href="profile-edit.html" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" class="nav-item">
+            <span class="nav-icon">⭐</span>
+            <span>Favorites</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">☰</button>
+          <div class="header-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search mentors, skills...">
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="icon-button">🔔</button>
+            <button class="icon-button">💬</button>
+          </div>
+          
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+            <span class="user-name">John Smith</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <main class="content-area">
+        <div style="margin-bottom: var(--space-md);">
+          <a href="bookings.html" style="color: var(--neutral-600); display: inline-flex; align-items: center; gap: var(--space-xs);">
+            ← Back to Bookings
+          </a>
+        </div>
+        
+        <div class="grid grid-3">
+          <div style="grid-column: span 2;">
+            <!-- Booking Details -->
+            <div class="card">
+              <div class="card-header" style="display: flex; justify-content: space-between; align-items: start;">
+                <h1 class="card-title" style="font-size: var(--font-size-xl);">Booking Details</h1>
+                <span class="badge badge-success" style="font-size: var(--font-size-sm); padding: var(--space-xs) var(--space-md);">Confirmed</span>
+              </div>
+              
+              <div class="card-body">
+                <div style="display: flex; gap: var(--space-lg); margin-bottom: var(--space-xl);">
+                  <div class="user-avatar" style="width: 80px; height: 80px; font-size: 32px;">SA</div>
+                  <div>
+                    <h2 style="font-size: var(--font-size-lg); margin-bottom: var(--space-xs);">Sarah Anderson</h2>
+                    <p style="color: var(--neutral-600); margin-bottom: var(--space-sm);">Senior Frontend Developer</p>
+                    <div style="display: flex; gap: var(--space-sm);">
+                      <button class="btn btn-outline btn-sm" onclick="window.location.href='mentor-profile.html'">View Profile</button>
+                      <button class="btn btn-outline btn-sm">Send Message</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="display: grid; gap: var(--space-lg);">
+                  <div>
+                    <h3 style="font-size: var(--font-size-md); font-weight: 600; margin-bottom: var(--space-sm);">Session Topic</h3>
+                    <p style="color: var(--neutral-700); line-height: 1.6;">React Advanced Patterns</p>
+                  </div>
+                  
+                  <div>
+                    <h3 style="font-size: var(--font-size-md); font-weight: 600; margin-bottom: var(--space-sm);">Description</h3>
+                    <p style="color: var(--neutral-700); line-height: 1.6;">
+                      I need help understanding advanced React patterns like compound components, render props, 
+                      and custom hooks. Would also like to discuss best practices for state management in large applications.
+                    </p>
+                  </div>
+                  
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md);">
+                    <div>
+                      <h3 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--neutral-500); margin-bottom: 4px;">Date</h3>
+                      <p style="color: var(--neutral-900); font-weight: 500;">November 25, 2025</p>
+                    </div>
+                    
+                    <div>
+                      <h3 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--neutral-500); margin-bottom: 4px;">Time</h3>
+                      <p style="color: var(--neutral-900); font-weight: 500;">10:00 AM - 11:00 AM (EST)</p>
+                    </div>
+                    
+                    <div>
+                      <h3 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--neutral-500); margin-bottom: 4px;">Duration</h3>
+                      <p style="color: var(--neutral-900); font-weight: 500;">1 hour</p>
+                    </div>
+                    
+                    <div>
+                      <h3 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--neutral-500); margin-bottom: 4px;">Booking ID</h3>
+                      <p style="color: var(--neutral-900); font-weight: 500;">#BK-2025-1124</p>
+                    </div>
+                  </div>
+                  
+                  <div style="background: var(--neutral-50); padding: var(--space-lg); border-radius: var(--radius-md); border: 1px solid var(--neutral-200);">
+                    <h3 style="font-size: var(--font-size-md); font-weight: 600; margin-bottom: var(--space-md);">Meeting Link</h3>
+                    <div style="display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap;">
+                      <input type="text" class="form-input" value="https://meet.mentorhub.com/sa-js-1124" readonly style="flex: 1; min-width: 250px;">
+                      <button class="btn btn-primary" onclick="alert('Link copied!')">
+                        📋 Copy Link
+                      </button>
+                      <button class="btn btn-success" onclick="alert('Joining meeting...')">
+                        🎥 Join Meeting
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Session Prep -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Session Preparation</h2>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                  <div style="padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm); border-left: 3px solid var(--primary-blue);">
+                    <h4 style="font-weight: 600; margin-bottom: var(--space-xs);">✓ Set up your environment</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--neutral-600);">Make sure you have a quiet space with good internet connection</p>
+                  </div>
+                  
+                  <div style="padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm); border-left: 3px solid var(--primary-blue);">
+                    <h4 style="font-weight: 600; margin-bottom: var(--space-xs);">✓ Test your equipment</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--neutral-600);">Check your camera, microphone, and screen sharing capabilities</p>
+                  </div>
+                  
+                  <div style="padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm); border-left: 3px solid var(--warning-yellow);">
+                    <h4 style="font-weight: 600; margin-bottom: var(--space-xs);">○ Prepare questions</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--neutral-600);">Write down specific questions or topics you want to cover</p>
+                  </div>
+                  
+                  <div style="padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm); border-left: 3px solid var(--warning-yellow);">
+                    <h4 style="font-weight: 600; margin-bottom: var(--space-xs);">○ Share materials</h4>
+                    <p style="font-size: var(--font-size-sm); color: var(--neutral-600);">Send any relevant code or documents to your mentor beforehand</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sidebar -->
+          <div>
+            <!-- Actions -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Actions</h2>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                  <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="alert('Joining meeting...')">
+                    🎥 Join Meeting
+                  </button>
+                  <button class="btn btn-outline" style="width: 100%; justify-content: center;" onclick="alert('Adding to calendar...')">
+                    📅 Add to Calendar
+                  </button>
+                  <button class="btn btn-outline" style="width: 100%; justify-content: center;" onclick="alert('Rescheduling...')">
+                    🔄 Reschedule
+                  </button>
+                  <button class="btn btn-outline" style="width: 100%; justify-content: center; color: var(--danger-red); border-color: var(--danger-red);" onclick="if(confirm('Cancel this booking?')) alert('Booking cancelled')">
+                    ❌ Cancel Booking
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Payment Details -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Payment Details</h2>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--neutral-600);">Session Fee</span>
+                    <span style="font-weight: 600;">$75.00</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--neutral-600);">Platform Fee</span>
+                    <span style="font-weight: 600;">$7.50</span>
+                  </div>
+                  <div style="height: 1px; background: var(--neutral-200); margin: var(--space-xs) 0;"></div>
+                  <div style="display: flex; justify-content: space-between; font-size: var(--font-size-md);">
+                    <span style="font-weight: 600;">Total Paid</span>
+                    <span style="font-weight: 600; color: var(--primary-blue);">$82.50</span>
+                  </div>
+                  <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--neutral-200);">
+                    <div style="font-size: var(--font-size-sm); color: var(--neutral-600);">
+                      <div style="margin-bottom: 4px;">Payment Method: •••• 4242</div>
+                      <div>Transaction ID: TXN-2025-1124-001</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Cancellation Policy -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Cancellation Policy</h2>
+              </div>
+              <div class="card-body">
+                <div style="font-size: var(--font-size-sm); color: var(--neutral-700); line-height: 1.6;">
+                  <p style="margin-bottom: var(--space-sm);">
+                    • <strong>24+ hours before:</strong> Full refund
+                  </p>
+                  <p style="margin-bottom: var(--space-sm);">
+                    • <strong>12-24 hours before:</strong> 50% refund
+                  </p>
+                  <p>
+                    • <strong>Less than 12 hours:</strong> No refund
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Support -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Need Help?</h2>
+              </div>
+              <div class="card-body">
+                <p style="font-size: var(--font-size-sm); color: var(--neutral-700); margin-bottom: var(--space-md); line-height: 1.6;">
+                  Having issues with your booking? Our support team is here to help.
+                </p>
+                <button class="btn btn-outline" style="width: 100%; justify-content: center;">
+                  💬 Contact Support
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
