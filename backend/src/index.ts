@@ -4,9 +4,18 @@ import { requireAuth } from "./middleware/auth";
 import authRouter from "./routes/auth";
 import profileRouter from "./routes/profiles"
 import { PrismaClient } from "@prisma/client";
+import cors from "cors";
 
 const app = express();
 const prisma = new PrismaClient();
+
+// Enable CORS for your React frontend
+app.use(cors({
+  origin: ['http://localhost:5174', 'http://localhost:3000'], // Add your frontend URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use("/auth", authRouter);
