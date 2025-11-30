@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:8080';
-const ACCESS_TOKEN = 'accessToken';
-const REFREH_TOKEN = 'refreshToken';
+const API_BASE_URL = 'http://localhost:3000';
+export const ACCESS_TOKEN = 'accessToken';
+export const REFRESH_TOKEN = 'refreshToken';
 
-const api = axios.create({
+export const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 localStorage.removeItem(ACCESS_TOKEN);
-                localStorage.removeItem(REFREH_TOKEN);
+                localStorage.removeItem(REFRESH_TOKEN);
                 window.location.href = '/login';
                 return Promise.reject(refreshError)
             }
