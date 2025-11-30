@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../services/authService";
 import { UserRole } from "../../types/auth";
-import './Auth.css';
+import '../../App.css';
 
 export const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -43,37 +43,45 @@ export const Register: React.FC = () => {
     }
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h2>Register</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>First Name</label>
-                        <input type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                            placeholder="Enter your first name"
-                        />
+        <div className="card-container">
+            <div className="card" style={{ maxWidth: '480px', width: '100%', margin: '0' }}>
+                <div style={{ textAlign: 'center', marginBottom: 'var(--space-xl)' }}>
+                    <div style={{ fontSize: '48px', marginBottom: 'var(--space-md)' }}>🎓</div>
+                    <h1 style={{ fontSize: 'var(--font-size-xxl)', marginBottom: 'var(--space-xs)' }}>Join MentorHub</h1>
+                    <p style={{ color: 'var(--neutral-600)' }}>Create your account to get started</p>
+                </div>
+                <form id="registerForm" onSubmit={handleSubmit}>
+                    <div className="grid grid-2">
+                        <div className="form-group">
+                            <label className="form-label">First Name</label>
+                            <input type="text"
+                                name="firstName"
+                                className="form-input"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                required
+                                placeholder="Enter your first name"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Last Name</label>
+                            <input
+                                type="text"
+                                name="lastName"
+                                className="form-input"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                required
+                                placeholder="Enter your last name"
+                            />
+                        </div>
                     </div>
                     <div className="form-group">
-                        <label>Last Name</label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                            placeholder="Enter your last name"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Email</label>
+                        <label className="form-label">Email</label>
                         <input
                             type="email"
                             name="email"
+                            className="form-input"
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -82,10 +90,11 @@ export const Register: React.FC = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Password</label>
+                        <label className="form-label">Password</label>
                         <input
                             type="password"
                             name="password"
+                            className="form-input"
                             value={formData.password}
                             onChange={handleChange}
                             required
@@ -94,10 +103,11 @@ export const Register: React.FC = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Confirm Password</label>
+                        <label className="form-label">Confirm Password</label>
                         <input
                             type="password"
                             name="confirmPassword"
+                            className="form-input"
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             required
@@ -106,8 +116,9 @@ export const Register: React.FC = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Role</label>
-                        <select name="role" value={formData.role} onChange={handleChange} required>
+                        <label className="form-label">Role</label>
+                        <select name="role" value={formData.role} onChange={handleChange} required
+                            className="form-select">
                             <option value="MENTEE">Mentee</option>
                             <option value="MENTOR">Mentor</option>
                         </select>
@@ -115,13 +126,15 @@ export const Register: React.FC = () => {
 
                     {error && <div className="error-message">{error}</div>}
 
-                    <button type="submit" disabled={loading} className="btn-primary">
+                    <button type="submit" disabled={loading} className="btn btn-primary btn-lg auth-btn ">
                         {loading ? 'Registering...' : 'Register'}
                     </button>
                 </form>
-                <p className="auth-link">
-                    Already have an account? <Link to="/login">Login here</Link>
-                </p>
+                <div className="auth-text-block">
+                    <p className="auth-p">
+                        Already have an account? <Link to="/login">Login here</Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

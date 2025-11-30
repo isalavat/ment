@@ -30,24 +30,30 @@ export const Login: React.FC = () => {
     }
 
     return (
-        <div className='authContainer'>
-            <div className="authCard">
-                <h2>Login</h2>
-                <form onSubmit={handleSubmit}>
+        <div className='card-container'>
+            <div className="card" style={{ maxWidth: '480px', width: '100%', margin: '0' }}>
+                <div style={{ textAlign: 'center', marginBottom: 'var(--space-xl)' }}>
+                    <div style={{ fontSize: '48px', marginBottom: 'var(--space-md)' }}>🎓</div>
+                    <h1 style={{ fontSize: 'var(--font-size-xxl)', marginBottom: 'var(--space-xs)' }}>MentorHub</h1>
+                    <p style={{ color: 'var(--neutral-600)' }}>Sign in to your account</p>
+                </div>
+                <form id="loginForm" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Email</label>
+                        <label className="form-label">Email</label>
                         <input
                             type="email"
                             value={email}
+                            className="form-input"
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             placeholder='Enter your email' />
                     </div>
                     <div className="form-group">
-                        <label>Password</label>
+                        <label className="form-label">Password</label>
                         <input
                             type="password"
                             value={password}
+                            className="form-input"
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             placeholder="Enter your password"
@@ -56,13 +62,15 @@ export const Login: React.FC = () => {
 
                     {error && <div className="error-message">{error}</div>}
 
-                    <button type="submit" disabled={loading} className="btn-primary">
+                    <button type="submit" disabled={loading} className="btn btn-primary btn-lg auth-btn ">
                         {loading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
-                <p className="auth-link">
-                    Don't have an account? <Link to="/register">Register here</Link>
-                </p>
+                <div className="auth-text-block">
+                    <p className="auth-p">
+                        Don't have an account? <Link to="/register">Register here</Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

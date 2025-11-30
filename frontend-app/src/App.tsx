@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { Header } from './components/layout/Header';
+import { Sidebar } from './components/layout/Sidebar';
 import { Login } from './components/auth/Login';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
@@ -13,7 +13,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <div className="App">
-          <Header />
+          <Sidebar />
           <Routes>
             <Route path='/' element={< Navigate to="/dashboard" replace />} />
             <Route path='/login' element={<Login />} />
