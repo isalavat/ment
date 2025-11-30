@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Settings - Mentor Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span>🎓</span>
+          <span>MentorHub</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="index.html" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+          <a href="mentors.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Find Mentors</span>
+          </a>
+          <a href="bookings.html" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span>My Bookings</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Profile</div>
+          <a href="profile-edit.html" class="nav-item active">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" class="nav-item">
+            <span class="nav-icon">⭐</span>
+            <span>Favorites</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle">☰</button>
+          <div class="header-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Search mentors, skills...">
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="icon-button">🔔</button>
+            <button class="icon-button">💬</button>
+          </div>
+          
+          <div class="user-menu">
+            <div class="user-avatar">JS</div>
+            <span class="user-name">John Smith</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <main class="content-area">
+        <div class="page-header">
+          <h1 class="page-title">Profile Settings</h1>
+          <p class="page-subtitle">Manage your account and profile information</p>
+        </div>
+        
+        <!-- Settings Tabs -->
+        <div style="display: flex; gap: var(--space-sm); margin-bottom: var(--space-lg); border-bottom: 1px solid var(--neutral-200); overflow-x: auto;">
+          <button class="btn btn-outline" id="tabBasic" style="border-radius: 0; border: none; border-bottom: 3px solid var(--primary-blue); white-space: nowrap;">
+            Basic Info
+          </button>
+          <button class="btn btn-outline" id="tabMentor" style="border-radius: 0; border: none; border-bottom: 3px solid transparent; white-space: nowrap;">
+            Mentor Profile
+          </button>
+          <button class="btn btn-outline" id="tabAvailability" style="border-radius: 0; border: none; border-bottom: 3px solid transparent; white-space: nowrap;">
+            Availability
+          </button>
+          <button class="btn btn-outline" id="tabSecurity" style="border-radius: 0; border: none; border-bottom: 3px solid transparent; white-space: nowrap;">
+            Security
+          </button>
+        </div>
+        
+        <div class="grid grid-3">
+          <div style="grid-column: span 2;">
+            <!-- Basic Info -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Basic Information</h2>
+              </div>
+              <div class="card-body">
+                <form>
+                  <div style="display: flex; gap: var(--space-lg); margin-bottom: var(--space-xl); flex-wrap: wrap;">
+                    <div class="user-avatar" style="width: 100px; height: 100px; font-size: 40px;">JS</div>
+                    <div style="flex: 1;">
+                      <h3 style="margin-bottom: var(--space-xs);">Profile Photo</h3>
+                      <p style="color: var(--neutral-600); font-size: var(--font-size-sm); margin-bottom: var(--space-md);">
+                        Upload a professional photo for your profile
+                      </p>
+                      <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                        <button type="button" class="btn btn-primary">Upload Photo</button>
+                        <button type="button" class="btn btn-outline">Remove</button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="grid grid-2">
+                    <div class="form-group">
+                      <label class="form-label">First Name</label>
+                      <input type="text" class="form-input" value="John">
+                    </div>
+                    
+                    <div class="form-group">
+                      <label class="form-label">Last Name</label>
+                      <input type="text" class="form-input" value="Smith">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" value="john.smith@example.com">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-select">
+                      <option value="MENTEE" selected>Mentee</option>
+                      <option value="MENTOR">Mentor</option>
+                    </select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-textarea" placeholder="Tell us about yourself...">Passionate software developer looking to learn from experienced professionals. Interested in web development, React, and best practices.</textarea>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Goals</label>
+                    <textarea class="form-textarea" placeholder="What are your learning goals?">- Master React and TypeScript
+- Learn system design principles
+- Improve problem-solving skills
+- Prepare for senior developer role</textarea>
+                  </div>
+                  
+                  <div style="display: flex; gap: var(--space-sm); padding-top: var(--space-md); border-top: 1px solid var(--neutral-200);">
+                    <button type="submit" class="btn btn-primary" onclick="event.preventDefault(); alert('Profile updated!')">
+                      Save Changes
+                    </button>
+                    <button type="button" class="btn btn-outline">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Mentor Profile (Only shown for mentors) -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Mentor Profile</h2>
+              </div>
+              <div class="card-body">
+                <div style="background: var(--neutral-50); padding: var(--space-md); border-radius: var(--radius-sm); margin-bottom: var(--space-lg); border-left: 3px solid var(--primary-blue);">
+                  <p style="font-size: var(--font-size-sm); color: var(--neutral-700);">
+                    💡 Switch your role to "Mentor" to enable mentor profile features and start offering mentorship sessions.
+                  </p>
+                </div>
+                
+                <form style="opacity: 0.5; pointer-events: none;">
+                  <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-input" placeholder="e.g., Senior Software Engineer">
+                  </div>
+                  
+                  <div class="grid grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Years of Experience</label>
+                      <input type="number" class="form-input" placeholder="10">
+                    </div>
+                    
+                    <div class="form-group">
+                      <label class="form-label">Hourly Rate (USD)</label>
+                      <input type="number" class="form-input" placeholder="75">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Categories</label>
+                    <select class="form-select" multiple style="height: 120px;">
+                      <option>Software Development</option>
+                      <option>Data Science</option>
+                      <option>Design</option>
+                      <option>Product Management</option>
+                      <option>Business</option>
+                    </select>
+                    <small style="color: var(--neutral-500); font-size: var(--font-size-xs); display: block; margin-top: 4px;">
+                      Hold Ctrl/Cmd to select multiple
+                    </small>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Skills</label>
+                    <input type="text" class="form-input" placeholder="Add skills separated by commas">
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-top: var(--space-sm);">
+                      <span class="skill-tag">React <button style="background: none; border: none; cursor: pointer; margin-left: 4px;">×</button></span>
+                      <span class="skill-tag">TypeScript <button style="background: none; border: none; cursor: pointer; margin-left: 4px;">×</button></span>
+                      <span class="skill-tag">Node.js <button style="background: none; border: none; cursor: pointer; margin-left: 4px;">×</button></span>
+                    </div>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary">
+                    Save Mentor Profile
+                  </button>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Availability Management -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Availability Schedule</h2>
+              </div>
+              <div class="card-body">
+                <div style="background: var(--neutral-50); padding: var(--space-md); border-radius: var(--radius-sm); margin-bottom: var(--space-lg); border-left: 3px solid var(--primary-blue);">
+                  <p style="font-size: var(--font-size-sm); color: var(--neutral-700);">
+                    💡 This feature is only available for mentors. Set your weekly availability for booking sessions.
+                  </p>
+                </div>
+                
+                <div style="opacity: 0.5; pointer-events: none;">
+                  <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                    <!-- Monday -->
+                    <div style="display: flex; gap: var(--space-md); align-items: center; padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                      <label style="display: flex; align-items: center; gap: var(--space-sm); min-width: 120px;">
+                        <input type="checkbox" checked>
+                        <span style="font-weight: 500;">Monday</span>
+                      </label>
+                      <input type="time" class="form-input" value="09:00" style="width: 120px;">
+                      <span>to</span>
+                      <input type="time" class="form-input" value="17:00" style="width: 120px;">
+                      <button class="icon-button">🗑️</button>
+                    </div>
+                    
+                    <!-- Tuesday -->
+                    <div style="display: flex; gap: var(--space-md); align-items: center; padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                      <label style="display: flex; align-items: center; gap: var(--space-sm); min-width: 120px;">
+                        <input type="checkbox" checked>
+                        <span style="font-weight: 500;">Tuesday</span>
+                      </label>
+                      <input type="time" class="form-input" value="09:00" style="width: 120px;">
+                      <span>to</span>
+                      <input type="time" class="form-input" value="17:00" style="width: 120px;">
+                      <button class="icon-button">🗑️</button>
+                    </div>
+                    
+                    <!-- Wednesday -->
+                    <div style="display: flex; gap: var(--space-md); align-items: center; padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                      <label style="display: flex; align-items: center; gap: var(--space-sm); min-width: 120px;">
+                        <input type="checkbox" checked>
+                        <span style="font-weight: 500;">Wednesday</span>
+                      </label>
+                      <input type="time" class="form-input" value="09:00" style="width: 120px;">
+                      <span>to</span>
+                      <input type="time" class="form-input" value="17:00" style="width: 120px;">
+                      <button class="icon-button">🗑️</button>
+                    </div>
+                    
+                    <!-- Thursday -->
+                    <div style="display: flex; gap: var(--space-md); align-items: center; padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                      <label style="display: flex; align-items: center; gap: var(--space-sm); min-width: 120px;">
+                        <input type="checkbox" checked>
+                        <span style="font-weight: 500;">Thursday</span>
+                      </label>
+                      <input type="time" class="form-input" value="09:00" style="width: 120px;">
+                      <span>to</span>
+                      <input type="time" class="form-input" value="17:00" style="width: 120px;">
+                      <button class="icon-button">🗑️</button>
+                    </div>
+                    
+                    <!-- Friday -->
+                    <div style="display: flex; gap: var(--space-md); align-items: center; padding: var(--space-md); background: var(--neutral-50); border-radius: var(--radius-sm);">
+                      <label style="display: flex; align-items: center; gap: var(--space-sm); min-width: 120px;">
+                        <input type="checkbox" checked>
+                        <span style="font-weight: 500;">Friday</span>
+                      </label>
+                      <input type="time" class="form-input" value="09:00" style="width: 120px;">
+                      <span>to</span>
+                      <input type="time" class="form-input" value="17:00" style="width: 120px;">
+                      <button class="icon-button">🗑️</button>
+                    </div>
+                  </div>
+                  
+                  <button class="btn btn-primary" style="margin-top: var(--space-md);">
+                    Save Availability
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Security -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Password & Security</h2>
+              </div>
+              <div class="card-body">
+                <form>
+                  <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-input" placeholder="••••••••">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-input" placeholder="••••••••">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-input" placeholder="••••••••">
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary" onclick="event.preventDefault(); alert('Password updated!')">
+                    Update Password
+                  </button>
+                </form>
+                
+                <div style="margin-top: var(--space-xl); padding-top: var(--space-xl); border-top: 1px solid var(--neutral-200);">
+                  <h3 style="font-size: var(--font-size-md); margin-bottom: var(--space-md);">Two-Factor Authentication</h3>
+                  <p style="color: var(--neutral-600); margin-bottom: var(--space-md); line-height: 1.6;">
+                    Add an extra layer of security to your account by enabling two-factor authentication.
+                  </p>
+                  <button class="btn btn-outline">
+                    Enable 2FA
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sidebar -->
+          <div>
+            <!-- Account Status -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Account Status</h2>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                  <div>
+                    <div style="color: var(--neutral-500); font-size: var(--font-size-sm); margin-bottom: 4px;">Account Type</div>
+                    <div style="font-weight: 600; font-size: var(--font-size-md);">Mentee</div>
+                  </div>
+                  
+                  <div>
+                    <div style="color: var(--neutral-500); font-size: var(--font-size-sm); margin-bottom: 4px;">Member Since</div>
+                    <div style="font-weight: 600; font-size: var(--font-size-md);">June 2024</div>
+                  </div>
+                  
+                  <div>
+                    <div style="color: var(--neutral-500); font-size: var(--font-size-sm); margin-bottom: 4px;">Total Sessions</div>
+                    <div style="font-weight: 600; font-size: var(--font-size-md);">24</div>
+                  </div>
+                  
+                  <div>
+                    <div style="color: var(--neutral-500); font-size: var(--font-size-sm); margin-bottom: 4px;">Email Verified</div>
+                    <div style="display: flex; align-items: center; gap: var(--space-xs);">
+                      <span style="color: var(--success-green);">✓</span>
+                      <span style="font-weight: 600;">Verified</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Preferences -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Preferences</h2>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span style="font-size: var(--font-size-sm);">Email Notifications</span>
+                    <input type="checkbox" checked>
+                  </label>
+                  
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span style="font-size: var(--font-size-sm);">SMS Reminders</span>
+                    <input type="checkbox" checked>
+                  </label>
+                  
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span style="font-size: var(--font-size-sm);">Marketing Emails</span>
+                    <input type="checkbox">
+                  </label>
+                  
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span style="font-size: var(--font-size-sm);">Public Profile</span>
+                    <input type="checkbox" checked>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            <div class="card" style="border: 1px solid var(--danger-red);">
+              <div class="card-header">
+                <h2 class="card-title" style="color: var(--danger-red);">Danger Zone</h2>
+              </div>
+              <div class="card-body">
+                <p style="font-size: var(--font-size-sm); color: var(--neutral-600); margin-bottom: var(--space-md); line-height: 1.6;">
+                  Once you delete your account, there is no going back. Please be certain.
+                </p>
+                <button class="btn btn-danger" style="width: 100%; justify-content: center; background: var(--danger-red);" onclick="if(confirm('Are you sure you want to delete your account? This action cannot be undone.')) alert('Account deletion initiated')">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('mobile-open');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    });
+    
+    // Tab functionality
+    const tabs = ['Basic', 'Mentor', 'Availability', 'Security'];
+    tabs.forEach(tab => {
+      document.getElementById(`tab${tab}`).addEventListener('click', function() {
+        tabs.forEach(t => {
+          const el = document.getElementById(`tab${t}`);
+          el.style.borderBottomColor = 'transparent';
+        });
+        this.style.borderBottomColor = 'var(--primary-blue)';
+      });
+    });
+  </script>
+</body>
+</html>
