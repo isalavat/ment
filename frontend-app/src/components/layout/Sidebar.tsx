@@ -30,6 +30,20 @@ export const Sidebar: React.FC = () => {
                 </div>
             </nav>
             <nav className="sidebar-nav">
+                <div className="nav-section">
+                    <div className="nav-section-title">Main</div>
+                    <Link to="/" className="nav-item">
+                        <span className="nav-icon">👨‍🎓</span>
+                        <span>MentorHub</span>
+                    </Link>
+                    <Link to="/dashboard" className="nav-item">
+                        <span className="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </Link>
+
+                </div>
+            </nav>
+            <nav className="sidebar-nav">
                 {isAuthenticated ? (
                     <>
                         <span className="user-info">
