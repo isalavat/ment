@@ -1,0 +1,140 @@
+export const ru = {
+  nav: {
+    home: "MentorHub",
+    dashboard: "Главная",
+    mentors: "Найти Менторов",
+    bookings: "Мои Бронирования",
+    profile: "Мой Профиль",
+    settings: "Настройки",
+    logout: "Выйти",
+    login: "Войти",
+    register: "Регистрация"
+  },
+  common: {
+    search: "Поиск",
+    filter: "Фильтр",
+    save: "Сохранить",
+    cancel: "Отмена",
+    edit: "Редактировать",
+    delete: "Удалить",
+    submit: "Отправить",
+    back: "Назад",
+    next: "Далее",
+    loading: "Загрузка...",
+    error: "Ошибка",
+    success: "Успешно",
+    confirm: "Подтвердить",
+    viewDetails: "Подробнее",
+    viewProfile: "Смотреть профиль"
+  },
+  dashboard: {
+    title: "Главная",
+    subtitle: "С возвращением, {name}! Вот что происходит с вашим обучением.",
+    stats: {
+      totalSessions: "Всего Сессий",
+      upcomingBookings: "Предстоящие Бронирования",
+      favoriteMentors: "Любимые Менторы",
+      hoursLearned: "Часов Обучения",
+      thisWeek: "На этой неделе",
+      activeConnections: "Активные связи",
+      thisMonth: "в этом месяце"
+    },
+    upcomingSessions: "Предстоящие Сессии",
+    recentActivity: "Недавняя Активность",
+    recommendedForYou: "Рекомендовано для Вас",
+    browseAllMentors: "Просмотреть всех менторов",
+    mentor: "Ментор",
+    topic: "Тема",
+    dateTime: "Дата и Время",
+    status: "Статус",
+    action: "Действие",
+    confirmed: "Подтверждено",
+    pending: "В ожидании",
+    joinMeeting: "Присоединиться",
+    sessionCompleted: "Сессия Завершена",
+    newBooking: "Новое Бронирование",
+    reviewPosted: "Отзыв Опубликован",
+    addedToFavorites: "Добавлено в Избранное"
+  },
+  mentors: {
+    title: "Найдите Своего Идеального Ментора",
+    subtitle: "Просмотрите опытных профессионалов, готовых помочь вам расти",
+    category: "Категория",
+    allCategories: "Все Категории",
+    skills: "Навыки",
+    allSkills: "Все Навыки",
+    minRating: "Мин. Рейтинг",
+    anyRating: "Любой Рейтинг",
+    priceRange: "Ценовой Диапазон",
+    anyPrice: "Любая Цена",
+    clearFilters: "Очистить Фильтры",
+    showing: "Показано",
+    mentorsFound: "менторов",
+    sortBy: "Сортировать: Рейтинг",
+    priceLowToHigh: "Цена: От низкой к высокой",
+    priceHighToLow: "Цена: От высокой к низкой",
+    mostReviews: "Больше всего отзывов",
+    reviews: "отзывов",
+    perHour: "/час"
+  },
+  profile: {
+    mentee: {
+      title: "Заполните Профиль Менти",
+      titleEdit: "Редактировать Профиль Менти",
+      subtitle: "Расскажите менторам о себе и своих целях обучения",
+      bio: "О себе",
+      bioPlaceholder: "Расскажите о себе, вашем опыте и что вы хотите изучить...",
+      goals: "Цели Обучения",
+      goalsPlaceholder: "Каковы ваши цели обучения? Какие навыки вы хотите развить?",
+      createProfile: "Создать Профиль",
+      updateProfile: "Обновить Профиль"
+    },
+    mentor: {
+      title: "Заполните Профиль Ментора",
+      titleEdit: "Редактировать Профиль Ментора",
+      subtitle: "Настройте свой профиль, чтобы начать предлагать сессии наставничества",
+      professionalTitle: "Должность",
+      titlePlaceholder: "например, Старший программист, UX-дизайнер",
+      bio: "О себе",
+      bioPlaceholder: "Расскажите потенциальным менти о своем опыте, экспертизе и чем вы можете помочь...",
+      yearsExperience: "Лет Опыта",
+      hourlyRate: "Почасовая Ставка",
+      currency: "Валюта",
+      createProfile: "Создать Профиль",
+      updateProfile: "Обновить Профиль"
+    },
+    errors: {
+      onlyMentees: "Только менти могут получить доступ к этой странице",
+      onlyMentors: "Только менторы могут получить доступ к этой странице",
+      failedToSave: "Не удалось сохранить профиль"
+    }
+  },
+  auth: {
+    login: {
+      title: "С Возвращением",
+      subtitle: "Войдите в свой аккаунт",
+      email: "Электронная Почта",
+      password: "Пароль",
+      remember: "Запомнить меня",
+      forgot: "Забыли пароль?",
+      submit: "Войти",
+      noAccount: "Нет аккаунта?",
+      signUp: "Зарегистрироваться"
+    },
+    register: {
+      title: "Присоединяйтесь к MentorHub",
+      subtitle: "Создайте аккаунт, чтобы начать",
+      firstName: "Имя",
+      lastName: "Фамилия",
+      email: "Электронная Почта",
+      password: "Пароль",
+      confirmPassword: "Подтвердите Пароль",
+      role: "Я хочу присоединиться как",
+      mentee: "Менти - Я ищу наставника",
+      mentor: "Ментор - Я хочу помогать другим",
+      submit: "Создать Аккаунт",
+      hasAccount: "Уже есть аккаунт?",
+      signIn: "Войти"
+    }
+  }
+};

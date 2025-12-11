@@ -1,0 +1,140 @@
+export const en = {
+  nav: {
+    home: "MentorHub",
+    dashboard: "Dashboard",
+    mentors: "Find Mentors",
+    bookings: "My Bookings",
+    profile: "My Profile",
+    settings: "Settings",
+    logout: "Logout",
+    login: "Login",
+    register: "Register"
+  },
+  common: {
+    search: "Search",
+    filter: "Filter",
+    save: "Save",
+    cancel: "Cancel",
+    edit: "Edit",
+    delete: "Delete",
+    submit: "Submit",
+    back: "Back",
+    next: "Next",
+    loading: "Loading...",
+    error: "Error",
+    success: "Success",
+    confirm: "Confirm",
+    viewDetails: "View Details",
+    viewProfile: "View Profile"
+  },
+  dashboard: {
+    title: "Dashboard",
+    subtitle: "Welcome back, {name}! Here's what's happening with your mentorship journey.",
+    stats: {
+      totalSessions: "Total Sessions",
+      upcomingBookings: "Upcoming Bookings",
+      favoriteMentors: "Favorite Mentors",
+      hoursLearned: "Hours Learned",
+      thisWeek: "This week",
+      activeConnections: "Active connections",
+      thisMonth: "this month"
+    },
+    upcomingSessions: "Upcoming Sessions",
+    recentActivity: "Recent Activity",
+    recommendedForYou: "Recommended for You",
+    browseAllMentors: "Browse All Mentors",
+    mentor: "Mentor",
+    topic: "Topic",
+    dateTime: "Date & Time",
+    status: "Status",
+    action: "Action",
+    confirmed: "Confirmed",
+    pending: "Pending",
+    joinMeeting: "Join Meeting",
+    sessionCompleted: "Session Completed",
+    newBooking: "New Booking",
+    reviewPosted: "Review Posted",
+    addedToFavorites: "Added to Favorites"
+  },
+  mentors: {
+    title: "Find Your Perfect Mentor",
+    subtitle: "Browse experienced professionals ready to help you grow",
+    category: "Category",
+    allCategories: "All Categories",
+    skills: "Skills",
+    allSkills: "All Skills",
+    minRating: "Min Rating",
+    anyRating: "Any Rating",
+    priceRange: "Price Range",
+    anyPrice: "Any Price",
+    clearFilters: "Clear Filters",
+    showing: "Showing",
+    mentorsFound: "mentors",
+    sortBy: "Sort by: Rating",
+    priceLowToHigh: "Price: Low to High",
+    priceHighToLow: "Price: High to Low",
+    mostReviews: "Most Reviews",
+    reviews: "reviews",
+    perHour: "/hr"
+  },
+  profile: {
+    mentee: {
+      title: "Complete Your Mentee Profile",
+      titleEdit: "Edit Your Mentee Profile",
+      subtitle: "Tell mentors about yourself and your learning goals",
+      bio: "Bio",
+      bioPlaceholder: "Tell us about yourself, your background, and what you're looking to learn...",
+      goals: "Learning Goals",
+      goalsPlaceholder: "What are your learning goals? What skills do you want to develop?",
+      createProfile: "Create Profile",
+      updateProfile: "Update Profile"
+    },
+    mentor: {
+      title: "Complete Your Mentor Profile",
+      titleEdit: "Edit Your Mentor Profile",
+      subtitle: "Set up your profile to start offering mentorship sessions",
+      professionalTitle: "Professional Title",
+      titlePlaceholder: "e.g., Senior Software Engineer, UX Designer",
+      bio: "Bio",
+      bioPlaceholder: "Tell potential mentees about your experience, expertise, and what you can help them with...",
+      yearsExperience: "Years of Experience",
+      hourlyRate: "Hourly Rate",
+      currency: "Currency",
+      createProfile: "Create Profile",
+      updateProfile: "Update Profile"
+    },
+    errors: {
+      onlyMentees: "Only mentees can access this page",
+      onlyMentors: "Only mentors can access this page",
+      failedToSave: "Failed to save profile"
+    }
+  },
+  auth: {
+    login: {
+      title: "Welcome Back",
+      subtitle: "Sign in to your account",
+      email: "Email Address",
+      password: "Password",
+      remember: "Remember me",
+      forgot: "Forgot password?",
+      submit: "Sign In",
+      noAccount: "Don't have an account?",
+      signUp: "Sign up"
+    },
+    register: {
+      title: "Join MentorHub",
+      subtitle: "Create your account to get started",
+      firstName: "First Name",
+      lastName: "Last Name",
+      email: "Email Address",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      role: "I want to join as",
+      mentee: "Mentee - I'm looking for mentorship",
+      mentor: "Mentor - I want to help others",
+      submit: "Create Account",
+      hasAccount: "Already have an account?",
+      signIn: "Sign in"
+    }
+  }
+};

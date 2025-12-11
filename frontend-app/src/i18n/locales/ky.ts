@@ -1,0 +1,140 @@
+export const ky = {
+  nav: {
+    home: "MentorHub",
+    dashboard: "Башкы бет",
+    mentors: "Менторлорду Табуу",
+    bookings: "Менин Брондоолорум",
+    profile: "Менин Профилим",
+    settings: "Жөндөөлөр",
+    logout: "Чыгуу",
+    login: "Кирүү",
+    register: "Каттоо"
+  },
+  common: {
+    search: "Издөө",
+    filter: "Чыпка",
+    save: "Сактоо",
+    cancel: "Жокко чыгаруу",
+    edit: "Өзгөртүү",
+    delete: "Өчүрүү",
+    submit: "Жиберүү",
+    back: "Артка",
+    next: "Кийинки",
+    loading: "Жүктөлүүдө...",
+    error: "Ката",
+    success: "Ийгиликтүү",
+    confirm: "Ырастоо",
+    viewDetails: "Толук маалымат",
+    viewProfile: "Профилди көрүү"
+  },
+  dashboard: {
+    title: "Башкы бет",
+    subtitle: "Кайра келиңиз, {name}! Бул жерде сиздин окуу жолуңуз жөнүндө маалымат.",
+    stats: {
+      totalSessions: "Бардыгы Сессиялар",
+      upcomingBookings: "Келе Жаткан Брондоолор",
+      favoriteMentors: "Сүйүктүү Менторлор",
+      hoursLearned: "Окуу Сааттары",
+      thisWeek: "Ушул жумада",
+      activeConnections: "Активдүү байланыштар",
+      thisMonth: "ушул айда"
+    },
+    upcomingSessions: "Келе Жаткан Сессиялар",
+    recentActivity: "Акыркы Иш-Аракеттер",
+    recommendedForYou: "Сизге Сунушталат",
+    browseAllMentors: "Бардык менторлорду көрүү",
+    mentor: "Ментор",
+    topic: "Тема",
+    dateTime: "Датасы жана Убакыты",
+    status: "Статусу",
+    action: "Аракет",
+    confirmed: "Ырасталды",
+    pending: "Күтүлүүдө",
+    joinMeeting: "Кошулуу",
+    sessionCompleted: "Сессия Аяктады",
+    newBooking: "Жаңы Брондоо",
+    reviewPosted: "Пикир Жарыяланды",
+    addedToFavorites: "Сүйүктүүлөргө Кошулду"
+  },
+  mentors: {
+    title: "Сиздин Эң Сонун Менторуңузду Табыңыз",
+    subtitle: "Сизге өсүүгө жардам берүүгө даяр тажрыйбалуу адистерди карап чыгыңыз",
+    category: "Категория",
+    allCategories: "Бардык Категориялар",
+    skills: "Көндүмдөр",
+    allSkills: "Бардык Көндүмдөр",
+    minRating: "Мин. Рейтинг",
+    anyRating: "Каалаган Рейтинг",
+    priceRange: "Баа Диапазону",
+    anyPrice: "Каалаган Баа",
+    clearFilters: "Чыпкаларды Тазалоо",
+    showing: "Көрсөтүлүүдө",
+    mentorsFound: "ментор",
+    sortBy: "Сорттоо: Рейтинг",
+    priceLowToHigh: "Баа: Арзандан кымбатка",
+    priceHighToLow: "Баа: Кымбаттан арзанга",
+    mostReviews: "Көп пикирлер",
+    reviews: "пикирлер",
+    perHour: "/саат"
+  },
+  profile: {
+    mentee: {
+      title: "Менти Профилиңизди Толтуруңуз",
+      titleEdit: "Менти Профилиңизди Өзгөртүңүз",
+      subtitle: "Менторлорго өзүңүз жөнүндө жана окуу максаттарыңыз жөнүндө айтып бериңиз",
+      bio: "Өзү жөнүндө",
+      bioPlaceholder: "Өзүңүз, тажрыйбаңыз жана эмне үйрөнгүңүз келгени жөнүндө айтып бериңиз...",
+      goals: "Окуу Максаттары",
+      goalsPlaceholder: "Сиздин окуу максаттарыңыз кандай? Кандай көндүмдөрдү өнүктүргүңүз келет?",
+      createProfile: "Профилди Түзүү",
+      updateProfile: "Профилди Жаңыртуу"
+    },
+    mentor: {
+      title: "Ментор Профилиңизди Толтуруңуз",
+      titleEdit: "Ментор Профилиңизди Өзгөртүңүз",
+      subtitle: "Насаатчылык сессияларын сунуштоону баштоо үчүн профилиңизди жөндөңүз",
+      professionalTitle: "Кесиптик Наам",
+      titlePlaceholder: "мисалы, Ага программист, UX дизайнер",
+      bio: "Өзү жөнүндө",
+      bioPlaceholder: "Потенциалдуу ментилерге тажрыйбаңыз, адистигиңиз жана эмне менен жардам бере алаарыңыз жөнүндө айтып бериңиз...",
+      yearsExperience: "Тажрыйба Жылдары",
+      hourlyRate: "Саатына Баасы",
+      currency: "Валюта",
+      createProfile: "Профилди Түзүү",
+      updateProfile: "Профилди Жаңыртуу"
+    },
+    errors: {
+      onlyMentees: "Бул бетке менти гана кире алат",
+      onlyMentors: "Бул бетке ментор гана кире алат",
+      failedToSave: "Профилди сактоо ийгиликсиз болду"
+    }
+  },
+  auth: {
+    login: {
+      title: "Кайра Келиңиз",
+      subtitle: "Аккаунтуңузга кириңиз",
+      email: "Электрондук Почта",
+      password: "Сыр Сөз",
+      remember: "Эстеп калуу",
+      forgot: "Сыр сөздү унуттуңузбу?",
+      submit: "Кирүү",
+      noAccount: "Аккаунт жокпу?",
+      signUp: "Каттоо"
+    },
+    register: {
+      title: "MentorHub'га Кошулуңуз",
+      subtitle: "Баштоо үчүн аккаунт түзүңүз",
+      firstName: "Аты",
+      lastName: "Фамилиясы",
+      email: "Электрондук Почта",
+      password: "Сыр Сөз",
+      confirmPassword: "Сыр Сөздү Ырастоо",
+      role: "Мен төмөнкүдөй катышкым келет",
+      mentee: "Менти - Мен насаатчыны издеп жатам",
+      mentor: "Ментор - Мен башкаларга жардам бергим келет",
+      submit: "Аккаунт Түзүү",
+      hasAccount: "Аккаунтуңуз барбы?",
+      signIn: "Кирүү"
+    }
+  }
+};

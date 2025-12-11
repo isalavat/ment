@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import { Link } from 'react-router-dom';
 import './Dashboard.css'
 
@@ -106,58 +107,59 @@ const mockRecommendedMentors = [
 
 export const Dashboard: React.FC = () => {
     const { user } = useAuth();
+    const { t } = useLanguage();
 
     return (
         <div className="content-area">
             <div className="page-header">
-                <h1 className="page-title">Dashboard</h1>
+                <h1 className="page-title">{t.dashboard.title}</h1>
                 <p className="page-subtitle">
-                    Welcome back, {user?.firstName}! Here's what's happening with your mentorship journey.
+                    {t.dashboard.subtitle.replace('{name}', user?.firstName || '')}
                 </p>
             </div>
 
             {/* Stats Grid */}
             <div className="stats-grid">
                 <div className="stat-card">
-                    <div className="stat-label">Total Sessions</div>
+                    <div className="stat-label">{t.dashboard.stats.totalSessions}</div>
                     <div className="stat-value">{mockStats.totalSessions}</div>
                     <div className="stat-change positive">↑ 12% from last month</div>
                 </div>
 
                 <div className="stat-card">
-                    <div className="stat-label">Upcoming Bookings</div>
+                    <div className="stat-label">{t.dashboard.stats.upcomingBookings}</div>
                     <div className="stat-value">{mockStats.upcomingBookings}</div>
-                    <div className="stat-change">This week</div>
+                    <div className="stat-change">{t.dashboard.stats.thisWeek}</div>
                 </div>
 
                 <div className="stat-card">
-                    <div className="stat-label">Favorite Mentors</div>
+                    <div className="stat-label">{t.dashboard.stats.favoriteMentors}</div>
                     <div className="stat-value">{mockStats.favoriteMentors}</div>
-                    <div className="stat-change">Active connections</div>
+                    <div className="stat-change">{t.dashboard.stats.activeConnections}</div>
                 </div>
 
                 <div className="stat-card">
-                    <div className="stat-label">Hours Learned</div>
+                    <div className="stat-label">{t.dashboard.stats.hoursLearned}</div>
                     <div className="stat-value">{mockStats.hoursLearned}</div>
-                    <div className="stat-change positive">↑ 8 hours this month</div>
+                    <div className="stat-change positive">↑ 8 {t.dashboard.stats.thisMonth}</div>
                 </div>
             </div>
 
             {/* Upcoming Sessions */}
             <div className="card">
                 <div className="card-header">
-                    <h2 className="card-title">Upcoming Sessions</h2>
+                    <h2 className="card-title">{t.dashboard.upcomingSessions}</h2>
                 </div>
                 <div className="card-body">
                     <div className="table-container">
                         <table className="table">
                             <thead>
                                 <tr>
-                                    <th>Mentor</th>
-                                    <th>Topic</th>
-                                    <th>Date & Time</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th>{t.dashboard.mentor}</th>
+                                    <th>{t.dashboard.topic}</th>
+                                    <th>{t.dashboard.dateTime}</th>
+                                    <th>{t.dashboard.status}</th>
+                                    <th>{t.dashboard.action}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -178,12 +180,12 @@ export const Dashboard: React.FC = () => {
                                         <td>{session.dateTime}</td>
                                         <td>
                                             <span className={`badge ${session.status === 'Confirmed' ? 'badge-success' : 'badge-warning'}`}>
-                                                {session.status}
+                                                {session.status === 'Confirmed' ? t.dashboard.confirmed : t.dashboard.pending}
                                             </span>
                                         </td>
                                         <td>
                                             <button className={`btn btn-sm ${session.status === 'Confirmed' ? 'btn-primary' : 'btn-outline'}`}>
-                                                {session.status === 'Confirmed' ? 'Join Meeting' : 'View Details'}
+                                                {session.status === 'Confirmed' ? t.dashboard.joinMeeting : t.common.viewDetails}
                                             </button>
                                         </td>
                                     </tr>
@@ -199,7 +201,7 @@ export const Dashboard: React.FC = () => {
                 {/* Recent Activity */}
                 <div className="card">
                     <div className="card-header">
-                        <h2 className="card-title">Recent Activity</h2>
+                        <h2 className="card-title">{t.dashboard.recentActivity}</h2>
                     </div>
                     <div className="card-body">
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -232,7 +234,7 @@ export const Dashboard: React.FC = () => {
                 {/* Recommended Mentors */}
                 <div className="card">
                     <div className="card-header">
-                        <h2 className="card-title">Recommended for You</h2>
+                        <h2 className="card-title">{t.dashboard.recommendedForYou}</h2>
                     </div>
                     <div className="card-body">
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -273,7 +275,7 @@ export const Dashboard: React.FC = () => {
 
                         <div className="mt-md">
                             <Link to="/mentors" className="btn btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
-                                Browse All Mentors
+                                {t.dashboard.browseAllMentors}
                             </Link>
                         </div>
                     </div>

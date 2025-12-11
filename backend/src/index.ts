@@ -2,7 +2,8 @@
 import express, { Request, Response, NextFunction } from "express";
 import { requireAuth } from "./middleware/auth";
 import authRouter from "./routes/auth";
-import profileRouter from "./routes/profiles"
+import profileRouter from "./routes/profiles";
+import adminRouter from "./routes/admin";
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 
@@ -20,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/profiles", profileRouter);
+app.use("/admin", adminRouter);
 
 app.get("/health", requireAuth, (req: Request, res: Response) => {
   res.json({ status: "ok" });

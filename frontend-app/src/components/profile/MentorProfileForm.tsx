@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { profileService } from '../../services/profileService';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import './ProfileForm.css';
 
 export const MentorProfileForm: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -20,7 +22,7 @@ export const MentorProfileForm: React.FC = () => {
 
   useEffect(() => {
     if (user?.role !== 'MENTOR') {
-      setError('Only mentors can access this page');
+      setError(t.profile.errors.onlyMentors);
       return;
     }
     loadProfile();
@@ -60,7 +62,7 @@ export const MentorProfileForm: React.FC = () => {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to save profile');
+      setError(err.response?.data?.error || t.profile.errors.failedToSave);
     } finally {
       setLoading(false);
     }
@@ -82,10 +84,10 @@ export const MentorProfileForm: React.FC = () => {
     <div className="profile-form-container">
       <div className="page-header">
         <h1 className="page-title">
-          {isEditing ? 'Edit Your Mentor Profile' : 'Complete Your Mentor Profile'}
+          {isEditing ? t.profile.mentor.titleEdit : t.profile.mentor.title}
         </h1>
         <p className="page-subtitle">
-          Set up your profile to start offering mentorship sessions
+          {t.profile.mentor.subtitle}
         </p>
       </div>
 
@@ -96,7 +98,7 @@ export const MentorProfileForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group">
             <label htmlFor="title" className="form-label">
-              Professional Title *
+              {t.profile.mentor.professionalTitle} *
             </label>
             <input
               type="text"
@@ -106,13 +108,13 @@ export const MentorProfileForm: React.FC = () => {
               onChange={handleChange}
               required
               className="form-input"
-              placeholder="e.g., Senior Software Engineer, UX Designer"
+              placeholder={t.profile.mentor.titlePlaceholder}
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="bio" className="form-label">
-              Bio *
+              {t.profile.mentor.bio} *
             </label>
             <textarea
               id="bio"
@@ -122,14 +124,14 @@ export const MentorProfileForm: React.FC = () => {
               required
               rows={6}
               className="form-textarea"
-              placeholder="Tell potential mentees about your experience, expertise, and what you can help them with..."
+              placeholder={t.profile.mentor.bioPlaceholder}
             />
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="yearsExperience" className="form-label">
-                Years of Experience *
+                {t.profile.mentor.yearsExperience} *
               </label>
               <input
                 type="number"
@@ -145,7 +147,7 @@ export const MentorProfileForm: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="hourlyRate" className="form-label">
-                Hourly Rate *
+                {t.profile.mentor.hourlyRate} *
               </label>
               <input
                 type="number"
@@ -162,7 +164,7 @@ export const MentorProfileForm: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="currency" className="form-label">
-                Currency
+                {t.profile.mentor.currency}
               </label>
               <select
                 id="currency"
@@ -187,10 +189,10 @@ export const MentorProfileForm: React.FC = () => {
               className="btn-secondary"
               disabled={loading}
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Create Profile'}
+              {loading ? t.common.loading : isEditing ? t.profile.mentor.updateProfile : t.profile.mentor.createProfile}
             </button>
           </div>
         </form>

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { profileService } from '../../services/profileService';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import './ProfileForm.css';
 
 export const MenteeProfileForm: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -17,7 +19,7 @@ export const MenteeProfileForm: React.FC = () => {
 
   useEffect(() => {
     if (user?.role !== 'MENTEE') {
-      setError('Only mentees can access this page');
+      setError(t.profile.errors.onlyMentees);
       return;
     }
     loadProfile();
@@ -54,7 +56,7 @@ export const MenteeProfileForm: React.FC = () => {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to save profile');
+      setError(err.response?.data?.error || t.profile.errors.failedToSave);
     } finally {
       setLoading(false);
     }
@@ -75,10 +77,10 @@ export const MenteeProfileForm: React.FC = () => {
     <div className="profile-form-container">
       <div className="page-header">
         <h1 className="page-title">
-          {isEditing ? 'Edit Your Mentee Profile' : 'Complete Your Mentee Profile'}
+          {isEditing ? t.profile.mentee.titleEdit : t.profile.mentee.title}
         </h1>
         <p className="page-subtitle">
-          Tell mentors about yourself and your learning goals
+          {t.profile.mentee.subtitle}
         </p>
       </div>
 
@@ -89,7 +91,7 @@ export const MenteeProfileForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group">
             <label htmlFor="bio" className="form-label">
-              Bio *
+              {t.profile.mentee.bio} *
             </label>
             <textarea
               id="bio"
@@ -99,13 +101,13 @@ export const MenteeProfileForm: React.FC = () => {
               required
               rows={5}
               className="form-textarea"
-              placeholder="Tell us about yourself, your background, and what you're looking to learn..."
+              placeholder={t.profile.mentee.bioPlaceholder}
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="goals" className="form-label">
-              Learning Goals *
+              {t.profile.mentee.goals} *
             </label>
             <textarea
               id="goals"
@@ -115,7 +117,7 @@ export const MenteeProfileForm: React.FC = () => {
               required
               rows={5}
               className="form-textarea"
-              placeholder="What are your learning goals? What skills do you want to develop?"
+              placeholder={t.profile.mentee.goalsPlaceholder}
             />
           </div>
 
@@ -126,10 +128,10 @@ export const MenteeProfileForm: React.FC = () => {
               className="btn-secondary"
               disabled={loading}
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Create Profile'}
+              {loading ? t.common.loading : isEditing ? t.profile.mentee.updateProfile : t.profile.mentee.createProfile}
             </button>
           </div>
         </form>

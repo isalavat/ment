@@ -121,6 +121,7 @@ export const Register: React.FC = () => {
                             className="form-select">
                             <option value="MENTEE">Mentee</option>
                             <option value="MENTOR">Mentor</option>
+                            <option value="ADMIN">Admin (Temporary)</option>
                         </select>
                     </div>
 

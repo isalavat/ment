@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../i18n/LanguageContext';
 import './Mentors.css';
 
 // Mock data
@@ -116,6 +117,7 @@ const mockMentors = [
 
 export const Mentors: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [filters, setFilters] = useState({
     category: '',
     skill: '',
@@ -162,20 +164,20 @@ export const Mentors: React.FC = () => {
   return (
     <div className="content-area">
       <div className="page-header">
-        <h1 className="page-title">Find Your Perfect Mentor</h1>
-        <p className="page-subtitle">Browse experienced professionals ready to help you grow</p>
+        <h1 className="page-title">{t.mentors.title}</h1>
+        <p className="page-subtitle">{t.mentors.subtitle}</p>
       </div>
 
       {/* Filters */}
       <div className="filter-bar">
         <div className="filter-item">
-          <label className="form-label">Category</label>
+          <label className="form-label">{t.mentors.category}</label>
           <select
             className="form-select"
             value={filters.category}
             onChange={(e) => handleFilterChange('category', e.target.value)}
           >
-            <option value="">All Categories</option>
+            <option value="">{t.mentors.allCategories}</option>
             <option value="software">Software Development</option>
             <option value="data">Data Science</option>
             <option value="design">Design</option>
@@ -185,13 +187,13 @@ export const Mentors: React.FC = () => {
         </div>
 
         <div className="filter-item">
-          <label className="form-label">Skills</label>
+          <label className="form-label">{t.mentors.skills}</label>
           <select
             className="form-select"
             value={filters.skill}
             onChange={(e) => handleFilterChange('skill', e.target.value)}
           >
-            <option value="">All Skills</option>
+            <option value="">{t.mentors.allSkills}</option>
             <option value="react">React</option>
             <option value="python">Python</option>
             <option value="aws">AWS</option>
@@ -201,13 +203,13 @@ export const Mentors: React.FC = () => {
         </div>
 
         <div className="filter-item">
-          <label className="form-label">Min Rating</label>
+          <label className="form-label">{t.mentors.minRating}</label>
           <select
             className="form-select"
             value={filters.rating}
             onChange={(e) => handleFilterChange('rating', e.target.value)}
           >
-            <option value="">Any Rating</option>
+            <option value="">{t.mentors.anyRating}</option>
             <option value="4.5">4.5+ ⭐</option>
             <option value="4.0">4.0+ ⭐</option>
             <option value="3.5">3.5+ ⭐</option>
@@ -215,13 +217,13 @@ export const Mentors: React.FC = () => {
         </div>
 
         <div className="filter-item">
-          <label className="form-label">Price Range</label>
+          <label className="form-label">{t.mentors.priceRange}</label>
           <select
             className="form-select"
             value={filters.price}
             onChange={(e) => handleFilterChange('price', e.target.value)}
           >
-            <option value="">Any Price</option>
+            <option value="">{t.mentors.anyPrice}</option>
             <option value="0-50">$0 - $50/hr</option>
             <option value="50-100">$50 - $100/hr</option>
             <option value="100+">$100+/hr</option>
@@ -230,7 +232,7 @@ export const Mentors: React.FC = () => {
 
         <div className="filter-item" style={{ display: 'flex', alignItems: 'flex-end' }}>
           <button className="btn btn-outline" style={{ width: '100%' }} onClick={clearFilters}>
-            Clear Filters
+            {t.mentors.clearFilters}
           </button>
         </div>
       </div>
@@ -238,7 +240,7 @@ export const Mentors: React.FC = () => {
       {/* Results Info */}
       <div className="flex-between mb-md">
         <div style={{ color: 'var(--neutral-600)' }}>
-          Showing <strong>{sortedMentors.length} mentors</strong>
+          {t.mentors.showing} <strong>{sortedMentors.length} {t.mentors.mentorsFound}</strong>
         </div>
         <div>
           <select
@@ -247,10 +249,10 @@ export const Mentors: React.FC = () => {
             value={filters.sort}
             onChange={(e) => handleFilterChange('sort', e.target.value)}
           >
-            <option value="rating">Sort by: Rating</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="reviews">Most Reviews</option>
+            <option value="rating">{t.mentors.sortBy}</option>
+            <option value="price-low">{t.mentors.priceLowToHigh}</option>
+            <option value="price-high">{t.mentors.priceHighToLow}</option>
+            <option value="reviews">{t.mentors.mostReviews}</option>
           </select>
         </div>
       </div>
@@ -270,7 +272,7 @@ export const Mentors: React.FC = () => {
                 <div className="mentor-title">{mentor.title}</div>
                 <div className="mentor-rating">
                   ⭐ <strong>{mentor.rating}</strong>{' '}
-                  <span style={{ color: 'var(--neutral-500)' }}>({mentor.reviews} reviews)</span>
+                  <span style={{ color: 'var(--neutral-500)' }}>({mentor.reviews} {t.mentors.reviews})</span>
                 </div>
               </div>
             </div>
@@ -288,8 +290,8 @@ export const Mentors: React.FC = () => {
             </div>
 
             <div className="mentor-card-footer">
-              <div className="mentor-rate">${mentor.rate}/hr</div>
-              <button className="btn btn-primary btn-sm">View Profile</button>
+              <div className="mentor-rate">${mentor.rate}{t.mentors.perHour}</div>
+              <button className="btn btn-primary btn-sm">{t.common.viewProfile}</button>
             </div>
           </div>
         ))}
