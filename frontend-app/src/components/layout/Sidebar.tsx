@@ -13,22 +13,6 @@ export const Sidebar: React.FC = () => {
 
     return (
         <aside id='sidebar' className="sidebar">
-            <div className="sidebar-header">
-                <div className="sidebar-logo">
-                    <span>🎓</span>
-                    <span>MentorHub</span>
-                </div>
-            </div>
-            <nav className="sidebar-nav">
-                <div className="nav-section">
-                    <div className="nav-section-title">Main</div>
-                    <Link to="/" className="nav-item">
-                        <span className="nav-icon">👨‍🎓</span>
-                        <span>MentorHub</span>
-                    </Link>
-
-                </div>
-            </nav>
             <nav className="sidebar-nav">
                 <div className="nav-section">
                     <div className="nav-section-title">Main</div>
@@ -44,23 +28,15 @@ export const Sidebar: React.FC = () => {
                 </div>
             </nav>
             <nav className="sidebar-nav">
-                {isAuthenticated ? (
-                    <>
-                        <span className="user-info">
-                            Hello, {user?.firstName} ({user?.role})
-                        </span>
+                <div className="nav-section">
+                    <div className="nav-section-title">Account</div>
 
-                        <Link to="/dashboard" className="nav-link">Dashboard</Link>
-                        <button onClick={handleLogout} className='btn-logout'>
-                            Logout
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/login" className="nav-link">Login</Link>
-                        <Link to="/register" className="nav-link">Register</Link>
-                    </>
-                )}
+                   <div className="nav-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                        <span className="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </div>
+                </div>
+                
             </nav>
         </aside>
     );
