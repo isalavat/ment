@@ -1,123 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { mentorService, MentorProfile } from '../../services/mentorService';
 import './Mentors.css';
-
-// Mock data
-const mockMentors = [
-  {
-    id: 1,
-    initials: 'SA',
-    name: 'Sarah Anderson',
-    title: 'Senior Frontend Developer',
-    bio: '10+ years building scalable web applications. Specialized in React, TypeScript, and modern frontend architecture.',
-    skills: ['React', 'TypeScript', 'Next.js', 'CSS'],
-    rating: 4.9,
-    reviews: 127,
-    rate: 75,
-    category: 'software',
-  },
-  {
-    id: 2,
-    initials: 'MJ',
-    name: 'Michael Johnson',
-    title: 'Data Scientist',
-    bio: 'PhD in ML, helping professionals transition into data science. Expert in Python, TensorFlow, and statistical analysis.',
-    skills: ['Python', 'ML', 'TensorFlow', 'Statistics'],
-    rating: 4.8,
-    reviews: 93,
-    rate: 95,
-    category: 'data',
-  },
-  {
-    id: 3,
-    initials: 'EW',
-    name: 'Emily Williams',
-    title: 'Senior UX Designer',
-    bio: 'Award-winning designer with 12 years experience. Passionate about creating user-centered designs that drive business results.',
-    skills: ['Figma', 'UX Research', 'Prototyping', 'Design Systems'],
-    rating: 5.0,
-    reviews: 156,
-    rate: 85,
-    category: 'design',
-  },
-  {
-    id: 4,
-    initials: 'DC',
-    name: 'David Chen',
-    title: 'DevOps Engineer',
-    bio: 'Cloud infrastructure expert. Helping teams implement CI/CD pipelines and scale their applications on AWS and Azure.',
-    skills: ['AWS', 'Docker', 'Kubernetes', 'Terraform'],
-    rating: 4.7,
-    reviews: 84,
-    rate: 90,
-    category: 'software',
-  },
-  {
-    id: 5,
-    initials: 'JM',
-    name: 'Jennifer Martinez',
-    title: 'Product Manager',
-    bio: 'Led product teams at Fortune 500 companies. Teaching product strategy, roadmapping, and stakeholder management.',
-    skills: ['Product Strategy', 'Agile', 'Analytics', 'Roadmapping'],
-    rating: 4.9,
-    reviews: 112,
-    rate: 100,
-    category: 'product',
-  },
-  {
-    id: 6,
-    initials: 'RT',
-    name: 'Robert Taylor',
-    title: 'Backend Architect',
-    bio: '15 years designing scalable backend systems. Expert in microservices, databases, and distributed systems architecture.',
-    skills: ['Node.js', 'PostgreSQL', 'Redis', 'Microservices'],
-    rating: 4.8,
-    reviews: 98,
-    rate: 110,
-    category: 'software',
-  },
-  {
-    id: 7,
-    initials: 'AM',
-    name: 'Anna Miller',
-    title: 'Mobile Developer',
-    bio: 'iOS and Android expert. Published 20+ apps with millions of downloads. Teaching Swift, Kotlin, and React Native.',
-    skills: ['Swift', 'Kotlin', 'React Native', 'Firebase'],
-    rating: 4.9,
-    reviews: 145,
-    rate: 80,
-    category: 'software',
-  },
-  {
-    id: 8,
-    initials: 'KB',
-    name: 'Kevin Brown',
-    title: 'Security Engineer',
-    bio: 'Cybersecurity specialist with focus on application security, penetration testing, and secure coding practices.',
-    skills: ['Security', 'Pentesting', 'OWASP', 'Compliance'],
-    rating: 4.7,
-    reviews: 76,
-    rate: 105,
-    category: 'software',
-  },
-  {
-    id: 9,
-    initials: 'LG',
-    name: 'Lisa Garcia',
-    title: 'Technical Writer',
-    bio: 'Creating clear, comprehensive documentation for technical products. Expert in API docs, user guides, and content strategy.',
-    skills: ['Documentation', 'API Docs', 'Markdown', 'Content'],
-    rating: 5.0,
-    reviews: 89,
-    rate: 65,
-    category: 'other',
-  },
-];
 
 export const Mentors: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [mentors, setMentors] = useState<MentorProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [filters, setFilters] = useState({
     category: '',
     skill: '',
@@ -125,6 +17,50 @@ export const Mentors: React.FC = () => {
     price: '',
     sort: 'rating',
   });
+
+  // Fetch mentors from API
+  useEffect(() => {
+    const fetchMentors = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const params: any = {};
+        
+        if (filters.category) {
+          params.category = filters.category;
+        }
+        
+        if (filters.skill) {
+          params.skill = filters.skill;
+        }
+        
+        if (filters.rating) {
+          params.rating = parseFloat(filters.rating);
+        }
+        
+        if (filters.price) {
+          if (filters.price === '0-50') {
+            params.maxPrice = 50;
+          } else if (filters.price === '50-100') {
+            params.minPrice = 50;
+            params.maxPrice = 100;
+          } else if (filters.price === '100+') {
+            params.minPrice = 100;
+          }
+        }
+
+        const data = await mentorService.getMentors(params);
+        setMentors(data);
+      } catch (err: any) {
+        setError(err.response?.data?.error || 'Failed to fetch mentors');
+        console.error('Error fetching mentors:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMentors();
+  }, [filters.category, filters.skill, filters.rating, filters.price]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters({ ...filters, [key]: value });
@@ -140,26 +76,21 @@ export const Mentors: React.FC = () => {
     });
   };
 
-  // Filter mentors based on selected filters
-  const filteredMentors = mockMentors.filter((mentor) => {
-    if (filters.category && mentor.category !== filters.category) return false;
-    if (filters.rating && mentor.rating < parseFloat(filters.rating)) return false;
-    if (filters.price) {
-      if (filters.price === '0-50' && mentor.rate > 50) return false;
-      if (filters.price === '50-100' && (mentor.rate < 50 || mentor.rate > 100)) return false;
-      if (filters.price === '100+' && mentor.rate < 100) return false;
-    }
-    return true;
-  });
-
-  // Sort mentors
-  const sortedMentors = [...filteredMentors].sort((a, b) => {
-    if (filters.sort === 'rating') return b.rating - a.rating;
-    if (filters.sort === 'price-low') return a.rate - b.rate;
-    if (filters.sort === 'price-high') return b.rate - a.rate;
-    if (filters.sort === 'reviews') return b.reviews - a.reviews;
+  // Sort mentors locally
+  const sortedMentors = [...mentors].sort((a, b) => {
+    if (filters.sort === 'rating') return (b.avgRating || 0) - (a.avgRating || 0);
+    if (filters.sort === 'price-low') return (a.hourlyRate || 0) - (b.hourlyRate || 0);
+    if (filters.sort === 'price-high') return (b.hourlyRate || 0) - (a.hourlyRate || 0);
+    if (filters.sort === 'reviews') return (b.totalReviews || 0) - (a.totalReviews || 0);
     return 0;
   });
+
+  // Helper function to get initials
+  const getInitials = (mentor: MentorProfile) => {
+    const firstName = mentor.user?.firstName || '';
+    const lastName = mentor.user?.lastName || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
 
   return (
     <div className="content-area">
@@ -194,11 +125,11 @@ export const Mentors: React.FC = () => {
             onChange={(e) => handleFilterChange('skill', e.target.value)}
           >
             <option value="">{t.mentors.allSkills}</option>
-            <option value="react">React</option>
-            <option value="python">Python</option>
-            <option value="aws">AWS</option>
-            <option value="figma">Figma</option>
-            <option value="ml">Machine Learning</option>
+            <option value="React">React</option>
+            <option value="Python">Python</option>
+            <option value="AWS">AWS</option>
+            <option value="Figma">Figma</option>
+            <option value="Machine Learning">Machine Learning</option>
           </select>
         </div>
 
@@ -237,65 +168,98 @@ export const Mentors: React.FC = () => {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--neutral-600)' }}>
+          Loading mentors...
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div style={{ 
+          padding: 'var(--space-md)', 
+          background: 'var(--danger-50)', 
+          color: 'var(--danger-700)', 
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 'var(--space-md)'
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && sortedMentors.length === 0 && (
+        <div style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--neutral-600)' }}>
+          No mentors found. Try adjusting your filters.
+        </div>
+      )}
+
       {/* Results Info */}
-      <div className="flex-between mb-md">
-        <div style={{ color: 'var(--neutral-600)' }}>
-          {t.mentors.showing} <strong>{sortedMentors.length} {t.mentors.mentorsFound}</strong>
-        </div>
-        <div>
-          <select
-            className="form-select"
-            style={{ width: 'auto' }}
-            value={filters.sort}
-            onChange={(e) => handleFilterChange('sort', e.target.value)}
-          >
-            <option value="rating">{t.mentors.sortBy}</option>
-            <option value="price-low">{t.mentors.priceLowToHigh}</option>
-            <option value="price-high">{t.mentors.priceHighToLow}</option>
-            <option value="reviews">{t.mentors.mostReviews}</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Mentor Grid */}
-      <div className="grid grid-3">
-        {sortedMentors.map((mentor) => (
-          <div
-            key={mentor.id}
-            className="mentor-card"
-            onClick={() => navigate(`/mentors/${mentor.id}`)}
-          >
-            <div className="mentor-card-header">
-              <div className="mentor-avatar-lg">{mentor.initials}</div>
-              <div className="mentor-info">
-                <h3>{mentor.name}</h3>
-                <div className="mentor-title">{mentor.title}</div>
-                <div className="mentor-rating">
-                  ⭐ <strong>{mentor.rating}</strong>{' '}
-                  <span style={{ color: 'var(--neutral-500)' }}>({mentor.reviews} {t.mentors.reviews})</span>
-                </div>
-              </div>
+      {!loading && !error && sortedMentors.length > 0 && (
+        <>
+          <div className="flex-between mb-md">
+            <div style={{ color: 'var(--neutral-600)' }}>
+              {t.mentors.showing} <strong>{sortedMentors.length} {t.mentors.mentorsFound}</strong>
             </div>
-
-            <div className="mentor-card-body">
-              <p className="mentor-bio">{mentor.bio}</p>
-
-              <div className="mentor-skills">
-                {mentor.skills.map((skill, idx) => (
-                  <span key={idx} className="skill-tag">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="mentor-card-footer">
-              <div className="mentor-rate">${mentor.rate}{t.mentors.perHour}</div>
-              <button className="btn btn-primary btn-sm">{t.common.viewProfile}</button>
+            <div>
+              <select
+                className="form-select"
+                style={{ width: 'auto' }}
+                value={filters.sort}
+                onChange={(e) => handleFilterChange('sort', e.target.value)}
+              >
+                <option value="rating">{t.mentors.sortBy}</option>
+                <option value="price-low">{t.mentors.priceLowToHigh}</option>
+                <option value="price-high">{t.mentors.priceHighToLow}</option>
+                <option value="reviews">{t.mentors.mostReviews}</option>
+              </select>
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Mentor Grid */}
+          <div className="grid grid-3">
+            {sortedMentors.map((mentor) => (
+              <div
+                key={mentor.id}
+                className="mentor-card"
+                onClick={() => navigate(`/mentors/${mentor.id}`)}
+              >
+                <div className="mentor-card-header">
+                  <div className="mentor-avatar-lg">{getInitials(mentor)}</div>
+                  <div className="mentor-info">
+                    <h3>{mentor.user?.firstName} {mentor.user?.lastName}</h3>
+                    <div className="mentor-title">{mentor.title || 'Mentor'}</div>
+                    <div className="mentor-rating">
+                      ⭐ <strong>{mentor.avgRating?.toFixed(1) || '0.0'}</strong>{' '}
+                      <span style={{ color: 'var(--neutral-500)' }}>
+                        ({mentor.totalReviews || 0} {t.mentors.reviews})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mentor-card-body">
+                  <p className="mentor-bio">{mentor.bio || 'No bio available'}</p>
+
+                  <div className="mentor-skills">
+                    {mentor.skills?.map((skillRel) => (
+                      <span key={skillRel.skill.id} className="skill-tag">
+                        {skillRel.skill.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mentor-card-footer">
+                  <div className="mentor-rate">${mentor.hourlyRate || 0}{t.mentors.perHour}</div>
+                  <button className="btn btn-primary btn-sm">{t.common.viewProfile}</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Pagination */}
       <div

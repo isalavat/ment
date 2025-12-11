@@ -9,3 +9,54 @@
   justify-content: space-between;
   align-items: center;
 }
+
+/* Mentor Detail Page */
+.mentor-avatar-xl {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.card-header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.card-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0;
+  color: var(--neutral-800);
+}
+
+.card-body {
+  padding: var(--space-lg);
+}
+
+.btn-lg {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-md);
+}
+
+/* Badge styles are inherited from App.css */
+
+@media (max-width: 768px) {
+  .mentor-avatar-xl {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+  }
+  
+  .grid-3 > div[style*="gridColumn"] {
+    grid-column: span 1 !important;
+  }
+}
+

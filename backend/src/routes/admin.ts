@@ -92,7 +92,11 @@ router.get("/users/:id", async (req, res) => {
         mentorProfile: {
           include: {
             categories: true,
-            skills: true
+            skills: {
+              include: {
+                skill: true
+              }
+            }
           }
         },
         menteeProfile: true
@@ -312,6 +316,212 @@ router.post("/users/:id/mentee-profile", async (req, res) => {
     return res.status(201).json({ profile });
   } catch (error) {
     logger.error(`Admin create mentee profile error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// PUT update mentor profile
+router.put("/users/:id/mentor-profile", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const { bio, title, yearsExperience, hourlyRate, currency } = req.body;
+
+    // Check if profile exists
+    const existing = await prisma.mentorProfile.findUnique({ where: { userId } });
+    if (!existing) {
+      return res.status(404).json({ error: "Mentor profile not found" });
+    }
+
+    const updateData: any = {};
+    if (bio !== undefined) updateData.bio = bio;
+    if (title !== undefined) updateData.title = title;
+    if (yearsExperience !== undefined) updateData.yearsExperience = parseInt(yearsExperience);
+    if (hourlyRate !== undefined) updateData.hourlyRate = parseFloat(hourlyRate);
+    if (currency !== undefined) updateData.currency = currency;
+
+    const profile = await prisma.mentorProfile.update({
+      where: { userId },
+      data: updateData
+    });
+
+    logger.info(`Admin updated mentor profile for user ID: ${userId}`);
+    return res.json({ profile });
+  } catch (error) {
+    logger.error(`Admin update mentor profile error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// PUT update mentee profile
+router.put("/users/:id/mentee-profile", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const { bio, goals } = req.body;
+
+    // Check if profile exists
+    const existing = await prisma.menteeProfile.findUnique({ where: { userId } });
+    if (!existing) {
+      return res.status(404).json({ error: "Mentee profile not found" });
+    }
+
+    const updateData: any = {};
+    if (bio !== undefined) updateData.bio = bio;
+    if (goals !== undefined) updateData.goals = goals;
+
+    const profile = await prisma.menteeProfile.update({
+      where: { userId },
+      data: updateData
+    });
+
+    logger.info(`Admin updated mentee profile for user ID: ${userId}`);
+    return res.json({ profile });
+  } catch (error) {
+    logger.error(`Admin update mentee profile error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// GET all skills
+router.get("/skills", async (req, res) => {
+  try {
+    const skills = await prisma.skill.findMany({
+      orderBy: { name: 'asc' }
+    });
+    return res.json({ skills });
+  } catch (error) {
+    logger.error(`Admin get skills error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// POST create new skill
+router.post("/skills", async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: "Skill name is required" });
+    }
+
+    // Check if skill already exists
+    const existing = await prisma.skill.findUnique({ where: { name } });
+    if (existing) {
+      return res.status(409).json({ error: "Skill already exists" });
+    }
+
+    const skill = await prisma.skill.create({
+      data: { name }
+    });
+
+    logger.info(`Admin created skill: ${skill.name}`);
+    return res.status(201).json({ skill });
+  } catch (error) {
+    logger.error(`Admin create skill error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// POST add skill to mentor profile
+router.post("/users/:id/mentor-profile/skills", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const { skillId, skillName } = req.body;
+
+    // Get mentor profile
+    const mentorProfile = await prisma.mentorProfile.findUnique({ 
+      where: { userId } 
+    });
+    
+    if (!mentorProfile) {
+      return res.status(404).json({ error: "Mentor profile not found" });
+    }
+
+    let finalSkillId = skillId;
+
+    // If skillName is provided, create skill if it doesn't exist
+    if (skillName) {
+      let skill = await prisma.skill.findUnique({ where: { name: skillName } });
+      if (!skill) {
+        skill = await prisma.skill.create({ data: { name: skillName } });
+      }
+      finalSkillId = skill.id;
+    }
+
+    if (!finalSkillId) {
+      return res.status(400).json({ error: "Either skillId or skillName is required" });
+    }
+
+    // Check if already added
+    const existing = await prisma.mentorSkill.findUnique({
+      where: {
+        mentorId_skillId: {
+          mentorId: mentorProfile.id,
+          skillId: finalSkillId
+        }
+      }
+    });
+
+    if (existing) {
+      return res.status(409).json({ error: "Skill already added to this mentor" });
+    }
+
+    // Add skill to mentor
+    await prisma.mentorSkill.create({
+      data: {
+        mentorId: mentorProfile.id,
+        skillId: finalSkillId
+      }
+    });
+
+    // Return updated profile with skills
+    const updatedProfile = await prisma.mentorProfile.findUnique({
+      where: { id: mentorProfile.id },
+      include: {
+        skills: {
+          include: {
+            skill: true
+          }
+        }
+      }
+    });
+
+    logger.info(`Admin added skill to mentor profile user ID: ${userId}`);
+    return res.json({ profile: updatedProfile });
+  } catch (error) {
+    logger.error(`Admin add skill to mentor error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// DELETE remove skill from mentor profile
+router.delete("/users/:id/mentor-profile/skills/:skillId", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const skillId = parseInt(req.params.skillId);
+
+    // Get mentor profile
+    const mentorProfile = await prisma.mentorProfile.findUnique({ 
+      where: { userId } 
+    });
+    
+    if (!mentorProfile) {
+      return res.status(404).json({ error: "Mentor profile not found" });
+    }
+
+    // Remove skill from mentor
+    await prisma.mentorSkill.delete({
+      where: {
+        mentorId_skillId: {
+          mentorId: mentorProfile.id,
+          skillId: skillId
+        }
+      }
+    });
+
+    logger.info(`Admin removed skill from mentor profile user ID: ${userId}`);
+    return res.json({ message: "Skill removed successfully" });
+  } catch (error) {
+    logger.error(`Admin remove skill from mentor error: ${(error as Error).message}`);
     return res.status(500).json({ error: (error as Error).message });
   }
 });

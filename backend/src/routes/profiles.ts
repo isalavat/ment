@@ -82,6 +82,139 @@ router.get("/me", requireAuth, async (req: AuthedRequest, res) => {
   return res.json({ user });
 });
 
+// GET all mentors with filtering
+router.get("/mentors", async (req, res) => {
+  try {
+    const { category, skill, rating, minPrice, maxPrice, search } = req.query;
+
+    const where: any = {};
+
+    // Filter by rating
+    if (rating) {
+      where.avgRating = { gte: parseFloat(rating as string) };
+    }
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      where.hourlyRate = {};
+      if (minPrice) where.hourlyRate.gte = parseFloat(minPrice as string);
+      if (maxPrice) where.hourlyRate.lte = parseFloat(maxPrice as string);
+    }
+
+    // Filter by category
+    if (category) {
+      where.categories = {
+        some: {
+          category: {
+            slug: category
+          }
+        }
+      };
+    }
+
+    // Filter by skill
+    if (skill) {
+      where.skills = {
+        some: {
+          skill: {
+            name: { contains: skill as string }
+          }
+        }
+      };
+    }
+
+    // Search in user name or mentor title
+    if (search) {
+      where.OR = [
+        { title: { contains: search as string } },
+        { bio: { contains: search as string } },
+        {
+          user: {
+            OR: [
+              { firstName: { contains: search as string } },
+              { lastName: { contains: search as string } }
+            ]
+          }
+        }
+      ];
+    }
+
+    const mentors = await prisma.mentorProfile.findMany({
+      where,
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            avatarUrl: true
+          }
+        },
+        skills: {
+          include: {
+            skill: true
+          }
+        },
+        categories: {
+          include: {
+            category: true
+          }
+        }
+      },
+      orderBy: {
+        avgRating: 'desc'
+      }
+    });
+
+    return res.json({ mentors });
+  } catch (error) {
+    console.error("Get mentors error:", error);
+    return res.status(500).json({ error: "Failed to fetch mentors" });
+  }
+});
+
+// GET single mentor by ID
+router.get("/mentors/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const mentor = await prisma.mentorProfile.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            avatarUrl: true
+          }
+        },
+        skills: {
+          include: {
+            skill: true
+          }
+        },
+        categories: {
+          include: {
+            category: true
+          }
+        }
+      }
+    });
+
+    if (!mentor) {
+      return res.status(404).json({ error: "Mentor not found" });
+    }
+
+    return res.json({ mentor });
+  } catch (error) {
+    console.error("Get mentor error:", error);
+    return res.status(500).json({ error: "Failed to fetch mentor" });
+  }
+});
+
 router.put("/mentor", requireAuth, async (req: AuthedRequest, res) => {
   const userId = req.user?.id;
   if (!userId) return res.status(401).json({ error: "Unauthorized" });

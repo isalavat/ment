@@ -60,6 +60,24 @@ export interface CreateMenteeProfileData {
   goals?: string;
 }
 
+export interface UpdateMentorProfileData {
+  bio?: string;
+  title?: string;
+  yearsExperience?: number;
+  hourlyRate?: number;
+  currency?: string;
+}
+
+export interface UpdateMenteeProfileData {
+  bio?: string;
+  goals?: string;
+}
+
+export interface Skill {
+  id: number;
+  name: string;
+}
+
 export const adminService = {
   // Get all users with optional filters
   getUsers: async (params?: {
@@ -105,5 +123,43 @@ export const adminService = {
   createMenteeProfile: async (userId: number, data: CreateMenteeProfileData): Promise<any> => {
     const response = await axios.post(`/admin/users/${userId}/mentee-profile`, data);
     return response.data.profile;
+  },
+
+  // Update mentor profile
+  updateMentorProfile: async (userId: number, data: UpdateMentorProfileData): Promise<any> => {
+    const response = await axios.put(`/admin/users/${userId}/mentor-profile`, data);
+    return response.data.profile;
+  },
+
+  // Update mentee profile
+  updateMenteeProfile: async (userId: number, data: UpdateMenteeProfileData): Promise<any> => {
+    const response = await axios.put(`/admin/users/${userId}/mentee-profile`, data);
+    return response.data.profile;
+  },
+
+  // Get all skills
+  getSkills: async (): Promise<Skill[]> => {
+    const response = await axios.get('/admin/skills');
+    return response.data.skills;
+  },
+
+  // Create new skill
+  createSkill: async (name: string): Promise<Skill> => {
+    const response = await axios.post('/admin/skills', { name });
+    return response.data.skill;
+  },
+
+  // Add skill to mentor profile
+  addSkillToMentor: async (userId: number, skillId?: number, skillName?: string): Promise<any> => {
+    const response = await axios.post(`/admin/users/${userId}/mentor-profile/skills`, { 
+      skillId, 
+      skillName 
+    });
+    return response.data.profile;
+  },
+
+  // Remove skill from mentor profile
+  removeSkillFromMentor: async (userId: number, skillId: number): Promise<void> => {
+    await axios.delete(`/admin/users/${userId}/mentor-profile/skills/${skillId}`);
   }
 };

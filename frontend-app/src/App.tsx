@@ -9,8 +9,10 @@ import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { MenteeProfileForm } from './components/profile/MenteeProfileForm';
 import { MentorProfileForm } from './components/profile/MentorProfileForm';
 import { Mentors } from './components/mentors/Mentors';
+import { MentorDetail } from './components/mentors/MentorDetail';
 import { AdminUsers } from './components/admin/AdminUsers';
 import { AdminCreateUser } from './components/admin/AdminCreateUser';
+import { AdminUserDetail } from './components/admin/AdminUserDetail';
 import './App.css';
 import { Register } from './components/auth/Register';
 
@@ -68,6 +70,14 @@ function AppContent() {
             }
           />
           <Route
+            path="/mentors/:id"
+            element={
+              <ProtectedRoute>
+                <MentorDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/profile/mentee"
             element={
               <ProtectedRoute>
@@ -96,6 +106,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <AdminCreateUser />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:id"
+            element={
+              <ProtectedRoute>
+                <AdminUserDetail />
               </ProtectedRoute>
             }
           />
