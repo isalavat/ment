@@ -104,10 +104,19 @@ export const AdminCreateUser: React.FC = () => {
   return (
     <div className="content-area">
       <div className="page-header">
-        <h1 className="page-title">Create New User</h1>
+        <div>
+          <button className="btn btn-outline btn-sm" onClick={() => navigate('/admin/users')}>
+            ← Back
+          </button>
+          <h1 className="page-title mt-sm">Create New User</h1>
+        </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '800px', margin: '0 auto' }}>
+      {error && (
+        <div className="alert alert-danger mb-md">{error}</div>
+      )}
+
+      <div className="card">
         <div className="card-body">
           {/* Step Indicator */}
           <div className="step-indicator mb-lg">
@@ -121,10 +130,6 @@ export const AdminCreateUser: React.FC = () => {
               <div className="step-label">Profile (Optional)</div>
             </div>
           </div>
-
-          {error && (
-            <div className="alert alert-danger mb-md">{error}</div>
-          )}
 
           {step === 'user' ? (
             <form onSubmit={handleCreateUser} className="admin-form">
