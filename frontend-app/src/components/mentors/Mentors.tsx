@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { mentorService, MentorProfile } from '../../services/mentorService';
+import { adminService } from '../../services/adminService';
 import './Mentors.css';
 
 export const Mentors: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [mentors, setMentors] = useState<MentorProfile[]>([]);
+  const [skills, setSkills] = useState<Array<{ id: number; name: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({
@@ -17,6 +19,19 @@ export const Mentors: React.FC = () => {
     price: '',
     sort: 'rating',
   });
+
+  // Load skills on mount
+  useEffect(() => {
+    const loadSkills = async () => {
+      try {
+        const allSkills = await adminService.getSkills();
+        setSkills(allSkills);
+      } catch (err) {
+        console.error('Failed to load skills:', err);
+      }
+    };
+    loadSkills();
+  }, []);
 
   // Fetch mentors from API
   useEffect(() => {
@@ -125,11 +140,9 @@ export const Mentors: React.FC = () => {
             onChange={(e) => handleFilterChange('skill', e.target.value)}
           >
             <option value="">{t.mentors.allSkills}</option>
-            <option value="React">React</option>
-            <option value="Python">Python</option>
-            <option value="AWS">AWS</option>
-            <option value="Figma">Figma</option>
-            <option value="Machine Learning">Machine Learning</option>
+            {skills.map(skill => (
+              <option key={skill.id} value={skill.name}>{skill.name}</option>
+            ))}
           </select>
         </div>
 

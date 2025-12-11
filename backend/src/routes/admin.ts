@@ -536,6 +536,11 @@ router.post("/users/:id/mentor-profile/categories", async (req, res) => {
     const userId = parseInt(req.params.id);
     const { categoryId } = req.body;
 
+    console.log('=== ADD CATEGORY REQUEST ===');
+    console.log('User ID:', userId);
+    console.log('Category ID:', categoryId);
+    console.log('Request body:', req.body);
+
     if (!categoryId) {
       return res.status(400).json({ error: "Category ID is required" });
     }

@@ -47,6 +47,7 @@ async function main() {
   const skills = [
     'React',
     'Python',
+    'Java',
     'AWS',
     'Figma',
     'Machine Learning',
