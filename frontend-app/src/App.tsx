@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './i18n/LanguageContext';
 import { Sidebar } from './components/layout/Sidebar';
+import { Header } from './components/layout/Header';
 import { Login } from './components/auth/Login';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
@@ -42,13 +43,7 @@ function AppContent() {
         </>
       )}
       <div className="main-content">
-        {user && (
-          <button className="mobile-menu-toggle" onClick={toggleMobileSidebar}>
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        )}
+        {user && <Header onMenuToggle={toggleMobileSidebar} />}
         <Routes>
           <Route path='/' element={<Navigate to="/dashboard" replace />} />
           <Route path='/login' element={<Login />} />

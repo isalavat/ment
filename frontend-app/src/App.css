@@ -264,17 +264,40 @@ a:hover {
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Content area wrapper inside components */
+.content-area {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  padding: var(--space-xl);
 }
 
 /* When no sidebar is present (login/register pages) */
 .app-layout:not(:has(.sidebar)) .main-content {
   margin-left: 0;
+  padding: 0;
+}
+
+.app-layout:not(:has(.sidebar)) .content-area {
+  padding: 0;
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
-    padding-top: 64px; /* Space for mobile menu toggle */
+  }
+
+  .content-area {
+    padding: var(--space-md);
+  }
+  
+  .app-layout:not(:has(.sidebar)) .content-area {
+    padding: 0;
   }
 }
 

@@ -1,0 +1,197 @@
+.app-header {
+  height: 64px;
+  background: white;
+  border-bottom: 1px solid var(--neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-sm);
+  font-size: 20px;
+  color: var(--neutral-700);
+}
+
+.menu-toggle:hover {
+  background-color: var(--neutral-100);
+  border-radius: var(--radius-sm);
+}
+
+.header-search {
+  position: relative;
+}
+
+.search-input {
+  padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-xl);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-sm);
+  width: 300px;
+  font-size: var(--font-size-base);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral-500);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neutral-600);
+  transition: background-color 0.2s;
+  font-size: 16px;
+}
+
+.icon-button:hover {
+  background-color: var(--neutral-100);
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.user-menu:hover {
+  background-color: var(--neutral-100);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  color: var(--neutral-700);
+  font-weight: 500;
+  font-size: var(--font-size-base);
+  line-height: 1.2;
+}
+
+.role-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  width: fit-content;
+}
+
+.role-admin {
+  background-color: #FFF4E6;
+  color: #F57C00;
+}
+
+.role-mentor {
+  background-color: #E3F2FD;
+  color: #1976D2;
+}
+
+.role-mentee {
+  background-color: #F3E5F5;
+  color: #7B1FA2;
+}
+
+.logout-btn {
+  white-space: nowrap;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .header-search {
+    display: none;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .role-badge {
+    display: none;
+  }
+
+  .logout-btn {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  .header-right {
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0 var(--space-md);
+  }
+
+  .header-actions {
+    display: none;
+  }
+}

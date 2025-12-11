@@ -42,8 +42,11 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
+                // Clear all auth data
                 localStorage.removeItem(ACCESS_TOKEN);
                 localStorage.removeItem(REFRESH_TOKEN);
+                localStorage.removeItem('user');
+                // Redirect to login
                 window.location.href = '/login';
                 return Promise.reject(refreshError)
             }
