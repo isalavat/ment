@@ -172,6 +172,11 @@ a:hover {
   flex-direction: column;
 }
 
+/* When no sidebar is present (login/register pages) */
+.app-layout:not(:has(.sidebar)) .main-content {
+  margin-left: 0;
+}
+
 /* Header */
 .app-header {
   height: var(--header-height);

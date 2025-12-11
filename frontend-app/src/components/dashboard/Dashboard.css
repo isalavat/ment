@@ -1,46 +1,23 @@
-.dashboard-container {
-  padding: 40px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* Dashboard-specific styles - inherits most from App.css */
+
+.stat-change.positive {
+  color: var(--success-green);
 }
 
-.dashboard-card {
-  background: white;
-  border-radius: 10px;
-  padding: 40px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.stat-change.negative {
+  color: var(--danger-red);
 }
 
-.dashboard-card h1 {
-  color: #333;
-  margin-bottom: 30px;
+/* Additional utility classes */
+.flex {
+  display: flex;
+  align-items: center;
 }
 
-.user-details {
-  background: #f5f5f5;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
+.gap-sm {
+  gap: var(--space-sm);
 }
 
-.user-details h2 {
-  color: #667eea;
-  margin-bottom: 15px;
-}
-
-.user-details p {
-  margin: 10px 0;
-  color: #555;
-}
-
-.role-section {
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-  padding: 20px;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
-}
-
-.role-section h3 {
-  color: #667eea;
-  margin-bottom: 10px;
+.mt-md {
+  margin-top: var(--space-md);
 }

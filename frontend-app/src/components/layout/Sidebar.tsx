@@ -24,7 +24,30 @@ export const Sidebar: React.FC = () => {
                         <span className="nav-icon">📊</span>
                         <span>Dashboard</span>
                     </Link>
+                    <Link to="/mentors" className="nav-item">
+                        <span className="nav-icon">👥</span>
+                        <span>Find Mentors</span>
+                    </Link>
 
+                </div>
+            </nav>
+            <nav className="sidebar-nav">
+                <div className="nav-section">
+                    <div className="nav-section-title">Profile</div>
+                    
+                    {user?.role === 'MENTEE' && (
+                        <Link to="/profile/mentee" className="nav-item">
+                            <span className="nav-icon">👤</span>
+                            <span>My Profile</span>
+                        </Link>
+                    )}
+                    
+                    {user?.role === 'MENTOR' && (
+                        <Link to="/profile/mentor" className="nav-item">
+                            <span className="nav-icon">👤</span>
+                            <span>My Profile</span>
+                        </Link>
+                    )}
                 </div>
             </nav>
             <nav className="sidebar-nav">

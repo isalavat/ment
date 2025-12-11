@@ -16,8 +16,16 @@ export const authService = {
         return response.data.user;
     },
     async fetchCurrenUser(): Promise<User> {
-        const response = await api.get<User>('profiles/me');
-        const user = response.data;
+        const response = await api.get<{ user: any }>('profiles/me');
+        const userData = response.data.user;
+        // Extract just the user fields we need
+        const user: User = {
+            id: String(userData.id),
+            email: userData.email,
+            role: userData.role,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+        };
         localStorage.setItem('user', JSON.stringify(user));
         return user;
     },
