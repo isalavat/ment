@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { profileService } from '../../services/profileService';
-import { adminService } from '../../services/adminService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import './ProfileForm.css';
@@ -44,7 +43,7 @@ export const MentorProfileForm: React.FC = () => {
 
   const loadSkills = async () => {
     try {
-      const skills = await adminService.getSkills();
+      const { skills } = await profileService.getSkills();
       setAvailableSkills(skills);
     } catch (err) {
       console.error('Error loading skills:', err);
@@ -117,7 +116,7 @@ export const MentorProfileForm: React.FC = () => {
       setSuccess(null);
       await profileService.addCategoryToMentorProfile(categoryId);
       await loadProfile(); // Reload to get updated categories
-      setSuccess('Category added successfully');
+      setSuccess(t.profile.common.categoryAdded);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to add category');
     }
@@ -129,7 +128,7 @@ export const MentorProfileForm: React.FC = () => {
       setSuccess(null);
       await profileService.removeCategoryFromMentorProfile(categoryId);
       await loadProfile(); // Reload to get updated categories
-      setSuccess('Category removed successfully');
+      setSuccess(t.profile.common.categoryRemoved);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to remove category');
     }
@@ -154,7 +153,7 @@ export const MentorProfileForm: React.FC = () => {
       }
       setNewSkillName('');
       setSelectedSkillId('');
-      setSuccess('Skill added successfully');
+      setSuccess(t.profile.common.skillAdded);
       await loadSkills(); // Reload skills list in case new one was created
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to add skill');
@@ -167,7 +166,7 @@ export const MentorProfileForm: React.FC = () => {
       setSuccess(null);
       await profileService.removeSkillFromMentorProfile(skillId);
       setSelectedSkills(prev => prev.filter(s => s.skill.id !== skillId));
-      setSuccess('Skill removed successfully');
+      setSuccess(t.profile.common.skillRemoved);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to remove skill');
     }
@@ -182,10 +181,10 @@ export const MentorProfileForm: React.FC = () => {
       <div className="page-header">
         <div>
           <button className="btn btn-outline btn-sm" onClick={() => navigate('/dashboard')}>
-            ← Back
+            ← {t.profile.common.back}
           </button>
           <h1 className="page-title mt-sm">
-            {isEditing ? 'Edit Mentor Profile' : 'Complete Your Mentor Profile'}
+            {isEditing ? t.profile.mentor.titleEdit : t.profile.mentor.title}
           </h1>
         </div>
       </div>
@@ -288,7 +287,7 @@ export const MentorProfileForm: React.FC = () => {
             {/* Skills Management */}
             {isEditing && (
               <div className="form-group">
-                <label className="form-label">Skills & Expertise</label>
+                <label className="form-label">{t.profile.common.skills}</label>
                 
                 {/* Current Skills */}
                 <div className="skills-list mb-md">
@@ -308,7 +307,7 @@ export const MentorProfileForm: React.FC = () => {
                     ))
                   ) : (
                     <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
-                      No skills added yet
+                      {t.profile.common.noSkillsYet}
                     </p>
                   )}
                 </div>
@@ -322,7 +321,7 @@ export const MentorProfileForm: React.FC = () => {
                         value={selectedSkillId}
                         onChange={(e) => setSelectedSkillId(e.target.value ? Number(e.target.value) : '')}
                       >
-                        <option value="">Select existing skill...</option>
+                        <option value="">{t.profile.common.selectSkill}</option>
                         {availableSkills.map(skill => (
                           <option key={skill.id} value={skill.id}>
                             {skill.name}
@@ -332,14 +331,14 @@ export const MentorProfileForm: React.FC = () => {
                     </div>
                     
                     <div style={{ display: 'flex', alignItems: 'center', padding: '0 var(--space-md)' }}>
-                      <span style={{ color: 'var(--neutral-500)' }}>OR</span>
+                      <span style={{ color: 'var(--neutral-500)' }}>{t.profile.common.orText}</span>
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <input
                         type="text"
                         className="form-input"
-                        placeholder="Enter new skill name..."
+                        placeholder={t.profile.common.enterSkillName}
                         value={newSkillName}
                         onChange={(e) => setNewSkillName(e.target.value)}
                       />
@@ -350,7 +349,7 @@ export const MentorProfileForm: React.FC = () => {
                       className="btn btn-outline"
                       onClick={handleAddSkill}
                     >
-                      + Add Skill
+                      {t.profile.common.addSkill}
                     </button>
                   </div>
                 </div>
@@ -360,7 +359,7 @@ export const MentorProfileForm: React.FC = () => {
             {/* Categories Management */}
             {isEditing && (
               <div className="form-group">
-                <label className="form-label">Categories</label>
+                <label className="form-label">{t.profile.common.categories}</label>
                 
                 {/* Current Categories */}
                 <div className="skills-list mb-md">
@@ -380,7 +379,7 @@ export const MentorProfileForm: React.FC = () => {
                     ))
                   ) : (
                     <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
-                      No categories assigned yet
+                      {t.profile.common.noCategoriesYet}
                     </p>
                   )}
                 </div>
@@ -399,7 +398,7 @@ export const MentorProfileForm: React.FC = () => {
                           }
                         }}
                       >
-                        <option value="">Select category...</option>
+                        <option value="">{t.profile.common.selectCategory}</option>
                         {categories
                           .filter(cat => !selectedCategories.some(sc => sc.category.id === cat.id))
                           .map((cat) => (
@@ -421,10 +420,10 @@ export const MentorProfileForm: React.FC = () => {
                 className="btn btn-outline"
                 disabled={loading}
               >
-                Cancel
+                {t.profile.common.cancel}
               </button>
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Create Profile'}
+                {loading ? t.profile.common.saving : isEditing ? t.profile.mentor.updateProfile : t.profile.mentor.createProfile}
               </button>
             </div>
           </form>

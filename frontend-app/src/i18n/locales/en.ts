@@ -110,20 +110,41 @@ export const en = {
     }
   },
   profile: {
+    common: {
+      back: "Back",
+      cancel: "Cancel",
+      saving: "Saving...",
+      skills: "Skills & Expertise",
+      categories: "Categories",
+      noSkillsYet: "No skills added yet",
+      noCategoriesYet: "No categories assigned yet",
+      selectSkill: "Select existing skill...",
+      orText: "OR",
+      enterSkillName: "Enter new skill name...",
+      addSkill: "+ Add Skill",
+      selectCategory: "Select category...",
+      addCategory: "+ Add Category",
+      skillAdded: "Skill added successfully",
+      skillRemoved: "Skill removed successfully",
+      categoryAdded: "Category added successfully",
+      categoryRemoved: "Category removed successfully"
+    },
     mentee: {
       title: "Complete Your Mentee Profile",
-      titleEdit: "Edit Your Mentee Profile",
+      titleEdit: "Edit Mentee Profile",
       subtitle: "Tell mentors about yourself and your learning goals",
       bio: "Bio",
       bioPlaceholder: "Tell us about yourself, your background, and what you're looking to learn...",
+      bioHelper: "Tell mentors about yourself, your background, current role, and interests",
       goals: "Learning Goals",
       goalsPlaceholder: "What are your learning goals? What skills do you want to develop?",
+      goalsHelper: "Share what you want to learn and achieve through mentorship",
       createProfile: "Create Profile",
       updateProfile: "Update Profile"
     },
     mentor: {
       title: "Complete Your Mentor Profile",
-      titleEdit: "Edit Your Mentor Profile",
+      titleEdit: "Edit Mentor Profile",
       subtitle: "Set up your profile to start offering mentorship sessions",
       professionalTitle: "Professional Title",
       titlePlaceholder: "e.g., Senior Software Engineer, UX Designer",

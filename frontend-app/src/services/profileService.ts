@@ -44,6 +44,12 @@ export const profileService = {
     return response.data;
   },
 
+  // Skills
+  getSkills: async (): Promise<{ skills: Array<{ id: number; name: string }> }> => {
+    const response = await api.get('/profiles/skills');
+    return response.data;
+  },
+
   addCategoryToMentorProfile: async (categoryId: number): Promise<{ message: string }> => {
     const response = await api.post('/profiles/mentor/categories', { categoryId });
     return response.data;

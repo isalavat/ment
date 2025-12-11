@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { mentorService, MentorProfile } from '../../services/mentorService';
-import { adminService } from '../../services/adminService';
+import { profileService } from '../../services/profileService';
 import './Mentors.css';
 
 export const Mentors: React.FC = () => {
@@ -24,8 +24,8 @@ export const Mentors: React.FC = () => {
   useEffect(() => {
     const loadSkills = async () => {
       try {
-        const allSkills = await adminService.getSkills();
-        setSkills(allSkills);
+        const result = await profileService.getSkills();
+        setSkills(result.skills);
       } catch (err) {
         console.error('Failed to load skills:', err);
       }

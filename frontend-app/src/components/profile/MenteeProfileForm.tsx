@@ -4,6 +4,7 @@ import { profileService } from '../../services/profileService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import './ProfileForm.css';
+import '../admin/AdminUsers.css';
 
 export const MenteeProfileForm: React.FC = () => {
   const navigate = useNavigate();
@@ -76,29 +77,23 @@ export const MenteeProfileForm: React.FC = () => {
   return (
     <div className="content-area">
       <div className="page-header">
-        <h1 className="page-title">
-          {isEditing ? t.profile.mentee.titleEdit : t.profile.mentee.title}
-        </h1>
-        <p className="page-subtitle">
-          {t.profile.mentee.subtitle}
-        </p>
+        <div>
+          <button className="btn btn-outline btn-sm" onClick={() => navigate('/dashboard')}>
+            ← {t.profile.common.back}
+          </button>
+          <h1 className="page-title mt-sm">
+            {isEditing ? t.profile.mentee.titleEdit : t.profile.mentee.title}
+          </h1>
+        </div>
       </div>
 
       {error && (
-        <div style={{ 
-          padding: 'var(--space-md)', 
-          background: 'var(--danger-50)', 
-          color: 'var(--danger-700)', 
-          borderRadius: 'var(--radius-md)',
-          marginBottom: 'var(--space-md)'
-        }}>
-          {error}
-        </div>
+        <div className="alert alert-danger mb-md">{error}</div>
       )}
 
       <div className="card">
         <div className="card-body">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="admin-form">
             <div className="form-group">
               <label htmlFor="bio" className="form-label">
                 {t.profile.mentee.bio} *
@@ -114,7 +109,7 @@ export const MenteeProfileForm: React.FC = () => {
                 placeholder={t.profile.mentee.bioPlaceholder}
               />
               <small style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', display: 'block', marginTop: 'var(--space-xs)' }}>
-                Tell mentors about yourself, your background, current role, and interests
+                {t.profile.mentee.bioHelper}
               </small>
             </div>
 
@@ -133,32 +128,25 @@ export const MenteeProfileForm: React.FC = () => {
                 placeholder={t.profile.mentee.goalsPlaceholder}
               />
               <small style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', display: 'block', marginTop: 'var(--space-xs)' }}>
-                Share what you want to learn and achieve through mentorship
+                {t.profile.mentee.goalsHelper}
               </small>
             </div>
 
-            <div style={{ 
-              display: 'flex', 
-              gap: 'var(--space-md)', 
-              justifyContent: 'flex-end',
-              paddingTop: 'var(--space-lg)',
-              borderTop: '1px solid var(--neutral-200)',
-              marginTop: 'var(--space-lg)'
-            }}>
+            <div className="form-actions">
               <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
                 className="btn btn-outline"
                 disabled={loading}
               >
-                {t.common.cancel}
+                {t.profile.common.cancel}
               </button>
               <button 
                 type="submit" 
                 className="btn btn-primary" 
                 disabled={loading}
               >
-                {loading ? t.common.loading : isEditing ? t.profile.mentee.updateProfile : t.profile.mentee.createProfile}
+                {loading ? t.profile.common.saving : isEditing ? t.profile.mentee.updateProfile : t.profile.mentee.createProfile}
               </button>
             </div>
           </form>

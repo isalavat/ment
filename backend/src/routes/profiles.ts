@@ -295,6 +295,19 @@ router.get("/categories", async (req, res) => {
   }
 });
 
+// GET all skills
+router.get("/skills", async (req, res) => {
+  try {
+    const skills = await prisma.skill.findMany({
+      orderBy: { name: 'asc' }
+    });
+    return res.json({ skills });
+  } catch (error) {
+    console.error("Get skills error:", error);
+    return res.status(500).json({ error: "Failed to fetch skills" });
+  }
+});
+
 // POST - Add category to mentor profile
 router.post("/mentor/categories", requireAuth, async (req: AuthedRequest, res) => {
   const userId = req.user?.id;
