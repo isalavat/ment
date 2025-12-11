@@ -53,4 +53,15 @@ export const profileService = {
     const response = await api.delete(`/profiles/mentor/categories/${categoryId}`);
     return response.data;
   },
+
+  // Skills
+  addSkillToMentorProfile: async (skillId?: number, skillName?: string): Promise<MentorProfile> => {
+    const response = await api.post('/profiles/mentor/skills', { skillId, skillName });
+    return response.data.profile;
+  },
+
+  removeSkillFromMentorProfile: async (skillId: number): Promise<{ message: string }> => {
+    const response = await api.delete(`/profiles/mentor/skills/${skillId}`);
+    return response.data;
+  },
 };

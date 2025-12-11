@@ -74,7 +74,7 @@ export const MenteeProfileForm: React.FC = () => {
   }
 
   return (
-    <div className="profile-form-container">
+    <div className="content-area">
       <div className="page-header">
         <h1 className="page-title">
           {isEditing ? t.profile.mentee.titleEdit : t.profile.mentee.title}
@@ -84,57 +84,85 @@ export const MenteeProfileForm: React.FC = () => {
         </p>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div style={{ 
+          padding: 'var(--space-md)', 
+          background: 'var(--danger-50)', 
+          color: 'var(--danger-700)', 
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 'var(--space-md)'
+        }}>
+          {error}
+        </div>
+      )}
 
-      <div className="profile-form-card">
+      <div className="card">
+        <div className="card-body">
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="bio" className="form-label">
+                {t.profile.mentee.bio} *
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                required
+                rows={6}
+                className="form-textarea"
+                placeholder={t.profile.mentee.bioPlaceholder}
+              />
+              <small style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', display: 'block', marginTop: 'var(--space-xs)' }}>
+                Tell mentors about yourself, your background, current role, and interests
+              </small>
+            </div>
 
-        <form onSubmit={handleSubmit} className="profile-form">
-          <div className="form-group">
-            <label htmlFor="bio" className="form-label">
-              {t.profile.mentee.bio} *
-            </label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              required
-              rows={5}
-              className="form-textarea"
-              placeholder={t.profile.mentee.bioPlaceholder}
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="goals" className="form-label">
+                {t.profile.mentee.goals} *
+              </label>
+              <textarea
+                id="goals"
+                name="goals"
+                value={formData.goals}
+                onChange={handleChange}
+                required
+                rows={6}
+                className="form-textarea"
+                placeholder={t.profile.mentee.goalsPlaceholder}
+              />
+              <small style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', display: 'block', marginTop: 'var(--space-xs)' }}>
+                Share what you want to learn and achieve through mentorship
+              </small>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="goals" className="form-label">
-              {t.profile.mentee.goals} *
-            </label>
-            <textarea
-              id="goals"
-              name="goals"
-              value={formData.goals}
-              onChange={handleChange}
-              required
-              rows={5}
-              className="form-textarea"
-              placeholder={t.profile.mentee.goalsPlaceholder}
-            />
-          </div>
-
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={() => navigate('/dashboard')}
-              className="btn-secondary"
-              disabled={loading}
-            >
-              {t.common.cancel}
-            </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? t.common.loading : isEditing ? t.profile.mentee.updateProfile : t.profile.mentee.createProfile}
-            </button>
-          </div>
-        </form>
+            <div style={{ 
+              display: 'flex', 
+              gap: 'var(--space-md)', 
+              justifyContent: 'flex-end',
+              paddingTop: 'var(--space-lg)',
+              borderTop: '1px solid var(--neutral-200)',
+              marginTop: 'var(--space-lg)'
+            }}>
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="btn btn-outline"
+                disabled={loading}
+              >
+                {t.common.cancel}
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                disabled={loading}
+              >
+                {loading ? t.common.loading : isEditing ? t.profile.mentee.updateProfile : t.profile.mentee.createProfile}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

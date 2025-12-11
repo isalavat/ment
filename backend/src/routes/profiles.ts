@@ -362,4 +362,112 @@ router.delete("/mentor/categories/:categoryId", requireAuth, async (req: AuthedR
   }
 });
 
+// POST - Add skill to mentor profile
+router.post("/mentor/skills", requireAuth, async (req: AuthedRequest, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (user?.role !== "MENTOR") {
+    return res.status(403).json({ error: "Only mentors can manage skills" });
+  }
+
+  const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+  if (!profile) {
+    return res.status(404).json({ error: "Mentor profile not found" });
+  }
+
+  const { skillId, skillName } = req.body;
+  
+  let finalSkillId = skillId;
+
+  // If skillName is provided, create or find the skill
+  if (skillName && !skillId) {
+    const existingSkill = await prisma.skill.findUnique({ where: { name: skillName } });
+    if (existingSkill) {
+      finalSkillId = existingSkill.id;
+    } else {
+      const newSkill = await prisma.skill.create({ data: { name: skillName } });
+      finalSkillId = newSkill.id;
+    }
+  }
+
+  if (!finalSkillId) {
+    return res.status(400).json({ error: "Skill ID or name is required" });
+  }
+
+  // Check if already added
+  const existing = await prisma.mentorSkill.findUnique({
+    where: {
+      mentorId_skillId: {
+        mentorId: profile.id,
+        skillId: finalSkillId
+      }
+    }
+  });
+
+  if (existing) {
+    return res.status(409).json({ error: "Skill already added" });
+  }
+
+  try {
+    await prisma.mentorSkill.create({
+      data: {
+        mentorId: profile.id,
+        skillId: finalSkillId
+      }
+    });
+
+    // Return updated profile with skills
+    const updatedProfile = await prisma.mentorProfile.findUnique({
+      where: { id: profile.id },
+      include: {
+        skills: {
+          include: {
+            skill: true
+          }
+        }
+      }
+    });
+
+    return res.json({ profile: updatedProfile });
+  } catch (error) {
+    console.error("Add skill error:", error);
+    return res.status(500).json({ error: "Failed to add skill" });
+  }
+});
+
+// DELETE - Remove skill from mentor profile
+router.delete("/mentor/skills/:skillId", requireAuth, async (req: AuthedRequest, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (user?.role !== "MENTOR") {
+    return res.status(403).json({ error: "Only mentors can manage skills" });
+  }
+
+  const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+  if (!profile) {
+    return res.status(404).json({ error: "Mentor profile not found" });
+  }
+
+  const { skillId } = req.params;
+
+  try {
+    await prisma.mentorSkill.delete({
+      where: {
+        mentorId_skillId: {
+          mentorId: profile.id,
+          skillId: parseInt(skillId)
+        }
+      }
+    });
+    return res.json({ message: "Skill removed successfully" });
+  } catch (error) {
+    console.error("Remove skill error:", error);
+    return res.status(500).json({ error: "Failed to remove skill" });
+  }
+});
+
 export default router;
