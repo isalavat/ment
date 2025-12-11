@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminService, User, UpdateUserData, UpdateMentorProfileData, UpdateMenteeProfileData, Skill } from '../../services/adminService';
+import { profileService } from '../../services/profileService';
 import { useLanguage } from '../../i18n/LanguageContext';
 import './AdminUsers.css';
 
@@ -40,10 +41,15 @@ export const AdminUserDetail: React.FC = () => {
   const [newSkillName, setNewSkillName] = useState('');
   const [selectedSkillId, setSelectedSkillId] = useState<number | ''>('');
 
+  const [availableCategories, setAvailableCategories] = useState<Array<{ id: number; name: string; slug: string; description?: string }>>([]);
+  const [mentorCategories, setMentorCategories] = useState<any[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | ''>('');
+
   useEffect(() => {
     if (id) {
       loadUser();
       loadSkills();
+      loadCategories();
     }
   }, [id]);
 
@@ -76,6 +82,11 @@ export const AdminUserDetail: React.FC = () => {
         if ((data.mentorProfile as any).skills) {
           setMentorSkills((data.mentorProfile as any).skills);
         }
+        
+        // Load mentor categories
+        if ((data.mentorProfile as any).categories) {
+          setMentorCategories((data.mentorProfile as any).categories);
+        }
       }
 
       if (data.menteeProfile) {
@@ -97,6 +108,15 @@ export const AdminUserDetail: React.FC = () => {
       setAvailableSkills(skills);
     } catch (err) {
       console.error('Failed to load skills', err);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const response = await profileService.getCategories();
+      setAvailableCategories(response.categories);
+    } catch (err) {
+      console.error('Failed to load categories', err);
     }
   };
 
@@ -201,6 +221,46 @@ export const AdminUserDetail: React.FC = () => {
       setSuccess('Skill removed successfully');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to remove skill');
+    }
+  };
+
+  const handleAddCategory = async () => {
+    if (!selectedCategoryId) {
+      alert('Please select a category');
+      return;
+    }
+
+    try {
+      setError('');
+      const updatedProfile = await adminService.addCategoryToMentor(
+        parseInt(id!),
+        Number(selectedCategoryId)
+      );
+      
+      console.log('Updated profile after adding category:', updatedProfile);
+      
+      if (updatedProfile.categories) {
+        setMentorCategories(updatedProfile.categories);
+      }
+      setSelectedCategoryId('');
+      setSuccess('Category added successfully');
+      
+      // Reload user to ensure everything is in sync
+      await loadUser();
+    } catch (err: any) {
+      console.error('Error adding category:', err);
+      setError(err.response?.data?.error || 'Failed to add category');
+    }
+  };
+
+  const handleRemoveCategory = async (categoryId: number) => {
+    try {
+      setError('');
+      await adminService.removeCategoryFromMentor(parseInt(id!), categoryId);
+      setMentorCategories(prev => prev.filter(mc => mc.category.id !== categoryId));
+      setSuccess('Category removed successfully');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to remove category');
     }
   };
 
@@ -500,6 +560,65 @@ export const AdminUserDetail: React.FC = () => {
                           onClick={handleAddSkill}
                         >
                           + Add Skill
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Categories Management */}
+                  <div className="form-group">
+                    <label className="form-label">Categories</label>
+                    
+                    {/* Current Categories */}
+                    <div className="skills-list mb-md">
+                      {mentorCategories.length > 0 ? (
+                        mentorCategories.map((mc: any) => (
+                          <div key={mc.category.id} className="skill-chip">
+                            <span>{mc.category.name}</span>
+                            <button
+                              type="button"
+                              className="skill-remove"
+                              onClick={() => handleRemoveCategory(mc.category.id)}
+                              title="Remove category"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
+                          No categories assigned yet
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Add Category */}
+                    <div className="skill-add-form">
+                      <div className="form-row">
+                        <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+                          <select
+                            className="form-select"
+                            value={selectedCategoryId}
+                            onChange={(e) => setSelectedCategoryId(e.target.value ? Number(e.target.value) : '')}
+                          >
+                            <option value="">Select category...</option>
+                            {availableCategories
+                              .filter(cat => !mentorCategories.some(mc => mc.category.id === cat.id))
+                              .map(category => (
+                                <option key={category.id} value={category.id}>
+                                  {category.name}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="btn btn-outline"
+                          onClick={handleAddCategory}
+                          disabled={!selectedCategoryId}
+                        >
+                          + Add Category
                         </button>
                       </div>
                     </div>

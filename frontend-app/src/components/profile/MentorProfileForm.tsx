@@ -12,6 +12,7 @@ export const MentorProfileForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [mentorProfileId, setMentorProfileId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     bio: '',
     title: '',
@@ -19,6 +20,9 @@ export const MentorProfileForm: React.FC = () => {
     hourlyRate: 0,
     currency: 'USD',
   });
+  const [categories, setCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Array<{ category: { id: number; name: string; slug: string } }>>([]);
+  const [availableCategories, setAvailableCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
 
   useEffect(() => {
     if (user?.role !== 'MENTOR') {
@@ -26,7 +30,17 @@ export const MentorProfileForm: React.FC = () => {
       return;
     }
     loadProfile();
+    loadCategories();
   }, [user]);
+
+  const loadCategories = async () => {
+    try {
+      const { categories: allCategories } = await profileService.getCategories();
+      setCategories(allCategories);
+    } catch (err) {
+      console.error('Error loading categories:', err);
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -40,6 +54,8 @@ export const MentorProfileForm: React.FC = () => {
           hourlyRate: userData.mentorProfile.hourlyRate,
           currency: userData.mentorProfile.currency,
         });
+        setMentorProfileId(userData.mentorProfile.id);
+        setSelectedCategories(userData.mentorProfile.categories || []);
         setIsEditing(true);
       }
     } catch (err: any) {
@@ -74,6 +90,30 @@ export const MentorProfileForm: React.FC = () => {
       ...formData,
       [name]: name === 'yearsExperience' || name === 'hourlyRate' ? Number(value) : value,
     });
+  };
+
+  const handleAddCategory = async (categoryId: number) => {
+    try {
+      await profileService.addCategoryToMentorProfile(categoryId);
+      await loadProfile(); // Reload to get updated categories
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to add category');
+    }
+  };
+
+  const handleRemoveCategory = async (categoryId: number) => {
+    try {
+      await profileService.removeCategoryFromMentorProfile(categoryId);
+      await loadProfile(); // Reload to get updated categories
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to remove category');
+    }
+  };
+
+  // Get categories that are not yet selected
+  const getAvailableCategories = () => {
+    const selectedIds = selectedCategories.map(c => c.category.id);
+    return categories.filter(c => !selectedIds.includes(c.id));
   };
 
   if (loading && !formData.bio) {
@@ -181,6 +221,48 @@ export const MentorProfileForm: React.FC = () => {
               </select>
             </div>
           </div>
+
+          {isEditing && (
+            <div className="form-group">
+              <label className="form-label">Categories</label>
+              <div className="categories-section">
+                <div className="selected-categories">
+                  {selectedCategories.map((catRel) => (
+                    <div key={catRel.category.id} className="category-chip">
+                      <span>{catRel.category.name}</span>
+                      <button
+                        type="button"
+                        className="category-remove"
+                        onClick={() => handleRemoveCategory(catRel.category.id)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {getAvailableCategories().length > 0 && (
+                  <div className="add-category-form">
+                    <select
+                      className="form-select"
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleAddCategory(parseInt(e.target.value));
+                          e.target.value = '';
+                        }
+                      }}
+                    >
+                      <option value="">Add a category...</option>
+                      {getAvailableCategories().map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="form-actions">
             <button

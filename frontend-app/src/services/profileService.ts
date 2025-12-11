@@ -37,4 +37,20 @@ export const profileService = {
     const response = await api.put('/profiles/mentee', data);
     return response.data;
   },
+
+  // Categories
+  getCategories: async (): Promise<{ categories: Array<{ id: number; name: string; slug: string; description?: string }> }> => {
+    const response = await api.get('/profiles/categories');
+    return response.data;
+  },
+
+  addCategoryToMentorProfile: async (categoryId: number): Promise<{ message: string }> => {
+    const response = await api.post('/profiles/mentor/categories', { categoryId });
+    return response.data;
+  },
+
+  removeCategoryFromMentorProfile: async (categoryId: number): Promise<{ message: string }> => {
+    const response = await api.delete(`/profiles/mentor/categories/${categoryId}`);
+    return response.data;
+  },
 };

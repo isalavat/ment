@@ -91,7 +91,11 @@ router.get("/users/:id", async (req, res) => {
       include: {
         mentorProfile: {
           include: {
-            categories: true,
+            categories: {
+              include: {
+                category: true
+              }
+            },
             skills: {
               include: {
                 skill: true
@@ -522,6 +526,103 @@ router.delete("/users/:id/mentor-profile/skills/:skillId", async (req, res) => {
     return res.json({ message: "Skill removed successfully" });
   } catch (error) {
     logger.error(`Admin remove skill from mentor error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// POST add category to mentor profile
+router.post("/users/:id/mentor-profile/categories", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const { categoryId } = req.body;
+
+    if (!categoryId) {
+      return res.status(400).json({ error: "Category ID is required" });
+    }
+
+    // Get mentor profile
+    const mentorProfile = await prisma.mentorProfile.findUnique({ 
+      where: { userId } 
+    });
+    
+    if (!mentorProfile) {
+      return res.status(404).json({ error: "Mentor profile not found" });
+    }
+
+    // Check if already added
+    const existing = await prisma.mentorCategory.findUnique({
+      where: {
+        mentorId_categoryId: {
+          mentorId: mentorProfile.id,
+          categoryId: parseInt(categoryId)
+        }
+      }
+    });
+
+    if (existing) {
+      return res.status(409).json({ error: "Category already added to this mentor" });
+    }
+
+    // Add category to mentor
+    const created = await prisma.mentorCategory.create({
+      data: {
+        mentorId: mentorProfile.id,
+        categoryId: parseInt(categoryId)
+      }
+    });
+    
+    logger.info(`Created MentorCategory: mentorId=${created.mentorId}, categoryId=${created.categoryId}`);
+
+    // Return updated profile with categories
+    const updatedProfile = await prisma.mentorProfile.findUnique({
+      where: { id: mentorProfile.id },
+      include: {
+        categories: {
+          include: {
+            category: true
+          }
+        }
+      }
+    });
+
+    logger.info(`Admin added category to mentor profile user ID: ${userId}, categories count: ${updatedProfile?.categories?.length}`);
+    console.log('Updated profile categories:', JSON.stringify(updatedProfile?.categories, null, 2));
+    return res.json({ profile: updatedProfile });
+  } catch (error) {
+    logger.error(`Admin add category to mentor error: ${(error as Error).message}`);
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// DELETE remove category from mentor profile
+router.delete("/users/:id/mentor-profile/categories/:categoryId", async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const categoryId = parseInt(req.params.categoryId);
+
+    // Get mentor profile
+    const mentorProfile = await prisma.mentorProfile.findUnique({ 
+      where: { userId } 
+    });
+    
+    if (!mentorProfile) {
+      return res.status(404).json({ error: "Mentor profile not found" });
+    }
+
+    // Remove category from mentor
+    await prisma.mentorCategory.delete({
+      where: {
+        mentorId_categoryId: {
+          mentorId: mentorProfile.id,
+          categoryId: categoryId
+        }
+      }
+    });
+
+    logger.info(`Admin removed category from mentor profile user ID: ${userId}`);
+    return res.json({ message: "Category removed successfully" });
+  } catch (error) {
+    logger.error(`Admin remove category from mentor error: ${(error as Error).message}`);
     return res.status(500).json({ error: (error as Error).message });
   }
 });

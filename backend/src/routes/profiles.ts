@@ -75,7 +75,20 @@ router.get("/me", requireAuth, async (req: AuthedRequest, res) => {
     where: { id: userId },
     include: {
       menteeProfile: true,
-      mentorProfile: true,
+      mentorProfile: {
+        include: {
+          skills: {
+            include: {
+              skill: true
+            }
+          },
+          categories: {
+            include: {
+              category: true
+            }
+          }
+        }
+      }
     },
   });
 
@@ -267,6 +280,86 @@ router.put("/mentee", requireAuth, async (req: AuthedRequest, res) => {
     });
 
     return res.json({ profile });
+});
+
+// GET all categories
+router.get("/categories", async (req, res) => {
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { name: 'asc' }
+    });
+    return res.json({ categories });
+  } catch (error) {
+    console.error("Get categories error:", error);
+    return res.status(500).json({ error: "Failed to fetch categories" });
+  }
+});
+
+// POST - Add category to mentor profile
+router.post("/mentor/categories", requireAuth, async (req: AuthedRequest, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (user?.role !== "MENTOR") {
+    return res.status(403).json({ error: "Only mentors can manage categories" });
+  }
+
+  const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+  if (!profile) {
+    return res.status(404).json({ error: "Mentor profile not found" });
+  }
+
+  const { categoryId } = req.body;
+  if (!categoryId) {
+    return res.status(400).json({ error: "Category ID is required" });
+  }
+
+  try {
+    await prisma.mentorCategory.create({
+      data: {
+        mentorId: profile.id,
+        categoryId: parseInt(categoryId)
+      }
+    });
+    return res.json({ message: "Category added successfully" });
+  } catch (error) {
+    console.error("Add category error:", error);
+    return res.status(500).json({ error: "Failed to add category" });
+  }
+});
+
+// DELETE - Remove category from mentor profile
+router.delete("/mentor/categories/:categoryId", requireAuth, async (req: AuthedRequest, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (user?.role !== "MENTOR") {
+    return res.status(403).json({ error: "Only mentors can manage categories" });
+  }
+
+  const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+  if (!profile) {
+    return res.status(404).json({ error: "Mentor profile not found" });
+  }
+
+  const { categoryId } = req.params;
+
+  try {
+    await prisma.mentorCategory.delete({
+      where: {
+        mentorId_categoryId: {
+          mentorId: profile.id,
+          categoryId: parseInt(categoryId)
+        }
+      }
+    });
+    return res.json({ message: "Category removed successfully" });
+  } catch (error) {
+    console.error("Remove category error:", error);
+    return res.status(500).json({ error: "Failed to remove category" });
+  }
 });
 
 export default router;

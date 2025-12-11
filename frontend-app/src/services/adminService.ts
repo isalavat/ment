@@ -161,5 +161,16 @@ export const adminService = {
   // Remove skill from mentor profile
   removeSkillFromMentor: async (userId: number, skillId: number): Promise<void> => {
     await axios.delete(`/admin/users/${userId}/mentor-profile/skills/${skillId}`);
+  },
+
+  // Add category to mentor profile
+  addCategoryToMentor: async (userId: number, categoryId: number): Promise<any> => {
+    const response = await axios.post(`/admin/users/${userId}/mentor-profile/categories`, { categoryId });
+    return response.data.profile;
+  },
+
+  // Remove category from mentor profile
+  removeCategoryFromMentor: async (userId: number, categoryId: number): Promise<void> => {
+    await axios.delete(`/admin/users/${userId}/mentor-profile/categories/${categoryId}`);
   }
 };

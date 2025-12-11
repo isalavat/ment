@@ -10,6 +10,20 @@ export interface MentorProfile {
   totalReviews: number;
   createdAt: string;
   updatedAt: string;
+  categories?: Array<{
+    category: {
+      id: number;
+      name: string;
+      slug: string;
+      description?: string;
+    };
+  }>;
+  skills?: Array<{
+    skill: {
+      id: number;
+      name: string;
+    };
+  }>;
 }
 
 export interface MenteeProfile {
