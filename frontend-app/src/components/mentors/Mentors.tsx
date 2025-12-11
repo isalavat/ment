@@ -12,6 +12,8 @@ export const Mentors: React.FC = () => {
   const [skills, setSkills] = useState<Array<{ id: number; name: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
     category: '',
     skill: '',
@@ -39,7 +41,10 @@ export const Mentors: React.FC = () => {
       setLoading(true);
       setError('');
       try {
-        const params: any = {};
+        const params: any = {
+          page: currentPage,
+          limit: 9
+        };
         
         if (filters.category) {
           params.category = filters.category;
@@ -65,7 +70,8 @@ export const Mentors: React.FC = () => {
         }
 
         const data = await mentorService.getMentors(params);
-        setMentors(data);
+        setMentors(data.mentors);
+        setTotalPages(data.pagination.totalPages);
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to fetch mentors');
         console.error('Error fetching mentors:', err);
@@ -75,10 +81,11 @@ export const Mentors: React.FC = () => {
     };
 
     fetchMentors();
-  }, [filters.category, filters.skill, filters.rating, filters.price]);
+  }, [filters.category, filters.skill, filters.rating, filters.price, currentPage]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters({ ...filters, [key]: value });
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const clearFilters = () => {
@@ -89,6 +96,14 @@ export const Mentors: React.FC = () => {
       price: '',
       sort: 'rating',
     });
+    setCurrentPage(1); // Reset to first page when clearing filters
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // Sort mentors locally
@@ -275,20 +290,56 @@ export const Mentors: React.FC = () => {
       )}
 
       {/* Pagination */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: 'var(--space-xl)',
-          gap: 'var(--space-sm)',
-        }}
-      >
-        <button className="btn btn-outline">← Previous</button>
-        <button className="btn btn-primary">1</button>
-        <button className="btn btn-outline">2</button>
-        <button className="btn btn-outline">3</button>
-        <button className="btn btn-outline">Next →</button>
-      </div>
+      {totalPages > 1 && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 'var(--space-xl)',
+            gap: 'var(--space-sm)',
+          }}
+        >
+          <button 
+            className="btn btn-outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            ← Previous
+          </button>
+          
+          {/* Page numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+            // Show first page, last page, current page, and pages around current
+            if (
+              page === 1 ||
+              page === totalPages ||
+              (page >= currentPage - 1 && page <= currentPage + 1)
+            ) {
+              return (
+                <button
+                  key={page}
+                  className={`btn ${page === currentPage ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              );
+            } else if (page === currentPage - 2 || page === currentPage + 2) {
+              return <span key={page}>...</span>;
+            }
+            return null;
+          })}
+          
+          <button 
+            className="btn btn-outline"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -98,7 +98,11 @@ router.get("/me", requireAuth, async (req: AuthedRequest, res) => {
 // GET all mentors with filtering
 router.get("/mentors", async (req, res) => {
   try {
-    const { category, skill, rating, minPrice, maxPrice, search } = req.query;
+    const { category, skill, rating, minPrice, maxPrice, search, page = "1", limit = "9" } = req.query;
+
+    const pageNum = parseInt(page as string);
+    const limitNum = parseInt(limit as string);
+    const skip = (pageNum - 1) * limitNum;
 
     const where: any = {};
 
@@ -152,35 +156,50 @@ router.get("/mentors", async (req, res) => {
       ];
     }
 
-    const mentors = await prisma.mentorProfile.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            avatarUrl: true
+    const [mentors, total] = await Promise.all([
+      prisma.mentorProfile.findMany({
+        where,
+        skip,
+        take: limitNum,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              avatarUrl: true
+            }
+          },
+          skills: {
+            include: {
+              skill: true
+            }
+          },
+          categories: {
+            include: {
+              category: true
+            }
           }
         },
-        skills: {
-          include: {
-            skill: true
-          }
-        },
-        categories: {
-          include: {
-            category: true
-          }
+        orderBy: {
+          avgRating: 'desc'
         }
-      },
-      orderBy: {
-        avgRating: 'desc'
+      }),
+      prisma.mentorProfile.count({ where })
+    ]);
+
+    const totalPages = Math.ceil(total / limitNum);
+
+    return res.json({ 
+      mentors,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages
       }
     });
-
-    return res.json({ mentors });
   } catch (error) {
     console.error("Get mentors error:", error);
     return res.status(500).json({ error: "Failed to fetch mentors" });
