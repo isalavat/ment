@@ -8,7 +8,15 @@ export const ru = {
     settings: "Настройки",
     logout: "Выйти",
     login: "Войти",
-    register: "Регистрация"
+    register: "Регистрация",
+    sections: {
+      main: "Главное",
+      admin: "Администратор",
+      account: "Аккаунт"
+    },
+    admin: {
+      userManagement: "Управление Пользователями"
+    }
   },
   common: {
     search: "Поиск",
@@ -75,7 +83,31 @@ export const ru = {
     priceHighToLow: "Цена: От высокой к низкой",
     mostReviews: "Больше всего отзывов",
     reviews: "отзывов",
-    perHour: "/час"
+    perHour: "/час",
+    detail: {
+      loading: "Загрузка профиля ментора...",
+      notFound: "Ментор не найден",
+      fetchError: "Не удалось загрузить данные ментора",
+      backToMentors: "Вернуться к менторам",
+      defaultTitle: "Ментор",
+      yearsExperience: "лет опыта",
+      bookSession: "Забронировать Сессию",
+      addToFavorites: "Добавить в Избранное",
+      message: "Сообщение",
+      perHour: "/час",
+      about: "О себе",
+      noBio: "Информация отсутствует",
+      skillsExpertise: "Навыки и Экспертиза",
+      reviewsTitle: "Отзывы",
+      noReviews: "Пока нет отзывов",
+      stats: "Статистика",
+      responseTime: "Время Ответа",
+      responseTimeValue: "В течение 24 часов",
+      totalSessions: "Всего Сессий",
+      hourlyRate: "Почасовая Ставка",
+      contact: "Контакт",
+      categories: "Категории"
+    }
   },
   profile: {
     mentee: {

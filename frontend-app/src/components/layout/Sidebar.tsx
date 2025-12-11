@@ -34,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </div>
             <nav className="sidebar-nav">
                 <div className="nav-section">
-                    <div className="nav-section-title">Main</div>
+                    <div className="nav-section-title">{t.nav.sections.main}</div>
                     <Link to="/" className="nav-item" onClick={handleLinkClick}>
                         <span className="nav-icon">👨‍🎓</span>
                         <span>{t.nav.home}</span>
@@ -54,10 +54,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             {user?.role === 'ADMIN' && (
                 <nav className="sidebar-nav">
                     <div className="nav-section">
-                        <div className="nav-section-title">Admin</div>
+                        <div className="nav-section-title">{t.nav.sections.admin}</div>
                         <Link to="/admin/users" className="nav-item" onClick={handleLinkClick}>
                             <span className="nav-icon">⚙️</span>
-                            <span>User Management</span>
+                            <span>{t.nav.admin.userManagement}</span>
                         </Link>
                     </div>
                 </nav>
@@ -84,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </nav>
             <nav className="sidebar-nav">
                 <div className="nav-section">
-                    <div className="nav-section-title">Account</div>
+                    <div className="nav-section-title">{t.nav.sections.account}</div>
 
                    <div className="nav-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
                         <span className="nav-icon">🚪</span>

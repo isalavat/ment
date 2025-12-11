@@ -42,7 +42,7 @@ export const MentorDetail: React.FC = () => {
     return (
       <div className="content-area">
         <div style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--neutral-600)' }}>
-          Loading mentor profile...
+          {t.mentors.detail.loading}
         </div>
       </div>
     );
@@ -58,10 +58,10 @@ export const MentorDetail: React.FC = () => {
           borderRadius: 'var(--radius-md)',
           marginBottom: 'var(--space-md)'
         }}>
-          {error || 'Mentor not found'}
+          {error || t.mentors.detail.notFound}
         </div>
         <button className="btn btn-outline" onClick={() => navigate('/mentors')}>
-          ← Back to Mentors
+          ← {t.mentors.detail.backToMentors}
         </button>
       </div>
     );
@@ -81,7 +81,7 @@ export const MentorDetail: React.FC = () => {
             textDecoration: 'none'
           }}
         >
-          ← Back to Mentors
+          ← {t.mentors.detail.backToMentors}
         </a>
       </div>
 
@@ -98,19 +98,19 @@ export const MentorDetail: React.FC = () => {
                     {mentor.user?.firstName} {mentor.user?.lastName}
                   </h1>
                   <p style={{ fontSize: 'var(--font-size-lg)', color: 'var(--neutral-600)', marginBottom: 'var(--space-sm)' }}>
-                    {mentor.title || 'Mentor'}
+                    {mentor.title || t.mentors.detail.defaultTitle}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
                       <span style={{ color: 'var(--warning-yellow)', fontSize: '20px' }}>⭐</span>
                       <span style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600 }}>{mentor.avgRating?.toFixed(1) || '0.0'}</span>
-                      <span style={{ color: 'var(--neutral-500)' }}>({mentor.totalReviews || 0} reviews)</span>
+                      <span style={{ color: 'var(--neutral-500)' }}>({mentor.totalReviews || 0} {t.mentors.reviews})</span>
                     </div>
                     {mentor.yearsExperience && (
                       <>
                         <span style={{ color: 'var(--neutral-400)' }}>|</span>
                         <div>
-                          <span style={{ fontWeight: 600 }}>{mentor.yearsExperience}</span> years experience
+                          <span style={{ fontWeight: 600 }}>{mentor.yearsExperience}</span> {t.mentors.detail.yearsExperience}
                         </div>
                       </>
                     )}
@@ -118,20 +118,20 @@ export const MentorDetail: React.FC = () => {
                   
                   <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
                     <button className="btn btn-primary btn-lg">
-                      📅 Book Session
+                      📅 {t.mentors.detail.bookSession}
                     </button>
                     <button className="btn btn-outline btn-lg">
-                      ❤️ Add to Favorites
+                      ❤️ {t.mentors.detail.addToFavorites}
                     </button>
                     <button className="btn btn-outline btn-lg">
-                      💬 Message
+                      💬 {t.mentors.detail.message}
                     </button>
                   </div>
                 </div>
                 
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 'var(--font-size-xxl)', fontWeight: 600, color: 'var(--primary-blue)' }}>
-                    ${mentor.hourlyRate || 0}<span style={{ fontSize: 'var(--font-size-base)', fontWeight: 400, color: 'var(--neutral-600)' }}>/hour</span>
+                    ${mentor.hourlyRate || 0}<span style={{ fontSize: 'var(--font-size-base)', fontWeight: 400, color: 'var(--neutral-600)' }}>{t.mentors.detail.perHour}</span>
                   </div>
                   <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--neutral-500)' }}>{mentor.currency || 'USD'}</div>
                 </div>
@@ -146,11 +146,11 @@ export const MentorDetail: React.FC = () => {
           {/* About Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">About</h2>
+              <h2 className="card-title">{t.mentors.detail.about}</h2>
             </div>
             <div className="card-body">
               <p style={{ lineHeight: 1.8 }}>
-                {mentor.bio || 'No bio available'}
+                {mentor.bio || t.mentors.detail.noBio}
               </p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export const MentorDetail: React.FC = () => {
           {mentor.skills && mentor.skills.length > 0 && (
             <div className="card">
               <div className="card-header">
-                <h2 className="card-title">Skills & Expertise</h2>
+                <h2 className="card-title">{t.mentors.detail.skillsExpertise}</h2>
               </div>
               <div className="card-body">
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
@@ -176,11 +176,11 @@ export const MentorDetail: React.FC = () => {
           {/* Reviews Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Reviews ({mentor.totalReviews || 0})</h2>
+              <h2 className="card-title">{t.mentors.detail.reviewsTitle} ({mentor.totalReviews || 0})</h2>
             </div>
             <div className="card-body">
               <div style={{ textAlign: 'center', color: 'var(--neutral-500)', padding: 'var(--space-xl)' }}>
-                No reviews yet
+                {t.mentors.detail.noReviews}
               </div>
             </div>
           </div>
@@ -191,27 +191,27 @@ export const MentorDetail: React.FC = () => {
           {/* Stats Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Stats</h2>
+              <h2 className="card-title">{t.mentors.detail.stats}</h2>
             </div>
             <div className="card-body">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
                 <div>
-                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Response Time</div>
-                  <div style={{ fontWeight: 600, fontSize: 'var(--font-size-md)' }}>Within 24 hours</div>
+                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>{t.mentors.detail.responseTime}</div>
+                  <div style={{ fontWeight: 600, fontSize: 'var(--font-size-md)' }}>{t.mentors.detail.responseTimeValue}</div>
                 </div>
                 
                 <div>
-                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Total Sessions</div>
+                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>{t.mentors.detail.totalSessions}</div>
                   <div style={{ fontWeight: 600, fontSize: 'var(--font-size-md)' }}>{mentor.totalReviews || 0}+</div>
                 </div>
                 
                 <div>
-                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Hourly Rate</div>
+                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>{t.mentors.detail.hourlyRate}</div>
                   <div style={{ fontWeight: 600, fontSize: 'var(--font-size-md)' }}>${mentor.hourlyRate || 0}/{mentor.currency || 'USD'}</div>
                 </div>
                 
                 <div>
-                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Contact</div>
+                  <div style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>{t.mentors.detail.contact}</div>
                   <div style={{ fontWeight: 600, fontSize: 'var(--font-size-md)', wordBreak: 'break-all' }}>{mentor.user?.email}</div>
                 </div>
               </div>
@@ -222,7 +222,7 @@ export const MentorDetail: React.FC = () => {
           {mentor.categories && mentor.categories.length > 0 && (
             <div className="card">
               <div className="card-header">
-                <h2 className="card-title">Categories</h2>
+                <h2 className="card-title">{t.mentors.detail.categories}</h2>
               </div>
               <div className="card-body">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>

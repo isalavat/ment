@@ -8,7 +8,15 @@ export const en = {
     settings: "Settings",
     logout: "Logout",
     login: "Login",
-    register: "Register"
+    register: "Register",
+    sections: {
+      main: "Main",
+      admin: "Admin",
+      account: "Account"
+    },
+    admin: {
+      userManagement: "User Management"
+    }
   },
   common: {
     search: "Search",
@@ -75,7 +83,31 @@ export const en = {
     priceHighToLow: "Price: High to Low",
     mostReviews: "Most Reviews",
     reviews: "reviews",
-    perHour: "/hr"
+    perHour: "/hr",
+    detail: {
+      loading: "Loading mentor profile...",
+      notFound: "Mentor not found",
+      fetchError: "Failed to fetch mentor details",
+      backToMentors: "Back to Mentors",
+      defaultTitle: "Mentor",
+      yearsExperience: "years experience",
+      bookSession: "Book Session",
+      addToFavorites: "Add to Favorites",
+      message: "Message",
+      perHour: "/hour",
+      about: "About",
+      noBio: "No bio available",
+      skillsExpertise: "Skills & Expertise",
+      reviewsTitle: "Reviews",
+      noReviews: "No reviews yet",
+      stats: "Stats",
+      responseTime: "Response Time",
+      responseTimeValue: "Within 24 hours",
+      totalSessions: "Total Sessions",
+      hourlyRate: "Hourly Rate",
+      contact: "Contact",
+      categories: "Categories"
+    }
   },
   profile: {
     mentee: {

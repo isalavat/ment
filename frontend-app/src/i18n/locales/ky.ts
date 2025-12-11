@@ -8,7 +8,15 @@ export const ky = {
     settings: "Жөндөөлөр",
     logout: "Чыгуу",
     login: "Кирүү",
-    register: "Каттоо"
+    register: "Каттоо",
+    sections: {
+      main: "Башкы",
+      admin: "Администратор",
+      account: "Аккаунт"
+    },
+    admin: {
+      userManagement: "Колдонуучуларды Башкаруу"
+    }
   },
   common: {
     search: "Издөө",
@@ -75,7 +83,31 @@ export const ky = {
     priceHighToLow: "Баа: Кымбаттан арзанга",
     mostReviews: "Көп пикирлер",
     reviews: "пикирлер",
-    perHour: "/саат"
+    perHour: "/саат",
+    detail: {
+      loading: "Ментор профили жүктөлүүдө...",
+      notFound: "Ментор табылган жок",
+      fetchError: "Ментор маалыматтарын алуу ийгиликсиз болду",
+      backToMentors: "Менторлорго кайтуу",
+      defaultTitle: "Ментор",
+      yearsExperience: "жыл тажрыйба",
+      bookSession: "Сессия Брондоо",
+      addToFavorites: "Сүйүктүүлөргө Кошуу",
+      message: "Билдирүү",
+      perHour: "/саат",
+      about: "Өзү жөнүндө",
+      noBio: "Маалымат жок",
+      skillsExpertise: "Көндүмдөр жана Адистиги",
+      reviewsTitle: "Пикирлер",
+      noReviews: "Азырынча пикир жок",
+      stats: "Статистика",
+      responseTime: "Жооп Берүү Убактысы",
+      responseTimeValue: "24 саат ичинде",
+      totalSessions: "Бардыгы Сессиялар",
+      hourlyRate: "Саатына Баасы",
+      contact: "Байланыш",
+      categories: "Категориялар"
+    }
   },
   profile: {
     mentee: {
