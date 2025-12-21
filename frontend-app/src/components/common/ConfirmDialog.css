@@ -15,7 +15,8 @@
 .confirm-dialog {
   background: white;
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
@@ -92,11 +93,11 @@
   .confirm-dialog {
     width: 95%;
   }
-  
+
   .confirm-dialog-footer {
     flex-direction: column-reverse;
   }
-  
+
   .confirm-dialog-footer .btn {
     width: 100%;
   }

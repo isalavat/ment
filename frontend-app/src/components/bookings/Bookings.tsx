@@ -23,26 +23,26 @@ export const Bookings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<BookingStatusFilter>("ALL");
-  
+
   // Dialog states
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
     onConfirm: () => void;
-    type?: 'danger' | 'warning' | 'info' | 'success';
+    type?: "danger" | "warning" | "info" | "success";
   }>({
     isOpen: false,
     title: "",
     message: "",
     onConfirm: () => {},
   });
-  
+
   const [alertDialog, setAlertDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
-    type?: 'danger' | 'warning' | 'info' | 'success';
+    type?: "danger" | "warning" | "info" | "success";
   }>({
     isOpen: false,
     title: "",
@@ -159,7 +159,8 @@ export const Bookings: React.FC = () => {
     setConfirmDialog({
       isOpen: true,
       title: "Cancel Booking",
-      message: "Are you sure you want to cancel this booking? This action cannot be undone.",
+      message:
+        "Are you sure you want to cancel this booking? This action cannot be undone.",
       type: "danger",
       onConfirm: async () => {
         try {
@@ -449,7 +450,7 @@ export const Bookings: React.FC = () => {
           })}
         </div>
       )}
-      
+
       {/* Dialogs */}
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
@@ -459,7 +460,7 @@ export const Bookings: React.FC = () => {
         onConfirm={confirmDialog.onConfirm}
         onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
       />
-      
+
       <AlertDialog
         isOpen={alertDialog.isOpen}
         title={alertDialog.title}

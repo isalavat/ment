@@ -61,14 +61,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {user?.role === "MENTOR" && (
         <nav className="sidebar-nav">
           <div className="nav-section">
-            <div className="nav-section-title">Mentor Tools</div>
+            <div className="nav-section-title">{t.nav.sections.mentorTools}</div>
             <Link
               to="/availability"
               className="nav-item"
               onClick={handleLinkClick}
             >
               <span className="nav-icon">🗓️</span>
-              <span>Availability</span>
+              <span>{t.nav.mentorTools.availability}</span>
             </Link>
             <Link
               to="/time-slots"
@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               onClick={handleLinkClick}
             >
               <span className="nav-icon">⏰</span>
-              <span>Time Slots</span>
+              <span>{t.nav.mentorTools.timeSlots}</span>
             </Link>
           </div>
         </nav>

@@ -12,10 +12,15 @@ export const ru = {
     sections: {
       main: "Главное",
       admin: "Администратор",
-      account: "Аккаунт"
+      account: "Аккаунт",
+      mentorTools: "Инструменты Ментора"
     },
     admin: {
       userManagement: "Управление Пользователями"
+    },
+    mentorTools: {
+      availability: "Доступность",
+      timeSlots: "Временные Слоты"
     }
   },
   common: {
@@ -52,17 +57,35 @@ export const ru = {
     recommendedForYou: "Рекомендовано для Вас",
     browseAllMentors: "Просмотреть всех менторов",
     mentor: "Ментор",
+    mentee: "Менти",
     topic: "Тема",
     dateTime: "Дата и Время",
+    date: "Дата",
+    duration: "Длительность",
     status: "Статус",
     action: "Действие",
     confirmed: "Подтверждено",
     pending: "В ожидании",
+    completed: "Завершено",
+    needsCompletion: "Требует Завершения",
     joinMeeting: "Присоединиться",
+    recentSessions: "Недавние Сессии",
+    viewAll: "Посмотреть Все",
+    noUpcomingSessions: "Нет предстоящих сессий.",
+    noRecentSessions: "Недавних сессий пока нет",
+    browseMentors: "Найти менторов",
+    complete: "Завершить",
+    viewDetails: "Подробнее",
     sessionCompleted: "Сессия Завершена",
     newBooking: "Новое Бронирование",
     reviewPosted: "Отзыв Опубликован",
-    addedToFavorites: "Добавлено в Избранное"
+    addedToFavorites: "Добавлено в Избранное",
+    noActivityYet: "Активности пока нет",
+    sessionWith: "Сессия с",
+    booking: "Бронирование",
+    bookingConfirmed: "Бронирование Подтверждено",
+    bookingCancelled: "Бронирование Отменено",
+    noMentorsAvailable: "Менторы недоступны"
   },
   mentors: {
     title: "Найдите Своего Идеального Ментора",
@@ -161,6 +184,37 @@ export const ru = {
       onlyMentors: "Только менторы могут получить доступ к этой странице",
       failedToSave: "Не удалось сохранить профиль"
     }
+  },
+  bookings: {
+    title: "Мои Бронирования",
+    confirmBooking: "Подтвердить Бронирование",
+    cancelBooking: "Отменить Бронирование",
+    completeSession: "Завершить Сессию",
+    viewDetails: "Подробнее",
+    complete: "Завершить",
+    meetingLink: "Ссылка на Встречу",
+    addMeetingLink: "Добавить Ссылку",
+    updateLink: "Обновить Ссылку",
+    saveMeetingLink: "Сохранить Ссылку",
+    joinMeeting: "Присоединиться",
+    noMeetingLink: "Ссылка еще не установлена",
+    meetingLinkNotAvailable: "Ссылка на встречу пока недоступна",
+    bookingConfirmed: "Бронирование успешно подтверждено!",
+    bookingCancelled: "Бронирование успешно отменено",
+    sessionCompleted: "Сессия отмечена как завершенная!",
+    meetingLinkUpdated: "Ссылка на встречу успешно обновлена!",
+    confirmBookingMessage: "Вы уверены, что хотите подтвердить эту сессию бронирования?",
+    cancelBookingMessage: "Вы уверены, что хотите отменить это бронирование? Это действие нельзя отменить.",
+    completeSessionMessage: "Отметить эту сессию как завершенную? Это подтверждает, что сессия закончена.",
+    booking: "Бронирование",
+    bookingId: "ID Бронирования",
+    created: "Создано",
+    needsCompletion: "Требует Завершения",
+    recentSessions: "Недавние Сессии",
+    viewAll: "Посмотреть Все",
+    noRecentSessions: "Недавних сессий пока нет",
+    duration: "Длительность",
+    minutes: "мин"
   },
   auth: {
     login: {

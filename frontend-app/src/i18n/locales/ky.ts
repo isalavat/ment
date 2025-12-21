@@ -12,10 +12,15 @@ export const ky = {
     sections: {
       main: "Башкы",
       admin: "Администратор",
-      account: "Аккаунт"
+      account: "Аккаунт",
+      mentorTools: "Ментор Куралдары"
     },
     admin: {
       userManagement: "Колдонуучуларды Башкаруу"
+    },
+    mentorTools: {
+      availability: "Жеткиликтүүлүк",
+      timeSlots: "Убакыт Слоттору"
     }
   },
   common: {
@@ -52,17 +57,35 @@ export const ky = {
     recommendedForYou: "Сизге Сунушталат",
     browseAllMentors: "Бардык менторлорду көрүү",
     mentor: "Ментор",
+    mentee: "Менти",
     topic: "Тема",
     dateTime: "Датасы жана Убакыты",
+    date: "Датасы",
+    duration: "Узактыгы",
     status: "Статусу",
     action: "Аракет",
     confirmed: "Ырасталды",
     pending: "Күтүлүүдө",
+    completed: "Аякталды",
+    needsCompletion: "Аяктоону Талап Кылат",
     joinMeeting: "Кошулуу",
+    recentSessions: "Акыркы Сессиялар",
+    viewAll: "Баарын Көрүү",
+    noUpcomingSessions: "Келе жаткан сессиялар жок.",
+    noRecentSessions: "Азырынча акыркы сессиялар жок",
+    browseMentors: "Менторлорду табуу",
+    complete: "Аяктоо",
+    viewDetails: "Толук Маалымат",
     sessionCompleted: "Сессия Аяктады",
     newBooking: "Жаңы Брондоо",
     reviewPosted: "Пикир Жарыяланды",
-    addedToFavorites: "Сүйүктүүлөргө Кошулду"
+    addedToFavorites: "Сүйүктүүлөргө Кошулду",
+    noActivityYet: "Азырынча иш-аракет жок",
+    sessionWith: "Сессия менен",
+    booking: "Брондоо",
+    bookingConfirmed: "Брондоо Ырасталды",
+    bookingCancelled: "Брондоо Жокко Чыгарылды",
+    noMentorsAvailable: "Менторлор жеткиликсиз"
   },
   mentors: {
     title: "Сиздин Эң Сонун Менторуңузду Табыңыз",
@@ -161,6 +184,37 @@ export const ky = {
       onlyMentors: "Бул бетке ментор гана кире алат",
       failedToSave: "Профилди сактоо ийгиликсиз болду"
     }
+  },
+  bookings: {
+    title: "Менин Брондоолорум",
+    confirmBooking: "Брондоону Ырастоо",
+    cancelBooking: "Брондоону Жокко Чыгаруу",
+    completeSession: "Сессияны Аяктоо",
+    viewDetails: "Толук Маалымат",
+    complete: "Аяктоо",
+    meetingLink: "Жолугушуу Шилтемеси",
+    addMeetingLink: "Шилтеме Кошуу",
+    updateLink: "Шилтемени Жаңыртуу",
+    saveMeetingLink: "Шилтемени Сактоо",
+    joinMeeting: "Кошулуу",
+    noMeetingLink: "Шилтеме азырынча коюлган жок",
+    meetingLinkNotAvailable: "Жолугушуу шилтемеси азырынча жеткиликтүү эмес",
+    bookingConfirmed: "Брондоо ийгиликтүү ырасталды!",
+    bookingCancelled: "Брондоо ийгиликтүү жокко чыгарылды",
+    sessionCompleted: "Сессия аяктады деп белгиленди!",
+    meetingLinkUpdated: "Жолугушуу шилтемеси ийгиликтүү жаңыртылды!",
+    confirmBookingMessage: "Бул сессияны брондоону ырастагыңыз келеби?",
+    cancelBookingMessage: "Бул брондоону жокко чыгарууну каалайсызбы? Бул аракетти кайтаруу мүмкүн эмес.",
+    completeSessionMessage: "Бул сессияны аяктады деп белгилейсизби? Бул сессия аяктаганын ырастайт.",
+    booking: "Брондоо",
+    bookingId: "Брондоо ID",
+    created: "Түзүлгөн",
+    needsCompletion: "Аяктоону Талап Кылат",
+    recentSessions: "Акыркы Сессиялар",
+    viewAll: "Баарын Көрүү",
+    noRecentSessions: "Азырынча акыркы сессиялар жок",
+    duration: "Узактыгы",
+    minutes: "мүн"
   },
   auth: {
     login: {

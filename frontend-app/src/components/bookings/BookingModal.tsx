@@ -35,14 +35,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-  
+
   // Dialog states
   const [showConfirm, setShowConfirm] = useState(false);
   const [alertDialog, setAlertDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
-    type?: 'danger' | 'warning' | 'info' | 'success';
+    type?: "danger" | "warning" | "info" | "success";
   }>({
     isOpen: false,
     title: "",
@@ -96,10 +96,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
     setShowConfirm(true);
   };
-  
+
   const confirmBooking = async () => {
     if (!selectedSlot) return;
-    
+
     setSubmitting(true);
     setError("");
 
@@ -294,18 +294,28 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             {submitting ? "Booking..." : "Confirm Booking"}
           </button>
         </div>
-        
+
         {/* Confirmation Dialog */}
         <ConfirmDialog
           isOpen={showConfirm}
           title="Confirm Booking"
-          message={selectedSlot ? `Confirm booking for ${formatTime(selectedSlot.startTime)} - ${formatTime(selectedSlot.endTime)} on ${new Date(selectedSlot.startTime).toLocaleDateString()}? Total: $${calculateAmount(selectedSlot)} ${currency}` : ""}
+          message={
+            selectedSlot
+              ? `Confirm booking for ${formatTime(
+                  selectedSlot.startTime
+                )} - ${formatTime(selectedSlot.endTime)} on ${new Date(
+                  selectedSlot.startTime
+                ).toLocaleDateString()}? Total: $${calculateAmount(
+                  selectedSlot
+                )} ${currency}`
+              : ""
+          }
           type="success"
           confirmText="Book Now"
           onConfirm={confirmBooking}
           onCancel={() => setShowConfirm(false)}
         />
-        
+
         <AlertDialog
           isOpen={alertDialog.isOpen}
           title={alertDialog.title}

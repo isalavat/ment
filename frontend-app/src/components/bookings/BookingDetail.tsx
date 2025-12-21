@@ -18,26 +18,26 @@ export const BookingDetail: React.FC = () => {
   const [error, setError] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
   const [showMeetingLinkForm, setShowMeetingLinkForm] = useState(false);
-  
+
   // Dialog states
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
     onConfirm: () => void;
-    type?: 'danger' | 'warning' | 'info' | 'success';
+    type?: "danger" | "warning" | "info" | "success";
   }>({
     isOpen: false,
     title: "",
     message: "",
     onConfirm: () => {},
   });
-  
+
   const [alertDialog, setAlertDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
-    type?: 'danger' | 'warning' | 'info' | 'success';
+    type?: "danger" | "warning" | "info" | "success";
   }>({
     isOpen: false,
     title: "",
@@ -76,7 +76,10 @@ export const BookingDetail: React.FC = () => {
       type: "success",
       onConfirm: async () => {
         try {
-          await bookingService.confirmBooking(booking.id, user.mentorProfileId!);
+          await bookingService.confirmBooking(
+            booking.id,
+            user.mentorProfileId!
+          );
           fetchBooking();
           setAlertDialog({
             isOpen: true,
@@ -103,7 +106,8 @@ export const BookingDetail: React.FC = () => {
     setConfirmDialog({
       isOpen: true,
       title: "Cancel Booking",
-      message: "Are you sure you want to cancel this booking? This action cannot be undone.",
+      message:
+        "Are you sure you want to cancel this booking? This action cannot be undone.",
       type: "danger",
       onConfirm: async () => {
         try {
@@ -173,7 +177,8 @@ export const BookingDetail: React.FC = () => {
     setConfirmDialog({
       isOpen: true,
       title: "Complete Session",
-      message: "Mark this session as completed? This confirms that the session has finished.",
+      message:
+        "Mark this session as completed? This confirms that the session has finished.",
       type: "success",
       onConfirm: async () => {
         try {
@@ -806,7 +811,7 @@ export const BookingDetail: React.FC = () => {
         onConfirm={confirmDialog.onConfirm}
         onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
       />
-      
+
       <AlertDialog
         isOpen={alertDialog.isOpen}
         title={alertDialog.title}

@@ -20,7 +20,7 @@ export const MentorDetail: React.FC = () => {
     isOpen: boolean;
     title: string;
     message: string;
-    type?: 'danger' | 'warning' | 'info' | 'success';
+    type?: "danger" | "warning" | "info" | "success";
     onCloseAction?: () => void;
   }>({
     isOpen: false,
@@ -504,7 +504,7 @@ export const MentorDetail: React.FC = () => {
           onSuccess={handleBookingSuccess}
         />
       )}
-      
+
       {/* Alert Dialog */}
       <AlertDialog
         isOpen={alertDialog.isOpen}

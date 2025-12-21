@@ -1,5 +1,5 @@
-import React from 'react';
-import './ConfirmDialog.css';
+import React from "react";
+import "./ConfirmDialog.css";
 
 interface AlertDialogProps {
   isOpen: boolean;
@@ -7,16 +7,16 @@ interface AlertDialogProps {
   message: string;
   confirmText?: string;
   onClose: () => void;
-  type?: 'danger' | 'warning' | 'info' | 'success';
+  type?: "danger" | "warning" | "info" | "success";
 }
 
 export const AlertDialog: React.FC<AlertDialogProps> = ({
   isOpen,
   title,
   message,
-  confirmText = 'OK',
+  confirmText = "OK",
   onClose,
-  type = 'info',
+  type = "info",
 }) => {
   if (!isOpen) return null;
 
@@ -33,7 +33,7 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
           <button
             className="btn btn-primary"
             onClick={onClose}
-            style={{ width: '100px' }}
+            style={{ width: "100px" }}
           >
             {confirmText}
           </button>

@@ -12,10 +12,15 @@ export const en = {
     sections: {
       main: "Main",
       admin: "Admin",
-      account: "Account"
+      account: "Account",
+      mentorTools: "Mentor Tools"
     },
     admin: {
       userManagement: "User Management"
+    },
+    mentorTools: {
+      availability: "Availability",
+      timeSlots: "Time Slots"
     }
   },
   common: {
@@ -52,17 +57,35 @@ export const en = {
     recommendedForYou: "Recommended for You",
     browseAllMentors: "Browse All Mentors",
     mentor: "Mentor",
+    mentee: "Mentee",
     topic: "Topic",
     dateTime: "Date & Time",
+    date: "Date",
+    duration: "Duration",
     status: "Status",
     action: "Action",
     confirmed: "Confirmed",
     pending: "Pending",
+    completed: "Completed",
+    needsCompletion: "Needs Completion",
     joinMeeting: "Join Meeting",
+    recentSessions: "Recent Sessions",
+    viewAll: "View All",
+    noUpcomingSessions: "No upcoming sessions.",
+    noRecentSessions: "No recent sessions yet",
+    browseMentors: "Browse mentors",
+    complete: "Complete",
+    viewDetails: "View Details",
     sessionCompleted: "Session Completed",
     newBooking: "New Booking",
     reviewPosted: "Review Posted",
-    addedToFavorites: "Added to Favorites"
+    addedToFavorites: "Added to Favorites",
+    noActivityYet: "No activity yet",
+    sessionWith: "Session with",
+    booking: "Booking",
+    bookingConfirmed: "Booking Confirmed",
+    bookingCancelled: "Booking Cancelled",
+    noMentorsAvailable: "No mentors available"
   },
   mentors: {
     title: "Find Your Perfect Mentor",
@@ -161,6 +184,37 @@ export const en = {
       onlyMentors: "Only mentors can access this page",
       failedToSave: "Failed to save profile"
     }
+  },
+  bookings: {
+    title: "My Bookings",
+    confirmBooking: "Confirm Booking",
+    cancelBooking: "Cancel Booking",
+    completeSession: "Complete Session",
+    viewDetails: "View Details",
+    complete: "Complete",
+    meetingLink: "Meeting Link",
+    addMeetingLink: "Add Meeting Link",
+    updateLink: "Update Link",
+    saveMeetingLink: "Save Link",
+    joinMeeting: "Join Meeting",
+    noMeetingLink: "No meeting link set yet",
+    meetingLinkNotAvailable: "Meeting link not available yet",
+    bookingConfirmed: "Booking confirmed successfully!",
+    bookingCancelled: "Booking cancelled successfully",
+    sessionCompleted: "Session marked as completed!",
+    meetingLinkUpdated: "Meeting link updated successfully!",
+    confirmBookingMessage: "Are you sure you want to confirm this booking session?",
+    cancelBookingMessage: "Are you sure you want to cancel this booking? This action cannot be undone.",
+    completeSessionMessage: "Mark this session as completed? This confirms that the session has finished.",
+    booking: "Booking",
+    bookingId: "Booking ID",
+    created: "Created",
+    needsCompletion: "Needs Completion",
+    recentSessions: "Recent Sessions",
+    viewAll: "View All",
+    noRecentSessions: "No recent sessions yet",
+    duration: "Duration",
+    minutes: "min"
   },
   auth: {
     login: {

@@ -20,7 +20,8 @@
   --neutral-900: #172b4d;
 
   /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   --font-size-xs: 11px;
   --font-size-sm: 12px;
   --font-size-base: 14px;
@@ -108,7 +109,7 @@ a:hover {
   .sidebar {
     transform: translateX(-100%);
   }
-  
+
   .sidebar.sidebar-open {
     transform: translateX(0);
   }
@@ -295,7 +296,7 @@ a:hover {
   .content-area {
     padding: var(--space-md);
   }
-  
+
   .app-layout:not(:has(.sidebar)) .content-area {
     padding: 0;
   }
@@ -1064,12 +1065,15 @@ a:hover {
   }
 }
 
-
 .card-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-blue) 0%,
+    var(--secondary-blue) 100%
+  );
   padding: var(--space-lg);
 }
