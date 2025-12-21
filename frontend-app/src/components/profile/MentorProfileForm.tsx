@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { profileService } from '../../services/profileService';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../i18n/LanguageContext';
-import './ProfileForm.css';
-import '../admin/AdminUsers.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { profileService } from "../../services/profileService";
+import { authService } from "../../services/authService";
+import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage } from "../../i18n/LanguageContext";
+import "./ProfileForm.css";
+import "../admin/AdminUsers.css";
 
 export const MentorProfileForm: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,23 +17,33 @@ export const MentorProfileForm: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [mentorProfileId, setMentorProfileId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
-    bio: '',
-    title: '',
+    bio: "",
+    title: "",
     yearsExperience: 0,
     hourlyRate: 0,
-    currency: 'USD',
+    currency: "USD",
   });
-  const [categories, setCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
-  const [selectedCategories, setSelectedCategories] = useState<Array<{ category: { id: number; name: string; slug: string } }>>([]);
-  const [availableCategories, setAvailableCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
-  
-  const [availableSkills, setAvailableSkills] = useState<Array<{ id: number; name: string }>>([]);
-  const [selectedSkills, setSelectedSkills] = useState<Array<{ skill: { id: number; name: string } }>>([]);
-  const [selectedSkillId, setSelectedSkillId] = useState<number | ''>('');
-  const [newSkillName, setNewSkillName] = useState('');
+  const [categories, setCategories] = useState<
+    Array<{ id: number; name: string; slug: string }>
+  >([]);
+  const [selectedCategories, setSelectedCategories] = useState<
+    Array<{ category: { id: number; name: string; slug: string } }>
+  >([]);
+  const [availableCategories, setAvailableCategories] = useState<
+    Array<{ id: number; name: string; slug: string }>
+  >([]);
+
+  const [availableSkills, setAvailableSkills] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [selectedSkills, setSelectedSkills] = useState<
+    Array<{ skill: { id: number; name: string } }>
+  >([]);
+  const [selectedSkillId, setSelectedSkillId] = useState<number | "">("");
+  const [newSkillName, setNewSkillName] = useState("");
 
   useEffect(() => {
-    if (user?.role !== 'MENTOR') {
+    if (user?.role !== "MENTOR") {
       setError(t.profile.errors.onlyMentors);
       return;
     }
@@ -46,16 +57,17 @@ export const MentorProfileForm: React.FC = () => {
       const { skills } = await profileService.getSkills();
       setAvailableSkills(skills);
     } catch (err) {
-      console.error('Error loading skills:', err);
+      console.error("Error loading skills:", err);
     }
   };
 
   const loadCategories = async () => {
     try {
-      const { categories: allCategories } = await profileService.getCategories();
+      const { categories: allCategories } =
+        await profileService.getCategories();
       setCategories(allCategories);
     } catch (err) {
-      console.error('Error loading categories:', err);
+      console.error("Error loading categories:", err);
     }
   };
 
@@ -77,7 +89,7 @@ export const MentorProfileForm: React.FC = () => {
         setIsEditing(true);
       }
     } catch (err: any) {
-      console.error('Error loading profile:', err);
+      console.error("Error loading profile:", err);
     } finally {
       setLoading(false);
     }
@@ -94,7 +106,10 @@ export const MentorProfileForm: React.FC = () => {
       } else {
         await profileService.createMentorProfile(formData);
       }
-      navigate('/dashboard');
+      // Refresh user data to get the new profile ID
+      const updatedUser = await authService.fetchCurrenUser();
+      login(updatedUser);
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.error || t.profile.errors.failedToSave);
     } finally {
@@ -102,11 +117,18 @@ export const MentorProfileForm: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'yearsExperience' || name === 'hourlyRate' ? Number(value) : value,
+      [name]:
+        name === "yearsExperience" || name === "hourlyRate"
+          ? Number(value)
+          : value,
     });
   };
 
@@ -118,7 +140,7 @@ export const MentorProfileForm: React.FC = () => {
       await loadProfile(); // Reload to get updated categories
       setSuccess(t.profile.common.categoryAdded);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to add category');
+      setError(err.response?.data?.error || "Failed to add category");
     }
   };
 
@@ -130,13 +152,13 @@ export const MentorProfileForm: React.FC = () => {
       await loadProfile(); // Reload to get updated categories
       setSuccess(t.profile.common.categoryRemoved);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to remove category');
+      setError(err.response?.data?.error || "Failed to remove category");
     }
   };
 
   const handleAddSkill = async () => {
     if (!newSkillName && !selectedSkillId) {
-      alert('Please select or enter a skill');
+      alert("Please select or enter a skill");
       return;
     }
 
@@ -147,16 +169,16 @@ export const MentorProfileForm: React.FC = () => {
         selectedSkillId ? Number(selectedSkillId) : undefined,
         newSkillName || undefined
       );
-      
+
       if (updatedProfile.skills) {
         setSelectedSkills(updatedProfile.skills);
       }
-      setNewSkillName('');
-      setSelectedSkillId('');
+      setNewSkillName("");
+      setSelectedSkillId("");
       setSuccess(t.profile.common.skillAdded);
       await loadSkills(); // Reload skills list in case new one was created
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to add skill');
+      setError(err.response?.data?.error || "Failed to add skill");
     }
   };
 
@@ -165,10 +187,10 @@ export const MentorProfileForm: React.FC = () => {
       setError(null);
       setSuccess(null);
       await profileService.removeSkillFromMentorProfile(skillId);
-      setSelectedSkills(prev => prev.filter(s => s.skill.id !== skillId));
+      setSelectedSkills((prev) => prev.filter((s) => s.skill.id !== skillId));
       setSuccess(t.profile.common.skillRemoved);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to remove skill');
+      setError(err.response?.data?.error || "Failed to remove skill");
     }
   };
 
@@ -180,7 +202,10 @@ export const MentorProfileForm: React.FC = () => {
     <div className="content-area">
       <div className="page-header">
         <div>
-          <button className="btn btn-outline btn-sm" onClick={() => navigate('/dashboard')}>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => navigate("/dashboard")}
+          >
             ← {t.profile.common.back}
           </button>
           <h1 className="page-title mt-sm">
@@ -189,13 +214,9 @@ export const MentorProfileForm: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger mb-md">{error}</div>
-      )}
+      {error && <div className="alert alert-danger mb-md">{error}</div>}
 
-      {success && (
-        <div className="alert alert-success mb-md">{success}</div>
-      )}
+      {success && <div className="alert alert-success mb-md">{success}</div>}
 
       <div className="card">
         <div className="card-body">
@@ -288,7 +309,7 @@ export const MentorProfileForm: React.FC = () => {
             {isEditing && (
               <div className="form-group">
                 <label className="form-label">{t.profile.common.skills}</label>
-                
+
                 {/* Current Skills */}
                 <div className="skills-list mb-md">
                   {selectedSkills.length > 0 ? (
@@ -306,7 +327,12 @@ export const MentorProfileForm: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
+                    <p
+                      style={{
+                        color: "var(--neutral-500)",
+                        fontSize: "var(--font-size-sm)",
+                      }}
+                    >
                       {t.profile.common.noSkillsYet}
                     </p>
                   )}
@@ -319,19 +345,31 @@ export const MentorProfileForm: React.FC = () => {
                       <select
                         className="form-select"
                         value={selectedSkillId}
-                        onChange={(e) => setSelectedSkillId(e.target.value ? Number(e.target.value) : '')}
+                        onChange={(e) =>
+                          setSelectedSkillId(
+                            e.target.value ? Number(e.target.value) : ""
+                          )
+                        }
                       >
                         <option value="">{t.profile.common.selectSkill}</option>
-                        {availableSkills.map(skill => (
+                        {availableSkills.map((skill) => (
                           <option key={skill.id} value={skill.id}>
                             {skill.name}
                           </option>
                         ))}
                       </select>
                     </div>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', padding: '0 var(--space-md)' }}>
-                      <span style={{ color: 'var(--neutral-500)' }}>{t.profile.common.orText}</span>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "0 var(--space-md)",
+                      }}
+                    >
+                      <span style={{ color: "var(--neutral-500)" }}>
+                        {t.profile.common.orText}
+                      </span>
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 0 }}>
@@ -359,8 +397,10 @@ export const MentorProfileForm: React.FC = () => {
             {/* Categories Management */}
             {isEditing && (
               <div className="form-group">
-                <label className="form-label">{t.profile.common.categories}</label>
-                
+                <label className="form-label">
+                  {t.profile.common.categories}
+                </label>
+
                 {/* Current Categories */}
                 <div className="skills-list mb-md">
                   {selectedCategories.length > 0 ? (
@@ -370,7 +410,9 @@ export const MentorProfileForm: React.FC = () => {
                         <button
                           type="button"
                           className="skill-remove"
-                          onClick={() => handleRemoveCategory(catRel.category.id)}
+                          onClick={() =>
+                            handleRemoveCategory(catRel.category.id)
+                          }
                           title="Remove category"
                         >
                           ×
@@ -378,7 +420,12 @@ export const MentorProfileForm: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
+                    <p
+                      style={{
+                        color: "var(--neutral-500)",
+                        fontSize: "var(--font-size-sm)",
+                      }}
+                    >
                       {t.profile.common.noCategoriesYet}
                     </p>
                   )}
@@ -387,20 +434,30 @@ export const MentorProfileForm: React.FC = () => {
                 {/* Add Category */}
                 <div className="skill-add-form">
                   <div className="form-row">
-                    <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+                    <div
+                      className="form-group"
+                      style={{ marginBottom: 0, flex: 1 }}
+                    >
                       <select
                         className="form-select"
                         defaultValue=""
                         onChange={(e) => {
                           if (e.target.value) {
                             handleAddCategory(parseInt(e.target.value));
-                            e.target.value = '';
+                            e.target.value = "";
                           }
                         }}
                       >
-                        <option value="">{t.profile.common.selectCategory}</option>
+                        <option value="">
+                          {t.profile.common.selectCategory}
+                        </option>
                         {categories
-                          .filter(cat => !selectedCategories.some(sc => sc.category.id === cat.id))
+                          .filter(
+                            (cat) =>
+                              !selectedCategories.some(
+                                (sc) => sc.category.id === cat.id
+                              )
+                          )
                           .map((cat) => (
                             <option key={cat.id} value={cat.id}>
                               {cat.name}
@@ -416,14 +473,22 @@ export const MentorProfileForm: React.FC = () => {
             <div className="form-actions">
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate("/dashboard")}
                 className="btn btn-outline"
                 disabled={loading}
               >
                 {t.profile.common.cancel}
               </button>
-              <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? t.profile.common.saving : isEditing ? t.profile.mentor.updateProfile : t.profile.mentor.createProfile}
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading
+                  ? t.profile.common.saving
+                  : isEditing
+                  ? t.profile.mentor.updateProfile
+                  : t.profile.mentor.createProfile}
               </button>
             </div>
           </form>

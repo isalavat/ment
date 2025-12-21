@@ -1,0 +1,81 @@
+.timeslot-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background: white;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+}
+
+.timeslots-list {
+  margin-top: var(--space-lg);
+}
+
+.timeslots-list h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.timeslot-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: white;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.timeslot-info {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.timeslot-datetime {
+  font-weight: 500;
+  color: var(--neutral-900);
+}
+
+.timeslot-booking-info {
+  color: var(--neutral-600);
+  font-size: var(--font-size-sm);
+}
+
+.badge-success {
+  background: var(--success-100);
+  color: var(--success-700);
+}
+
+.badge-warning {
+  background: var(--warning-100);
+  color: var(--warning-700);
+}
+
+.badge-danger {
+  background: var(--danger-100);
+  color: var(--danger-700);
+}
+
+.badge-neutral {
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+@media (max-width: 768px) {
+  .timeslot-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .timeslot-info {
+    width: 100%;
+  }
+}

@@ -501,8 +501,18 @@ a:hover {
   color: white;
 }
 
+.btn-success:hover {
+  background: #006644;
+  color: white;
+}
+
 .btn-danger {
   background: var(--danger-red);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #bf2600;
   color: white;
 }
 

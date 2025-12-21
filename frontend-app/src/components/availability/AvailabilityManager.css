@@ -1,0 +1,149 @@
+.availability-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.weekly-day-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.weekly-day-row:last-child {
+  border-bottom: none;
+}
+
+.day-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 120px;
+  cursor: pointer;
+}
+
+.day-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.day-label {
+  font-weight: 500;
+  color: var(--neutral-900);
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.time-inputs input {
+  flex: 1;
+  max-width: 150px;
+}
+
+.time-inputs span {
+  color: var(--neutral-600);
+}
+
+.availability-list {
+  margin-top: var(--space-xl);
+}
+
+.availability-list h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.availability-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: white;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.availability-info {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.availability-type {
+  padding: 4px 12px;
+  background: var(--primary-100);
+  color: var(--primary-700);
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.availability-day {
+  font-weight: 600;
+  color: var(--neutral-900);
+}
+
+.availability-time {
+  color: var(--neutral-600);
+  font-family: monospace;
+}
+
+.loading-message,
+.empty-message,
+.error-message {
+  padding: var(--space-xl);
+  text-align: center;
+  background: var(--neutral-50);
+  border-radius: var(--radius-md);
+  color: var(--neutral-600);
+}
+
+.error-message {
+  background: var(--danger-50);
+  color: var(--danger-700);
+}
+
+.empty-message p {
+  margin: 0;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 768px) {
+  .weekly-day-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .day-checkbox {
+    width: 100%;
+  }
+
+  .time-inputs {
+    width: 100%;
+  }
+
+  .time-inputs input {
+    max-width: none;
+  }
+
+  .availability-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+}

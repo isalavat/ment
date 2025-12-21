@@ -1,25 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { profileService } from '../../services/profileService';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../i18n/LanguageContext';
-import './ProfileForm.css';
-import '../admin/AdminUsers.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { profileService } from "../../services/profileService";
+import { authService } from "../../services/authService";
+import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage } from "../../i18n/LanguageContext";
+import "./ProfileForm.css";
+import "../admin/AdminUsers.css";
 
 export const MenteeProfileForm: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    bio: '',
-    goals: '',
+    bio: "",
+    goals: "",
   });
 
   useEffect(() => {
-    if (user?.role !== 'MENTEE') {
+    if (user?.role !== "MENTEE") {
       setError(t.profile.errors.onlyMentees);
       return;
     }
@@ -32,13 +33,13 @@ export const MenteeProfileForm: React.FC = () => {
       const { user: userData } = await profileService.getMyProfile();
       if (userData.menteeProfile) {
         setFormData({
-          bio: userData.menteeProfile.bio || '',
-          goals: userData.menteeProfile.goals || '',
+          bio: userData.menteeProfile.bio || "",
+          goals: userData.menteeProfile.goals || "",
         });
         setIsEditing(true);
       }
     } catch (err: any) {
-      console.error('Error loading profile:', err);
+      console.error("Error loading profile:", err);
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,10 @@ export const MenteeProfileForm: React.FC = () => {
       } else {
         await profileService.createMenteeProfile(formData);
       }
-      navigate('/dashboard');
+      // Refresh user data to get the new profile ID
+      const updatedUser = await authService.fetchCurrenUser();
+      login(updatedUser);
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.error || t.profile.errors.failedToSave);
     } finally {
@@ -63,7 +67,9 @@ export const MenteeProfileForm: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -78,7 +84,10 @@ export const MenteeProfileForm: React.FC = () => {
     <div className="content-area">
       <div className="page-header">
         <div>
-          <button className="btn btn-outline btn-sm" onClick={() => navigate('/dashboard')}>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => navigate("/dashboard")}
+          >
             ← {t.profile.common.back}
           </button>
           <h1 className="page-title mt-sm">
@@ -87,9 +96,7 @@ export const MenteeProfileForm: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger mb-md">{error}</div>
-      )}
+      {error && <div className="alert alert-danger mb-md">{error}</div>}
 
       <div className="card">
         <div className="card-body">
@@ -108,7 +115,14 @@ export const MenteeProfileForm: React.FC = () => {
                 className="form-textarea"
                 placeholder={t.profile.mentee.bioPlaceholder}
               />
-              <small style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', display: 'block', marginTop: 'var(--space-xs)' }}>
+              <small
+                style={{
+                  color: "var(--neutral-500)",
+                  fontSize: "var(--font-size-sm)",
+                  display: "block",
+                  marginTop: "var(--space-xs)",
+                }}
+              >
                 {t.profile.mentee.bioHelper}
               </small>
             </div>
@@ -127,7 +141,14 @@ export const MenteeProfileForm: React.FC = () => {
                 className="form-textarea"
                 placeholder={t.profile.mentee.goalsPlaceholder}
               />
-              <small style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)', display: 'block', marginTop: 'var(--space-xs)' }}>
+              <small
+                style={{
+                  color: "var(--neutral-500)",
+                  fontSize: "var(--font-size-sm)",
+                  display: "block",
+                  marginTop: "var(--space-xs)",
+                }}
+              >
                 {t.profile.mentee.goalsHelper}
               </small>
             </div>
@@ -135,18 +156,22 @@ export const MenteeProfileForm: React.FC = () => {
             <div className="form-actions">
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate("/dashboard")}
                 className="btn btn-outline"
                 disabled={loading}
               >
                 {t.profile.common.cancel}
               </button>
-              <button 
-                type="submit" 
-                className="btn btn-primary" 
+              <button
+                type="submit"
+                className="btn btn-primary"
                 disabled={loading}
               >
-                {loading ? t.profile.common.saving : isEditing ? t.profile.mentee.updateProfile : t.profile.mentee.createProfile}
+                {loading
+                  ? t.profile.common.saving
+                  : isEditing
+                  ? t.profile.mentee.updateProfile
+                  : t.profile.mentee.createProfile}
               </button>
             </div>
           </form>

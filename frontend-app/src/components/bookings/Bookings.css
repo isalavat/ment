@@ -1,0 +1,226 @@
+.booking-tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--neutral-200);
+  overflow-x: auto;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--space-md) var(--space-lg);
+  color: var(--neutral-600);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: var(--primary-blue);
+  background: var(--primary-50);
+}
+
+.tab-button.active {
+  color: var(--primary-blue);
+  border-bottom-color: var(--primary-blue);
+}
+
+.bookings-loading,
+.bookings-error,
+.bookings-empty {
+  text-align: center;
+  padding: var(--space-xxl);
+  color: var(--neutral-600);
+}
+
+.bookings-error {
+  background: var(--danger-50);
+  color: var(--danger-700);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.bookings-empty p {
+  margin-bottom: var(--space-lg);
+  font-size: var(--font-size-lg);
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.booking-card {
+  background: white;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+
+.booking-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.booking-main {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: start;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.booking-mentor-section {
+  display: flex;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 300px;
+}
+
+.mentor-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.booking-info {
+  flex: 1;
+}
+
+.booking-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.mentor-name {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0;
+  color: var(--neutral-900);
+}
+
+.mentor-title {
+  color: var(--neutral-600);
+  margin: 0 0 var(--space-xs) 0;
+  font-size: var(--font-size-sm);
+}
+
+.booking-notes {
+  color: var(--neutral-700);
+  font-weight: 500;
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.booking-details {
+  display: flex;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+  color: var(--neutral-600);
+  font-size: var(--font-size-sm);
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.booking-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  align-items: flex-start;
+  position: relative;
+  z-index: 10;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background: var(--success-100);
+  color: var(--success-700);
+}
+
+.badge-warning {
+  background: var(--warning-100);
+  color: var(--warning-700);
+}
+
+.badge-info {
+  background: var(--neutral-100);
+  color: var(--neutral-700);
+}
+
+.badge-danger {
+  background: var(--danger-100);
+  color: var(--danger-700);
+}
+
+.badge-neutral {
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+.btn-danger {
+  color: var(--danger-600);
+  border-color: var(--danger-300);
+}
+
+.btn-danger:hover {
+  background: var(--danger-50);
+  border-color: var(--danger-400);
+}
+
+.btn-success {
+  background: var(--success-600);
+  color: white;
+  border-color: var(--success-600);
+}
+
+.btn-success:hover {
+  background: var(--success-700);
+  border-color: var(--success-700);
+}
+
+@media (max-width: 768px) {
+  .booking-main {
+    flex-direction: column;
+  }
+
+  .booking-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .booking-actions button {
+    flex: 1;
+  }
+}

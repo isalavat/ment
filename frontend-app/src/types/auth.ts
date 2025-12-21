@@ -6,22 +6,24 @@ export interface User {
   role: UserRole;
   firstName: string;
   lastName: string;
+  menteeProfileId?: number;
+  mentorProfileId?: number;
 }
 
 export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface LoginRequest {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterRequest {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role: UserRole;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
 }
