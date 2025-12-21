@@ -220,5 +220,5 @@ ALTER TABLE `FavoriteMentor` ADD CONSTRAINT `FavoriteMentor_menteeId_fkey` FOREI
 ALTER TABLE `refreshtoken` ADD CONSTRAINT `refreshtoken_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- RedefineIndex
-CREATE UNIQUE INDEX `refreshtoken_token_key` ON `refreshtoken`(`token`);
 DROP INDEX `RefreshToken_token_key` ON `refreshtoken`;
+CREATE UNIQUE INDEX `refreshtoken_token_key` ON `refreshtoken`(`token`);
