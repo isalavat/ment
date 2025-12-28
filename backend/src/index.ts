@@ -6,11 +6,10 @@ import adminRouter from "./routes/admin";
 import bookingRouter from "./routes/bookings";
 import availabilityRouter from "./routes/availability";
 import timeSlotsRouter from "./routes/timeSlots";
-import { PrismaClient } from "@prisma/client";
 import cors from "cors";
+import { prisma } from "../prisma/client";
 
 const app = express();
-const prisma = new PrismaClient();
 
 // Enable CORS for your React frontend
 app.use(

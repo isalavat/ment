@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../lib/jwt";
-import { PrismaClient } from "@prisma/client";
 import logger from "../lib/logger";
+import { prisma } from "../../prisma/client";
 
-const prisma = new PrismaClient();
 
 export type AuthedRequest = Request & { user?: {id: number; email: string} };
 
