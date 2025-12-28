@@ -13,15 +13,15 @@ export const ru = {
       main: "Главное",
       admin: "Администратор",
       account: "Аккаунт",
-      mentorTools: "Инструменты Ментора"
+      mentorTools: "Инструменты Ментора",
     },
     admin: {
-      userManagement: "Управление Пользователями"
+      userManagement: "Управление Пользователями",
     },
     mentorTools: {
       availability: "Доступность",
-      timeSlots: "Временные Слоты"
-    }
+      timeSlots: "Временные Слоты",
+    },
   },
   common: {
     search: "Поиск",
@@ -38,7 +38,7 @@ export const ru = {
     success: "Успешно",
     confirm: "Подтвердить",
     viewDetails: "Подробнее",
-    viewProfile: "Смотреть профиль"
+    viewProfile: "Смотреть профиль",
   },
   dashboard: {
     title: "Главная",
@@ -50,7 +50,7 @@ export const ru = {
       hoursLearned: "Часов Обучения",
       thisWeek: "На этой неделе",
       activeConnections: "Активные связи",
-      thisMonth: "в этом месяце"
+      thisMonth: "в этом месяце",
     },
     upcomingSessions: "Предстоящие Сессии",
     recentActivity: "Недавняя Активность",
@@ -85,7 +85,7 @@ export const ru = {
     booking: "Бронирование",
     bookingConfirmed: "Бронирование Подтверждено",
     bookingCancelled: "Бронирование Отменено",
-    noMentorsAvailable: "Менторы недоступны"
+    noMentorsAvailable: "Менторы недоступны",
   },
   mentors: {
     title: "Найдите Своего Идеального Ментора",
@@ -129,8 +129,8 @@ export const ru = {
       totalSessions: "Всего Сессий",
       hourlyRate: "Почасовая Ставка",
       contact: "Контакт",
-      categories: "Категории"
-    }
+      categories: "Категории",
+    },
   },
   profile: {
     common: {
@@ -150,40 +150,46 @@ export const ru = {
       skillAdded: "Навык успешно добавлен",
       skillRemoved: "Навык успешно удален",
       categoryAdded: "Категория успешно добавлена",
-      categoryRemoved: "Категория успешно удалена"
+      categoryRemoved: "Категория успешно удалена",
     },
     mentee: {
       title: "Заполните Профиль Менти",
       titleEdit: "Редактировать Профиль Менти",
       subtitle: "Расскажите менторам о себе и своих целях обучения",
       bio: "О себе",
-      bioPlaceholder: "Расскажите о себе, вашем опыте и что вы хотите изучить...",
-      bioHelper: "Расскажите менторам о себе, вашем опыте, текущей роли и интересах",
+      bioPlaceholder:
+        "Расскажите о себе, вашем опыте и что вы хотите изучить...",
+      bioHelper:
+        "Расскажите менторам о себе, вашем опыте, текущей роли и интересах",
       goals: "Цели Обучения",
-      goalsPlaceholder: "Каковы ваши цели обучения? Какие навыки вы хотите развить?",
-      goalsHelper: "Поделитесь тем, что вы хотите изучить и достичь через наставничество",
+      goalsPlaceholder:
+        "Каковы ваши цели обучения? Какие навыки вы хотите развить?",
+      goalsHelper:
+        "Поделитесь тем, что вы хотите изучить и достичь через наставничество",
       createProfile: "Создать Профиль",
-      updateProfile: "Обновить Профиль"
+      updateProfile: "Обновить Профиль",
     },
     mentor: {
       title: "Заполните Профиль Ментора",
       titleEdit: "Редактировать Профиль Ментора",
-      subtitle: "Настройте свой профиль, чтобы начать предлагать сессии наставничества",
+      subtitle:
+        "Настройте свой профиль, чтобы начать предлагать сессии наставничества",
       professionalTitle: "Должность",
       titlePlaceholder: "например, Старший программист, UX-дизайнер",
       bio: "О себе",
-      bioPlaceholder: "Расскажите потенциальным менти о своем опыте, экспертизе и чем вы можете помочь...",
+      bioPlaceholder:
+        "Расскажите потенциальным менти о своем опыте, экспертизе и чем вы можете помочь...",
       yearsExperience: "Лет Опыта",
       hourlyRate: "Почасовая Ставка",
       currency: "Валюта",
       createProfile: "Создать Профиль",
-      updateProfile: "Обновить Профиль"
+      updateProfile: "Обновить Профиль",
     },
     errors: {
       onlyMentees: "Только менти могут получить доступ к этой странице",
       onlyMentors: "Только менторы могут получить доступ к этой странице",
-      failedToSave: "Не удалось сохранить профиль"
-    }
+      failedToSave: "Не удалось сохранить профиль",
+    },
   },
   bookings: {
     title: "Мои Бронирования",
@@ -203,9 +209,12 @@ export const ru = {
     bookingCancelled: "Бронирование успешно отменено",
     sessionCompleted: "Сессия отмечена как завершенная!",
     meetingLinkUpdated: "Ссылка на встречу успешно обновлена!",
-    confirmBookingMessage: "Вы уверены, что хотите подтвердить эту сессию бронирования?",
-    cancelBookingMessage: "Вы уверены, что хотите отменить это бронирование? Это действие нельзя отменить.",
-    completeSessionMessage: "Отметить эту сессию как завершенную? Это подтверждает, что сессия закончена.",
+    confirmBookingMessage:
+      "Вы уверены, что хотите подтвердить эту сессию бронирования?",
+    cancelBookingMessage:
+      "Вы уверены, что хотите отменить это бронирование? Это действие нельзя отменить.",
+    completeSessionMessage:
+      "Отметить эту сессию как завершенную? Это подтверждает, что сессия закончена.",
     booking: "Бронирование",
     bookingId: "ID Бронирования",
     created: "Создано",
@@ -214,7 +223,7 @@ export const ru = {
     viewAll: "Посмотреть Все",
     noRecentSessions: "Недавних сессий пока нет",
     duration: "Длительность",
-    minutes: "мин"
+    minutes: "мин",
   },
   auth: {
     login: {
@@ -226,7 +235,7 @@ export const ru = {
       forgot: "Забыли пароль?",
       submit: "Войти",
       noAccount: "Нет аккаунта?",
-      signUp: "Зарегистрироваться"
+      signUp: "Зарегистрироваться",
     },
     register: {
       title: "Присоединяйтесь к MentorHub",
@@ -241,7 +250,7 @@ export const ru = {
       mentor: "Ментор - Я хочу помогать другим",
       submit: "Создать Аккаунт",
       hasAccount: "Уже есть аккаунт?",
-      signIn: "Войти"
-    }
-  }
+      signIn: "Войти",
+    },
+  },
 };

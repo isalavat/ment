@@ -61,7 +61,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {user?.role === "MENTOR" && (
         <nav className="sidebar-nav">
           <div className="nav-section">
-            <div className="nav-section-title">{t.nav.sections.mentorTools}</div>
+            <div className="nav-section-title">
+              {t.nav.sections.mentorTools}
+            </div>
             <Link
               to="/availability"
               className="nav-item"

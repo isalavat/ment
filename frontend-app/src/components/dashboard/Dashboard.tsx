@@ -207,14 +207,18 @@ export const Dashboard: React.FC = () => {
                   }}
                 >
                   {t.dashboard.noUpcomingSessions}{" "}
-                  {!isMentor && <Link to="/mentors">{t.dashboard.browseMentors}</Link>}
+                  {!isMentor && (
+                    <Link to="/mentors">{t.dashboard.browseMentors}</Link>
+                  )}
                 </div>
               ) : (
                 <div className="table-container">
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>{isMentor ? t.dashboard.mentee : t.dashboard.mentor}</th>
+                        <th>
+                          {isMentor ? t.dashboard.mentee : t.dashboard.mentor}
+                        </th>
                         <th>{t.dashboard.topic}</th>
                         <th>{t.dashboard.dateTime}</th>
                         <th>{t.dashboard.status}</th>
@@ -328,7 +332,9 @@ export const Dashboard: React.FC = () => {
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>{isMentor ? t.dashboard.mentee : t.dashboard.mentor}</th>
+                        <th>
+                          {isMentor ? t.dashboard.mentee : t.dashboard.mentor}
+                        </th>
                         <th>{t.dashboard.topic}</th>
                         <th>{t.dashboard.date}</th>
                         <th>{t.dashboard.duration}</th>
@@ -398,7 +404,9 @@ export const Dashboard: React.FC = () => {
                                   navigate(`/bookings/${booking.id}`)
                                 }
                               >
-                                {isPastConfirmed ? t.dashboard.complete : t.dashboard.viewDetails}
+                                {isPastConfirmed
+                                  ? t.dashboard.complete
+                                  : t.dashboard.viewDetails}
                               </button>
                             </td>
                           </tr>

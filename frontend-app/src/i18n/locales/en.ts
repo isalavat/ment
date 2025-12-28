@@ -13,15 +13,15 @@ export const en = {
       main: "Main",
       admin: "Admin",
       account: "Account",
-      mentorTools: "Mentor Tools"
+      mentorTools: "Mentor Tools",
     },
     admin: {
-      userManagement: "User Management"
+      userManagement: "User Management",
     },
     mentorTools: {
       availability: "Availability",
-      timeSlots: "Time Slots"
-    }
+      timeSlots: "Time Slots",
+    },
   },
   common: {
     search: "Search",
@@ -38,11 +38,12 @@ export const en = {
     success: "Success",
     confirm: "Confirm",
     viewDetails: "View Details",
-    viewProfile: "View Profile"
+    viewProfile: "View Profile",
   },
   dashboard: {
     title: "Dashboard",
-    subtitle: "Welcome back, {name}! Here's what's happening with your mentorship journey.",
+    subtitle:
+      "Welcome back, {name}! Here's what's happening with your mentorship journey.",
     stats: {
       totalSessions: "Total Sessions",
       upcomingBookings: "Upcoming Bookings",
@@ -50,7 +51,7 @@ export const en = {
       hoursLearned: "Hours Learned",
       thisWeek: "This week",
       activeConnections: "Active connections",
-      thisMonth: "this month"
+      thisMonth: "this month",
     },
     upcomingSessions: "Upcoming Sessions",
     recentActivity: "Recent Activity",
@@ -85,7 +86,7 @@ export const en = {
     booking: "Booking",
     bookingConfirmed: "Booking Confirmed",
     bookingCancelled: "Booking Cancelled",
-    noMentorsAvailable: "No mentors available"
+    noMentorsAvailable: "No mentors available",
   },
   mentors: {
     title: "Find Your Perfect Mentor",
@@ -129,8 +130,8 @@ export const en = {
       totalSessions: "Total Sessions",
       hourlyRate: "Hourly Rate",
       contact: "Contact",
-      categories: "Categories"
-    }
+      categories: "Categories",
+    },
   },
   profile: {
     common: {
@@ -150,20 +151,24 @@ export const en = {
       skillAdded: "Skill added successfully",
       skillRemoved: "Skill removed successfully",
       categoryAdded: "Category added successfully",
-      categoryRemoved: "Category removed successfully"
+      categoryRemoved: "Category removed successfully",
     },
     mentee: {
       title: "Complete Your Mentee Profile",
       titleEdit: "Edit Mentee Profile",
       subtitle: "Tell mentors about yourself and your learning goals",
       bio: "Bio",
-      bioPlaceholder: "Tell us about yourself, your background, and what you're looking to learn...",
-      bioHelper: "Tell mentors about yourself, your background, current role, and interests",
+      bioPlaceholder:
+        "Tell us about yourself, your background, and what you're looking to learn...",
+      bioHelper:
+        "Tell mentors about yourself, your background, current role, and interests",
       goals: "Learning Goals",
-      goalsPlaceholder: "What are your learning goals? What skills do you want to develop?",
-      goalsHelper: "Share what you want to learn and achieve through mentorship",
+      goalsPlaceholder:
+        "What are your learning goals? What skills do you want to develop?",
+      goalsHelper:
+        "Share what you want to learn and achieve through mentorship",
       createProfile: "Create Profile",
-      updateProfile: "Update Profile"
+      updateProfile: "Update Profile",
     },
     mentor: {
       title: "Complete Your Mentor Profile",
@@ -172,18 +177,19 @@ export const en = {
       professionalTitle: "Professional Title",
       titlePlaceholder: "e.g., Senior Software Engineer, UX Designer",
       bio: "Bio",
-      bioPlaceholder: "Tell potential mentees about your experience, expertise, and what you can help them with...",
+      bioPlaceholder:
+        "Tell potential mentees about your experience, expertise, and what you can help them with...",
       yearsExperience: "Years of Experience",
       hourlyRate: "Hourly Rate",
       currency: "Currency",
       createProfile: "Create Profile",
-      updateProfile: "Update Profile"
+      updateProfile: "Update Profile",
     },
     errors: {
       onlyMentees: "Only mentees can access this page",
       onlyMentors: "Only mentors can access this page",
-      failedToSave: "Failed to save profile"
-    }
+      failedToSave: "Failed to save profile",
+    },
   },
   bookings: {
     title: "My Bookings",
@@ -203,9 +209,12 @@ export const en = {
     bookingCancelled: "Booking cancelled successfully",
     sessionCompleted: "Session marked as completed!",
     meetingLinkUpdated: "Meeting link updated successfully!",
-    confirmBookingMessage: "Are you sure you want to confirm this booking session?",
-    cancelBookingMessage: "Are you sure you want to cancel this booking? This action cannot be undone.",
-    completeSessionMessage: "Mark this session as completed? This confirms that the session has finished.",
+    confirmBookingMessage:
+      "Are you sure you want to confirm this booking session?",
+    cancelBookingMessage:
+      "Are you sure you want to cancel this booking? This action cannot be undone.",
+    completeSessionMessage:
+      "Mark this session as completed? This confirms that the session has finished.",
     booking: "Booking",
     bookingId: "Booking ID",
     created: "Created",
@@ -214,7 +223,7 @@ export const en = {
     viewAll: "View All",
     noRecentSessions: "No recent sessions yet",
     duration: "Duration",
-    minutes: "min"
+    minutes: "min",
   },
   auth: {
     login: {
@@ -226,7 +235,7 @@ export const en = {
       forgot: "Forgot password?",
       submit: "Sign In",
       noAccount: "Don't have an account?",
-      signUp: "Sign up"
+      signUp: "Sign up",
     },
     register: {
       title: "Join MentorHub",
@@ -241,7 +250,7 @@ export const en = {
       mentor: "Mentor - I want to help others",
       submit: "Create Account",
       hasAccount: "Already have an account?",
-      signIn: "Sign in"
-    }
-  }
+      signIn: "Sign in",
+    },
+  },
 };
