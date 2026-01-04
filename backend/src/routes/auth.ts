@@ -5,13 +5,14 @@ import logger from "../lib/logger";
 import { prisma } from "../../prisma/client";
 import { CreateUserSchema } from "../schemas/auth.schemas";
 import { validateBody } from "../middleware/requestValidator";
-import { createUserController } from "../controllers/user.controllers";
+import { signUpController } from "../controllers/signUpController";
 
 const router = Router();
 
-router.post("/register",
+router.post(
+  "/register",
   validateBody(CreateUserSchema),
-  createUserController
+  signUpController
 );
 
 // ...existing code...
