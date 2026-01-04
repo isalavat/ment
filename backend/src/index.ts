@@ -9,6 +9,7 @@ import timeSlotsRouter from "./routes/timeSlots";
 import cors from "cors";
 import { prisma } from "../prisma/client";
 import z from "zod";
+import { EmailAlreadyTakenError } from "./use-cases/createUserUseCase";
 
 const app = express();
 
@@ -64,6 +65,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   if (err instanceof z.ZodError) {
     return res.status(400).json({ error: z.flattenError(err) })
+  }
+  if (err instanceof EmailAlreadyTakenError) {
+    return res.status(404).json({ error: err.message })
   }
   res.status(500).json({ error: "Internal Server Error" });
 });
