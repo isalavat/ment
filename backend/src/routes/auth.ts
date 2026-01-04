@@ -1,57 +1,18 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
 import logger from "../lib/logger";
 import { prisma } from "../../prisma/client";
-import { CreateUserDTO, CreateUserSchema } from "../schemas/auth.schemas";
+import { CreateUserSchema } from "../schemas/auth.schemas";
 import { validateBody } from "../middleware/requestValidator";
+import { createUserController } from "../controllers/user.controllers";
 
 const router = Router();
 
 router.post("/register",
   validateBody(CreateUserSchema),
-  async (req: Request<{}, {}, CreateUserDTO>, res: Response) => {
-    const { email, password, role, firstName, lastName } = req.body;
-
-    try {
-      const exists = await prisma.user.findUnique({ where: { email } });
-      if (exists) {
-        return res.status(409).json({ error: "Email already in use" });
-      }
-
-      const passwordHash = await bcrypt.hash(password, 12);
-      const user = await prisma.user.create({
-        data: {
-          email,
-          passwordHash,
-          role,
-          firstName,
-          lastName
-        }
-      });
-
-      const accessToken = signAccessToken({ sub: user.id, email: user.email });
-      const refreshToken = signRefreshToken({ sub: user.id, email: user.email });
-
-      await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id } });
-
-      return res.status(201).json({
-        accessToken,
-        refreshToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName
-        }
-      });
-    } catch (error) {
-      console.error("Register error:", error);
-      return res.status(500).json({ error: (error as Error).message });
-    }
-
-  });
+  createUserController
+);
 
 // ...existing code...
 router.post("/login", async (req, res) => {
