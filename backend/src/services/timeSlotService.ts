@@ -1,6 +1,6 @@
-import { PrismaClient, SlotStatus } from "@prisma/client";
+import {  SlotStatus } from "@prisma/client";
+import { prisma } from "../../prisma/client";
 
-const prisma = new PrismaClient();
 
 interface GenerateTimeSlotsOptions {
   mentorId: number;

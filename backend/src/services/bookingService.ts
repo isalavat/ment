@@ -1,6 +1,6 @@
-import { PrismaClient, BookingStatus, SlotStatus } from "@prisma/client";
+import { BookingStatus, SlotStatus } from "@prisma/client";
+import { prisma } from "../../prisma/client";
 
-const prisma = new PrismaClient();
 
 interface CreateBookingData {
   menteeId: number;
