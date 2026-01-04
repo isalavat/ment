@@ -3,57 +3,51 @@ import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
 import logger from "../lib/logger";
 import { prisma } from "../../prisma/client";
+import { validateInputAndMap } from "../lib/validator";
+import { CreateUserSchema } from "../schemas/auth.schemas";
 
 const router = Router();
 
 router.post("/register", async (req, res) => {
-    try {
-    const { email, password, role, firstName, lastName } = req.body ?? {};
-    
-    if (typeof email !== "string" || typeof password !== "string") {
-        return res.status(400).json({ error: "email and password required"});
-    }
+  const { email, password, role, firstName, lastName } = await validateInputAndMap(req.body, CreateUserSchema);
 
-    if (!role || !["MENTEE", "MENTOR", "ADMIN"].includes(role)) {
-        return res.status(400).json({ error: "valid role required (MENTEE, MENTOR, ADMIN)" });
-    }
-
-    if (typeof firstName !== "string" || typeof lastName !== "string") {
-            return res.status(400).json({ error: "firstName and lastName required" });
-    }
-
+  try {
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) {
-        return res.status(409).json({ error: "Email already in use"});
+      return res.status(409).json({ error: "Email already in use" });
     }
-    
+
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await prisma.user.create({ data: { 
-                email, 
-                passwordHash, 
-                role,
-                firstName,
-                lastName
-            } });
-    
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        role,
+        firstName,
+        lastName
+      }
+    });
+
     const accessToken = signAccessToken({ sub: user.id, email: user.email });
     const refreshToken = signRefreshToken({ sub: user.id, email: user.email });
 
-    await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id} });
+    await prisma.refreshToken.create({ data: { token: refreshToken, userId: user.id } });
 
-    return res.status(201).json({ accessToken, 
-            refreshToken,
-            user: {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                firstName: user.firstName,
-                lastName: user.lastName
-            }});
-    } catch (error) {
-        console.error("Register error:", error);
-        return res.status(500).json({ error: (error as Error).message });
-    }
+    return res.status(201).json({
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName
+      }
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    return res.status(500).json({ error: (error as Error).message });
+  }
 
 });
 
