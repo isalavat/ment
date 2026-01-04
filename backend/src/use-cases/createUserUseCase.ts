@@ -7,7 +7,7 @@ export class EmailAlreadyTakenError extends Error {
     readonly code = 'EMAIL_ALREADY_TAKEN'
 }
 
-type CreatedUser = { id: number } & Omit<CreateUserDTO, 'password'>
+export type CreatedUser = { id: number } & Omit<CreateUserDTO, 'password'>
 
 //TODO: use aggregate and repository later instead of prisma calls?
 export const createUserUseCase = async ({ email, firstName, lastName, password, role }: CreateUserDTO): Promise<CreatedUser> => {
