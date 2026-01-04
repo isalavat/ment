@@ -3,13 +3,12 @@ import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
 import logger from "../lib/logger";
 import { prisma } from "../../prisma/client";
-import { validateInputAndMap } from "../lib/validator";
 import { CreateUserSchema } from "../schemas/auth.schemas";
 
 const router = Router();
 
 router.post("/register", async (req, res) => {
-  const { email, password, role, firstName, lastName } = await validateInputAndMap(req.body, CreateUserSchema);
+  const { email, password, role, firstName, lastName } = await CreateUserSchema.parseAsync(req.body);
 
   try {
     const exists = await prisma.user.findUnique({ where: { email } });
