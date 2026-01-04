@@ -8,7 +8,7 @@ import availabilityRouter from "./routes/availability";
 import timeSlotsRouter from "./routes/timeSlots";
 import cors from "cors";
 import { prisma } from "../prisma/client";
-import z, { ZodError } from "zod";
+import z from "zod";
 
 const app = express();
 
@@ -62,7 +62,7 @@ app.get("/hello", async (req: Request, res: Response, next: NextFunction) => {
 // Basic error handler
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
-  if (err instanceof ZodError) {
+  if (err instanceof z.ZodError) {
     return res.status(400).json({ error: z.flattenError(err) })
   }
   res.status(500).json({ error: "Internal Server Error" });
