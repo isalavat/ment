@@ -4,6 +4,7 @@ import { CreateUserSchema } from "../schemas/auth.schemas";
 import { CreateUserDTO, RegisterUserUseCase } from "../use-cases/register-user.use-case";
 import { JWTTokenService } from "../services/token.service";
 import { BCrpytPasswordHasher } from "../services/password-hasher";
+import { PrismaTransaction } from "../infra/PrismaTransaction";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.post(
     async (req: Request<{}, {}, CreateUserDTO>, res: Response) => {
         const dto = req.body;
         const useCase = new RegisterUserUseCase(
+            new PrismaTransaction(),
             new JWTTokenService(),
             new BCrpytPasswordHasher()
         );
