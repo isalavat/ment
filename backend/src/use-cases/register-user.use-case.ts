@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
 import { prisma } from "../../prisma/client";
 import { ITokenService, Tokens } from "../services/token.service";
+import { IPasswordHasher } from "../services/password-hasher";
 
 type UserRole = "MENTEE" | "MENTOR" | "ADMIN"
 
@@ -28,7 +28,10 @@ export class EmailAlreadyTakenError extends Error {
 }
 
 export class RegisterUserUseCase {
-    constructor(private readonly tokenService: ITokenService) { }
+    constructor(
+        private readonly tokenService: ITokenService,
+        private readonly hasher: IPasswordHasher
+    ) { }
 
     //should be transaction
     async execute(dto: CreateUserDTO): Promise<RegisteredUser> {
@@ -38,12 +41,12 @@ export class RegisterUserUseCase {
             throw new EmailAlreadyTakenError('Email already in use');
         }
 
-        const passwordHash = await bcrypt.hash(dto.password, 12);
+        const hashedPassword = await this.hasher.hash(dto.password);
         //TODO: Use Domain Object and repository
         const createdUser = await prisma.user.create({
             data: {
                 email: dto.email,
-                passwordHash,
+                passwordHash: hashedPassword,
                 role: dto.role,
                 firstName: dto.firstName,
                 lastName: dto.lastName

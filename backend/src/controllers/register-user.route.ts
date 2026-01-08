@@ -3,6 +3,7 @@ import { validateBody } from "../middleware/requestValidator";
 import { CreateUserSchema } from "../schemas/auth.schemas";
 import { CreateUserDTO, RegisterUserUseCase } from "../use-cases/register-user.use-case";
 import { JWTTokenService } from "../services/token.service";
+import { BCrpytPasswordHasher } from "../services/password-hasher";
 
 const router = Router();
 
@@ -11,7 +12,12 @@ router.post(
     validateBody(CreateUserSchema),
     async (req: Request<{}, {}, CreateUserDTO>, res: Response) => {
         const dto = req.body;
-        const { tokens, user } = await new RegisterUserUseCase(new JWTTokenService()).execute(dto);
+        const useCase = new RegisterUserUseCase(
+            new JWTTokenService(),
+            new BCrpytPasswordHasher()
+        );
+
+        const { tokens, user } = await useCase.execute(dto);
 
         return res.status(201).json({
             accessToken: tokens.accessToken,
