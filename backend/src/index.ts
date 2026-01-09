@@ -9,7 +9,7 @@ import timeSlotsRouter from "./routes/timeSlots";
 import cors from "cors";
 import { prisma } from "../prisma/client";
 import z from "zod";
-import { EmailAlreadyTakenError } from "./use-cases/createUserUseCase";
+import { EmailAlreadyTakenError } from "./use-cases/register-user.use-case";
 
 const app = express();
 

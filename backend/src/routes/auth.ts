@@ -3,17 +3,11 @@ import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
 import logger from "../lib/logger";
 import { prisma } from "../../prisma/client";
-import { CreateUserSchema } from "../schemas/auth.schemas";
-import { validateBody } from "../middleware/requestValidator";
-import { signUpController } from "../controllers/signUpController";
+import registerUser from "../controllers/register-user.route"
 
 const router = Router();
 
-router.post(
-  "/register",
-  validateBody(CreateUserSchema),
-  signUpController
-);
+router.use(registerUser);
 
 // ...existing code...
 router.post("/login", async (req, res) => {
