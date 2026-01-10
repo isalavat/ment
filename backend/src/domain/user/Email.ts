@@ -1,5 +1,5 @@
 import z from "zod";
-import { InvalidEmailFormatError } from "./InvalidEmailFormatError";
+import { InvalidEmailFormatError } from "./errors/InvalidEmailFormatError";
 
 export class Email {
     private constructor(public readonly value: string) { }

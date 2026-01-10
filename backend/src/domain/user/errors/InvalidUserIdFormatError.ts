@@ -1,4 +1,4 @@
-import { DomainError } from "../../lib/error";
+import { DomainError } from "../../../lib/error";
 
 export class InvalidUserIdFormatError extends DomainError{
     public code: string = 'INVALID_USER_ID_FORMAT';
