@@ -46,7 +46,7 @@ router.get(
   "/mentor/:mentorId/available",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const mentorId = parseInt(req.params.mentorId);
+      const mentorId = req.params.mentorId;
       const startDate = req.query.startDate
         ? new Date(req.query.startDate as string)
         : undefined;
@@ -74,7 +74,7 @@ router.get(
   "/mentor/:mentorId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const mentorId = parseInt(req.params.mentorId);
+      const mentorId = req.params.mentorId;
       const startDate = req.query.startDate
         ? new Date(req.query.startDate as string)
         : undefined;
@@ -104,7 +104,7 @@ router.get(
  */
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const slotId = parseInt(req.params.id);
+    const slotId = req.params.id;
 
     const slot = await timeSlotService.getSlotById(slotId);
 
@@ -121,7 +121,7 @@ router.patch(
   "/:id/status",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const slotId = parseInt(req.params.id);
+      const slotId = req.params.id;
       const { status, mentorId } = req.body;
 
       if (!status) {
@@ -159,7 +159,7 @@ router.delete(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const slotId = parseInt(req.params.id);
+      const slotId = req.params.id;
       const { mentorId } = req.body;
 
       // TODO: Add authorization check

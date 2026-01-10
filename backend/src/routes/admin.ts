@@ -83,7 +83,7 @@ router.get("/users", async (req: AuthedRequest, res) => {
 // GET single user by ID
 router.get("/users/:id", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -170,7 +170,7 @@ router.post("/users", async (req, res) => {
 // PUT update user
 router.put("/users/:id", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { email, password, role, firstName, lastName, avatarUrl } = req.body;
     
     const updateData: any = {};
@@ -227,7 +227,7 @@ router.put("/users/:id", async (req, res) => {
 // DELETE user
 router.delete("/users/:id", async (req: AuthedRequest, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     
     // Prevent self-deletion
     if (req.user?.id === userId) {
@@ -249,7 +249,7 @@ router.delete("/users/:id", async (req: AuthedRequest, res) => {
 // POST create mentor profile for a user
 router.post("/users/:id/mentor-profile", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { bio, title, yearsExperience, hourlyRate, currency } = req.body;
 
     // Check user exists and has MENTOR role
@@ -289,7 +289,7 @@ router.post("/users/:id/mentor-profile", async (req, res) => {
 // POST create mentee profile for a user
 router.post("/users/:id/mentee-profile", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { bio, goals } = req.body;
 
     // Check user exists and has MENTEE role
@@ -326,7 +326,7 @@ router.post("/users/:id/mentee-profile", async (req, res) => {
 // PUT update mentor profile
 router.put("/users/:id/mentor-profile", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { bio, title, yearsExperience, hourlyRate, currency } = req.body;
 
     // Check if profile exists
@@ -358,7 +358,7 @@ router.put("/users/:id/mentor-profile", async (req, res) => {
 // PUT update mentee profile
 router.put("/users/:id/mentee-profile", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { bio, goals } = req.body;
 
     // Check if profile exists
@@ -427,7 +427,7 @@ router.post("/skills", async (req, res) => {
 // POST add skill to mentor profile
 router.post("/users/:id/mentor-profile/skills", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { skillId, skillName } = req.body;
 
     // Get mentor profile
@@ -499,8 +499,8 @@ router.post("/users/:id/mentor-profile/skills", async (req, res) => {
 // DELETE remove skill from mentor profile
 router.delete("/users/:id/mentor-profile/skills/:skillId", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
-    const skillId = parseInt(req.params.skillId);
+    const userId = req.params.id;
+    const skillId = req.params.skillId;
 
     // Get mentor profile
     const mentorProfile = await prisma.mentorProfile.findUnique({ 
@@ -532,7 +532,7 @@ router.delete("/users/:id/mentor-profile/skills/:skillId", async (req, res) => {
 // POST add category to mentor profile
 router.post("/users/:id/mentor-profile/categories", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { categoryId } = req.body;
 
     console.log('=== ADD CATEGORY REQUEST ===');
@@ -558,7 +558,7 @@ router.post("/users/:id/mentor-profile/categories", async (req, res) => {
       where: {
         mentorId_categoryId: {
           mentorId: mentorProfile.id,
-          categoryId: parseInt(categoryId)
+          categoryId: categoryId
         }
       }
     });
@@ -571,7 +571,7 @@ router.post("/users/:id/mentor-profile/categories", async (req, res) => {
     const created = await prisma.mentorCategory.create({
       data: {
         mentorId: mentorProfile.id,
-        categoryId: parseInt(categoryId)
+        categoryId: categoryId
       }
     });
     
@@ -601,8 +601,8 @@ router.post("/users/:id/mentor-profile/categories", async (req, res) => {
 // DELETE remove category from mentor profile
 router.delete("/users/:id/mentor-profile/categories/:categoryId", async (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
-    const categoryId = parseInt(req.params.categoryId);
+    const userId = req.params.id;
+    const categoryId = req.params.categoryId;
 
     // Get mentor profile
     const mentorProfile = await prisma.mentorProfile.findUnique({ 

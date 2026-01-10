@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 // 1) Rename to avoid clashing with the library's JwtPayload
 export type AppJwtPayload = {
-  sub: number;
+  sub: string;
   email: string;
   type: "access" | "refresh";
 };
@@ -15,7 +15,7 @@ function isAppJwtPayload(v: unknown): v is AppJwtPayload {
   if (typeof v !== "object" || v === null) return false;
   const o = v as Record<string, unknown>;
   return (
-    typeof o.sub === "number" &&
+    typeof o.sub === "string" &&
     typeof o.email === "string" &&
     (o.type === "access" || o.type === "refresh")
   );

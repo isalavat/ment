@@ -72,7 +72,7 @@ router.get(
   "/mentor/:mentorId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const mentorId = parseInt(req.params.mentorId);
+      const mentorId = req.params.mentorId;
 
       const availabilities =
         await availabilityService.getAvailabilitiesForMentor(mentorId);
@@ -91,7 +91,7 @@ router.get(
   "/mentor/:mentorId/recurring",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const mentorId = parseInt(req.params.mentorId);
+      const mentorId = req.params.mentorId;
       const dayOfWeek = req.query.dayOfWeek
         ? parseInt(req.query.dayOfWeek as string)
         : undefined;
@@ -116,7 +116,7 @@ router.get(
   "/mentor/:mentorId/specific",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const mentorId = parseInt(req.params.mentorId);
+      const mentorId = req.params.mentorId;
       const date = req.query.date
         ? new Date(req.query.date as string)
         : undefined;
@@ -136,7 +136,7 @@ router.get(
  */
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
 
     const availability = await availabilityService.getAvailabilityById(id);
 
@@ -153,7 +153,7 @@ router.patch(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const { mentorId, ...updateData } = req.body;
 
       // TODO: Add authorization check
@@ -178,7 +178,7 @@ router.delete(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const { mentorId } = req.body;
 
       // TODO: Add authorization check

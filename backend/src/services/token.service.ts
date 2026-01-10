@@ -1,7 +1,7 @@
 import { getPrismaClient } from "../infra/PrismaTransaction";
 import { signAccessToken, signRefreshToken } from "../lib/jwt";
 
-type UserInfo = { id: number, email: string }
+type UserInfo = { id: string, email: string }
 export type Tokens = { accessToken: string, refreshToken: string }
 
 export interface ITokenService {

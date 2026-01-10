@@ -15,7 +15,7 @@ export type CreateUserDTO = {
 
 type RegisteredUser = {
     user: {
-        id: number,
+        id: string,
         email: string,
         firstName: string,
         lastName: string,

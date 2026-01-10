@@ -4,7 +4,7 @@ import logger from "../lib/logger";
 import { prisma } from "../../prisma/client";
 
 
-export type AuthedRequest = Request & { user?: {id: number; email: string} };
+export type AuthedRequest = Request & { user?: {id: string; email: string} };
 
 export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
     const header = req.headers.authorization;

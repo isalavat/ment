@@ -45,7 +45,7 @@ router.get(
   "/mentee/:menteeId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const menteeId = parseInt(req.params.menteeId);
+      const menteeId = req.params.menteeId;
       const status = req.query.status as BookingStatus | undefined;
       const startDate = req.query.startDate
         ? new Date(req.query.startDate as string)
@@ -76,7 +76,7 @@ router.get(
   "/mentor/:mentorId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const mentorId = parseInt(req.params.mentorId);
+      const mentorId = req.params.mentorId;
       const status = req.query.status as BookingStatus | undefined;
       const startDate = req.query.startDate
         ? new Date(req.query.startDate as string)
@@ -105,7 +105,7 @@ router.get(
  */
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const bookingId = parseInt(req.params.id);
+    const bookingId = req.params.id;
 
     // TODO: Add authorization check - only mentee or mentor involved should access
 
@@ -123,7 +123,7 @@ router.patch(
   "/:id/confirm",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const bookingId = parseInt(req.params.id);
+      const bookingId = req.params.id;
       const { mentorId } = req.body;
 
       // TODO: Add proper authorization check
@@ -143,7 +143,7 @@ router.patch(
   "/:id/cancel-mentee",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const bookingId = parseInt(req.params.id);
+      const bookingId = req.params.id;
       const { menteeId } = req.body;
 
       // TODO: Add proper authorization check
@@ -166,7 +166,7 @@ router.patch(
   "/:id/cancel-mentor",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const bookingId = parseInt(req.params.id);
+      const bookingId = req.params.id;
       const { mentorId } = req.body;
 
       // TODO: Add proper authorization check
@@ -189,7 +189,7 @@ router.patch(
   "/:id/complete",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const bookingId = parseInt(req.params.id);
+      const bookingId = req.params.id;
 
       // TODO: Add proper authorization check - should be after session time has passed
 
@@ -208,7 +208,7 @@ router.patch(
   "/:id/meeting-link",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const bookingId = parseInt(req.params.id);
+      const bookingId = req.params.id;
       const { mentorId, meetingLink } = req.body;
 
       if (!meetingLink) {

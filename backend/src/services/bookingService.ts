@@ -3,9 +3,9 @@ import { prisma } from "../../prisma/client";
 
 
 interface CreateBookingData {
-  menteeId: number;
-  mentorId: number;
-  timeSlotId: number;
+  menteeId: string;
+  mentorId: string;
+  timeSlotId: string;
   notes?: string;
 }
 
@@ -128,7 +128,7 @@ export const bookingService = {
   /**
    * Confirm a booking (mentor confirms)
    */
-  async confirmBooking(bookingId: number, mentorId: number) {
+  async confirmBooking(bookingId: string, mentorId: string) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
     });
@@ -184,7 +184,7 @@ export const bookingService = {
   /**
    * Cancel booking by mentee
    */
-  async cancelBookingByMentee(bookingId: number, menteeId: number) {
+  async cancelBookingByMentee(bookingId: string, menteeId: string) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: { timeSlot: true },
@@ -255,7 +255,7 @@ export const bookingService = {
   /**
    * Cancel booking by mentor
    */
-  async cancelBookingByMentor(bookingId: number, mentorId: number) {
+  async cancelBookingByMentor(bookingId: string, mentorId: string) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: { timeSlot: true },
@@ -326,7 +326,7 @@ export const bookingService = {
   /**
    * Complete a booking
    */
-  async completeBooking(bookingId: number) {
+  async completeBooking(bookingId: string) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
     });
@@ -378,7 +378,7 @@ export const bookingService = {
   /**
    * Get bookings for a mentee
    */
-  async getBookingsForMentee(menteeId: number, filters?: BookingFilters) {
+  async getBookingsForMentee(menteeId: string, filters?: BookingFilters) {
     const where: any = { menteeId };
 
     if (filters?.status) {
@@ -422,7 +422,7 @@ export const bookingService = {
   /**
    * Get bookings for a mentor
    */
-  async getBookingsForMentor(mentorId: number, filters?: BookingFilters) {
+  async getBookingsForMentor(mentorId: string, filters?: BookingFilters) {
     const where: any = { mentorId };
 
     if (filters?.status) {
@@ -466,7 +466,7 @@ export const bookingService = {
   /**
    * Get a single booking by ID
    */
-  async getBookingById(bookingId: number) {
+  async getBookingById(bookingId: string) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
@@ -510,8 +510,8 @@ export const bookingService = {
    * Update meeting link (typically by mentor)
    */
   async updateMeetingLink(
-    bookingId: number,
-    mentorId: number,
+    bookingId: string,
+    mentorId: string,
     meetingLink: string
   ) {
     const booking = await prisma.booking.findUnique({
