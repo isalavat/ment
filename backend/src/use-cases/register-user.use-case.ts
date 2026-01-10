@@ -2,10 +2,10 @@ import { ITokenService, Tokens } from "../services/token.service";
 import { User, UserRole } from "../domain/user/User";
 import { IPasswordHasher } from "../services/password-hasher";
 import { Transaction } from "../Transaction";
-import { HashedPassword } from "../domain/user/HashedPassword";
+import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
 import { UserRepository } from "../domain/user/UserRepository";
-import { UserId } from "../domain/user/UserId";
-import { Email } from "../domain/user/Email";
+import { UserId } from "../domain/user/value-objects/UserId";
+import { Email } from "../domain/user/value-objects/Email";
 import { UserAlreadyExistsError } from "./UserAlreadyExistsError";
 
 export type CreateUserDTO = {

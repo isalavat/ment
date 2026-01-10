@@ -1,5 +1,5 @@
 import { v7 as uuid7, validate as uuidValidate } from 'uuid'
-import { InvalidUserIdFormatError } from './errors/InvalidUserIdFormatError';
+import { InvalidUserIdFormatError } from '../errors/InvalidUserIdFormatError';
 
 export class UserId {
     private constructor(public readonly value: string) { }

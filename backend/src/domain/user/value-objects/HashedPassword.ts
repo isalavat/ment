@@ -1,4 +1,4 @@
-import { InternalServerError } from "../../lib/error";
+import { InternalServerError } from "../../../lib/error";
 
 export class HashedPassword {
     private constructor(public readonly value: string) { }

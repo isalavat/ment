@@ -1,6 +1,6 @@
-import { Email } from "./Email";
-import { HashedPassword } from "./HashedPassword";
-import { UserId } from "./UserId";
+import { Email } from "./value-objects/Email";
+import { HashedPassword } from "./value-objects/HashedPassword";
+import { UserId } from "./value-objects/UserId";
 
 export type UserRole = "MENTEE" | "MENTOR" | "ADMIN"
 
