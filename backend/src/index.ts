@@ -9,6 +9,7 @@ import timeSlotsRouter from "./routes/timeSlots";
 import cors from "cors";
 import { prisma } from "../prisma/client";
 import z from "zod";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 
@@ -59,11 +60,7 @@ app.get("/hello", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// Basic error handler
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: "Internal Server Error" });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT ?? 3000;
 app.listen(PORT, () => {
