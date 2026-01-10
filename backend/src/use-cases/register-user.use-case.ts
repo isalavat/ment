@@ -35,7 +35,6 @@ export class RegisterUserUseCase {
         private readonly hasher: IPasswordHasher
     ) { }
 
-    //should be transaction
     async execute(dto: CreateUserDTO): Promise<RegisteredUser> {
         return await this.transaction.run(async () => {
             const email = Email.from(dto.email);
