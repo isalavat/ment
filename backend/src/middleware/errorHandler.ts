@@ -29,6 +29,7 @@ export const errorHandler = (err: BaseError, req: AuthedRequest, res: Response, 
 
     res.status(err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
         code: err.code || 'INTERNAL_SERVER_ERROR',
-        message: err.message
+        message: err.message,
+        instance: req.url,
     });
 }
