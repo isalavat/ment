@@ -5,11 +5,12 @@ import { HashedPassword } from "../domain/user/HashedPassword";
 import { prisma } from "../../prisma/client";
 import { UserId } from "../domain/user/UserId";
 import { Email } from "../domain/user/Email";
+import { getPrismaClient } from "./Prisma";
 
 export class PrismaUserRepository implements UserRepository {
 
     async save(user: User): Promise<User> {
-        const result = await prisma.user.create({
+        const result = await getPrismaClient().user.create({
             data: {
                 id: user.id.value,
                 email: user.email.value,

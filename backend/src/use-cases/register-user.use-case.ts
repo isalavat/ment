@@ -2,7 +2,7 @@ import { ITokenService, Tokens } from "../services/token.service";
 import { User, UserRole } from "../domain/user/User";
 import { IPasswordHasher } from "../services/password-hasher";
 import { Transaction } from "../Transaction";
-import { getPrismaClient } from "../infra/PrismaTransaction";
+import { getPrismaClient } from "../infra/Prisma";
 import { HashedPassword } from "../domain/user/HashedPassword";
 import { UserRepository } from "../domain/user/UserRepository";
 import { UserId } from "../domain/user/UserId";

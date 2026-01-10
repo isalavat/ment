@@ -4,7 +4,7 @@ import { CreateUserSchema } from "../schemas/auth.schemas";
 import { CreateUserDTO, RegisterUserUseCase } from "../use-cases/register-user.use-case";
 import { JWTTokenService } from "../services/token.service";
 import { BCrpytPasswordHasher } from "../services/password-hasher";
-import { PrismaTransaction } from "../infra/PrismaTransaction";
+import { PrismaTransaction } from "../infra/Prisma";
 import { PrismaUserRepository } from "../infra/PrismaUserRepository";
 
 const router = Router();

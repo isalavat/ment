@@ -1,4 +1,4 @@
-import { getPrismaClient } from "../infra/PrismaTransaction";
+import { getPrismaClient } from "../infra/Prisma";
 import { signAccessToken, signRefreshToken } from "../lib/jwt";
 
 type UserInfo = { id: string, email: string }
