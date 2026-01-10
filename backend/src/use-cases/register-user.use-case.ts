@@ -6,6 +6,7 @@ import { HashedPassword } from "../domain/user/HashedPassword";
 import { UserRepository } from "../domain/user/UserRepository";
 import { UserId } from "../domain/user/UserId";
 import { Email } from "../domain/user/Email";
+import { UserAlreadyExistsError } from "./UserAlreadyExistsError";
 
 export type CreateUserDTO = {
     email: string,
@@ -26,10 +27,6 @@ type RegisteredUser = {
     tokens: Tokens
 }
 
-export class EmailAlreadyTakenError extends Error {
-    readonly code = 'EMAIL_ALREADY_TAKEN'
-}
-
 export class RegisterUserUseCase {
     constructor(
         private readonly transaction: Transaction,
@@ -45,7 +42,7 @@ export class RegisterUserUseCase {
             const existed = await this.userRepository.existsByEmail(email)
 
             if (existed) {
-                throw new EmailAlreadyTakenError('Email already in use');
+                throw new UserAlreadyExistsError(email.value);
             }
 
             const hashedPassword = await this.hasher.hash(dto.password);
