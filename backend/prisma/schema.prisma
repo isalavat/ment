@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid(7))
   text      String
   createdAt DateTime @default(now())
 }
@@ -40,176 +40,176 @@ enum SlotStatus {
   UNAVAILABLE
 }
 
-
 // ---------- Auth & Core User ----------
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  passwordHash  String
-  role          UserRole
-  firstName     String
-  lastName      String
-  avatarUrl     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
+  id           String   @id @default(uuid(7))
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  firstName    String
+  lastName     String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   refreshTokens RefreshToken[]
   mentorProfile MentorProfile?
   menteeProfile MenteeProfile?
 }
 
 model MentorProfile {
-  id              Int      @id @default(autoincrement())
-  userId          Int      @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  bio             String   @db.Text
-  title           String   // e.g., "Senior Software Engineer"
+  id     String @id @default(uuid(7))
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio             String  @db.Text
+  title           String // e.g., "Senior Software Engineer"
   yearsExperience Int
-  hourlyRate      Decimal  @db.Decimal(10, 2)
-  currency        String   @default("USD")
-  
+  hourlyRate      Decimal @db.Decimal(10, 2)
+  currency        String  @default("USD")
+
   // Aggregated rating
-  avgRating       Float    @default(0)
-  totalReviews    Int      @default(0)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  categories      MentorCategory[]
-  skills          MentorSkill[]
-  availabilities  Availability[]
-  bookings        Booking[]
-  reviews         Review[]       @relation("MentorReviews")
-  
+  avgRating    Float @default(0)
+  totalReviews Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories     MentorCategory[]
+  skills         MentorSkill[]
+  availabilities Availability[]
+  bookings       Booking[]
+  reviews        Review[]         @relation("MentorReviews")
+
   @@index([avgRating])
   @@index([hourlyRate])
 }
+
 // ---------- Mentee Profile ----------
 model MenteeProfile {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  bio       String?  @db.Text
-  goals     String?  @db.Text
-  
+  id     String @id @default(uuid(7))
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio   String? @db.Text
+  goals String? @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   bookings  Booking[]
-  reviews   Review[]   @relation("MenteeReviews")
+  reviews   Review[]         @relation("MenteeReviews")
   favorites FavoriteMentor[]
 }
 
 // ---------- Categories & Skills ----------
 model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          String  @id @default(uuid(7))
+  name        String  @unique
   description String?
-  slug        String   @unique
-  
-  mentors     MentorCategory[]
-  
+  slug        String  @unique
+
+  mentors MentorCategory[]
+
   @@index([slug])
 }
 
 model MentorCategory {
-  mentorId   Int
-  categoryId Int
-  
-  mentor     MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
-  category   Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+  mentorId   String
+  categoryId String
+
+  mentor   MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  category Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
   @@id([mentorId, categoryId])
   @@index([categoryId])
 }
 
 model Skill {
-  id      Int    @id @default(autoincrement())
-  name    String @unique
-  
+  id   String @id @default(uuid(7))
+  name String @unique
+
   mentors MentorSkill[]
 }
 
 model MentorSkill {
-  mentorId Int
-  skillId  Int
-  
-  mentor   MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
-  skill    Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  
+  mentorId String
+  skillId  String
+
+  mentor MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  skill  Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
   @@id([mentorId, skillId])
   @@index([skillId])
 }
 
 // ---------- Calendar & Availability ----------
 model Availability {
-  id          Int        @id @default(autoincrement())
-  mentorId    Int
-  mentor      MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
-  
-  dayOfWeek   Int        // 0 = Sunday, 6 = Saturday
-  startTime   String     // e.g., "09:00"
-  endTime     String     // e.g., "17:00"
-  isRecurring Boolean    @default(true)
-  
+  id       String        @id @default(uuid(7))
+  mentorId String
+  mentor   MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  dayOfWeek   Int // 0 = Sunday, 6 = Saturday
+  startTime   String // e.g., "09:00"
+  endTime     String // e.g., "17:00"
+  isRecurring Boolean @default(true)
+
   // For one-time slots
   specificDate DateTime?
-  
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([mentorId, dayOfWeek])
 }
 
 // ---------- Time Slots (Generated from Availability) ----------
 model TimeSlot {
-  id        Int        @id @default(autoincrement())
-  mentorId  Int
-  
+  id       String @id @default(uuid(7))
+  mentorId String
+
   startTime DateTime
   endTime   DateTime
   status    SlotStatus @default(AVAILABLE)
-  
-  booking   Booking?
-  
+
+  booking Booking?
+
   @@index([mentorId, startTime, status])
   @@index([status, startTime])
 }
 
 // ---------- Bookings ----------
 model Booking {
-  id          Int           @id @default(autoincrement())
-  
-  mentorId    Int
-  mentor      MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
-  
-  menteeId    Int
-  mentee      MenteeProfile @relation(fields: [menteeId], references: [id], onDelete: Cascade)
-  
-  timeSlotId  Int           @unique
-  timeSlot    TimeSlot      @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
-  
-  status      BookingStatus @default(PENDING)
-  notes       String?       @db.Text
-  
+  id String @id @default(uuid(7))
+
+  mentorId String
+  mentor   MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  menteeId String
+  mentee   MenteeProfile @relation(fields: [menteeId], references: [id], onDelete: Cascade)
+
+  timeSlotId String   @unique
+  timeSlot   TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+
+  status BookingStatus @default(PENDING)
+  notes  String?       @db.Text
+
   // Price snapshot
-  hourlyRate  Decimal       @db.Decimal(10, 2)
-  duration    Int           // minutes
-  totalAmount Decimal       @db.Decimal(10, 2)
+  hourlyRate  Decimal @db.Decimal(10, 2)
+  duration    Int // minutes
+  totalAmount Decimal @db.Decimal(10, 2)
   currency    String
-  
+
   meetingLink String?
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   confirmedAt DateTime?
   completedAt DateTime?
   cancelledAt DateTime?
-  
-  review      Review?
-  
+
+  review Review?
+
   @@index([mentorId, status])
   @@index([menteeId, status])
   @@index([status, createdAt])
@@ -217,52 +217,49 @@ model Booking {
 
 // ---------- Reviews & Ratings ----------
 model Review {
-  id        Int      @id @default(autoincrement())
-  
-  bookingId Int      @unique
-  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  
-  mentorId  Int
-  mentor    MentorProfile @relation("MentorReviews", fields: [mentorId], references: [id], onDelete: Cascade)
-  
-  menteeId  Int
-  mentee    MenteeProfile @relation("MenteeReviews", fields: [menteeId], references: [id], onDelete: Cascade)
-  
-  rating    Int      // 1-5
-  comment   String?  @db.Text
-  
+  id String @id @default(uuid(7))
+
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  mentorId String
+  mentor   MentorProfile @relation("MentorReviews", fields: [mentorId], references: [id], onDelete: Cascade)
+
+  menteeId String
+  mentee   MenteeProfile @relation("MenteeReviews", fields: [menteeId], references: [id], onDelete: Cascade)
+
+  rating  Int // 1-5
+  comment String? @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([mentorId, rating])
 }
 
 // ---------- Favorites ----------
 model FavoriteMentor {
-  id        Int      @id @default(autoincrement())
-  
-  menteeId  Int
-  mentee    MenteeProfile @relation(fields: [menteeId], references: [id], onDelete: Cascade)
-  
-  mentorId  Int
-  
+  id String @id @default(uuid(7))
+
+  menteeId String
+  mentee   MenteeProfile @relation(fields: [menteeId], references: [id], onDelete: Cascade)
+
+  mentorId String
+
   createdAt DateTime @default(now())
-  
+
   @@unique([menteeId, mentorId])
   @@index([menteeId])
 }
 
 model RefreshToken {
-  id  Int @id @default(autoincrement())
-  token String @db.VarChar(500)
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id        String    @id @default(uuid())
+  token     String    @db.VarChar(500)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
   revokedAt DateTime?
-  
+
   @@unique([token])
   @@map("refreshtoken")
 }
-
-
-
