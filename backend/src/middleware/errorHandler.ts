@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { BaseError } from "../lib/error";
+import { BaseError, InternalServerError } from "../lib/error";
 import logger from "../lib/logger";
 import { AuthedRequest } from "./auth";
 import { StatusCodes } from "http-status-codes";
@@ -21,7 +21,8 @@ export const errorHandler = (err: BaseError, req: AuthedRequest, res: Response, 
             code: err.code || 'INTERNAL_SERVER_ERROR',
             message: err.message,
             stack: logLevel === 'error' ? err.stack : undefined,
-            validationErrorDetails: err instanceof RequestValidationError ? err.errors : undefined
+            validationErrorDetails: err instanceof RequestValidationError ? err.errors : undefined,
+            detailedMessage: err instanceof InternalServerError ?err.details :undefined
         }
     };
 
