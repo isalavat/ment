@@ -2,7 +2,6 @@ import { ITokenService, Tokens } from "../services/token.service";
 import { User, UserRole } from "../domain/user/User";
 import { IPasswordHasher } from "../services/password-hasher";
 import { Transaction } from "../Transaction";
-import { getPrismaClient } from "../infra/Prisma";
 import { HashedPassword } from "../domain/user/HashedPassword";
 import { UserRepository } from "../domain/user/UserRepository";
 import { UserId } from "../domain/user/UserId";
@@ -42,16 +41,17 @@ export class RegisterUserUseCase {
     //should be transaction
     async execute(dto: CreateUserDTO): Promise<RegisteredUser> {
         return await this.transaction.run(async () => {
-            const exists = await getPrismaClient().user.findUnique({ where: { email: dto.email } });
+            const email = Email.from(dto.email);
+            const existed = await this.userRepository.existsByEmail(email)
 
-            if (exists) {
+            if (existed) {
                 throw new EmailAlreadyTakenError('Email already in use');
             }
 
             const hashedPassword = await this.hasher.hash(dto.password);
             
-            const user = User.create(UserId.generate(), Email.from(dto.email), dto.firstName, dto.lastName, HashedPassword.fromHash(hashedPassword), dto.role);
-            this.userRepository.save(user);
+            const user = User.create(UserId.generate(), email, dto.firstName, dto.lastName, HashedPassword.fromHash(hashedPassword), dto.role);
+            await this.userRepository.save(user);
 
             const tokens = await this.tokenService.generate({ id: user.id.value, email: user.email.value });
 

@@ -8,7 +8,6 @@ import { Email } from "../domain/user/Email";
 import { getPrismaClient } from "./Prisma";
 
 export class PrismaUserRepository implements UserRepository {
-
     async save(user: User): Promise<User> {
         const result = await getPrismaClient().user.create({
             data: {
@@ -21,6 +20,14 @@ export class PrismaUserRepository implements UserRepository {
             }
         })
         return this.toUser(result);
+    }
+
+    async existsByEmail(email: Email): Promise<boolean> {
+        const result = await getPrismaClient().user.findUnique({ where: { email: email.value} });
+        if(result === null){
+            return false;
+        }
+        return true;
     }
 
     private toUser(fromPrisma: PrismaUser): User {

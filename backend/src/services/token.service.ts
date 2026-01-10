@@ -13,7 +13,6 @@ export class JWTTokenService implements ITokenService {
         const accessToken = signAccessToken({ sub: info.id, email: info.email });
         const refreshToken = signRefreshToken({ sub: info.id, email: info.email });
 
-        //Repository?
         await getPrismaClient().refreshToken.create({ data: { token: refreshToken, userId: info.id } });
 
         return { accessToken, refreshToken };
