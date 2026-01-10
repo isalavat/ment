@@ -3,6 +3,7 @@ import { BaseError } from "../lib/error";
 import logger from "../lib/logger";
 import { AuthedRequest } from "./auth";
 import { StatusCodes } from "http-status-codes";
+import { RequestValidationError } from "../controllers/RequestValidationError";
 
 export const errorHandler = (err: BaseError, req: AuthedRequest, res: Response, _next: NextFunction) => {
     const isUnexpected = !(err instanceof BaseError);
@@ -20,6 +21,7 @@ export const errorHandler = (err: BaseError, req: AuthedRequest, res: Response, 
             code: err.code || 'INTERNAL_SERVER_ERROR',
             message: err.message,
             stack: logLevel === 'error' ? err.stack : undefined,
+            validationErrorDetails: err instanceof RequestValidationError ? err.errors : undefined
         }
     };
 
