@@ -94,7 +94,7 @@ export const TimeSlotManager: React.FC = () => {
     }
   };
 
-  const handleDeleteSlot = async (slotId: number) => {
+  const handleDeleteSlot = async (slotId: string) => {
     if (!user?.mentorProfileId) return;
     if (!window.confirm("Delete this time slot?")) return;
 

@@ -10,7 +10,7 @@ export const bookingService = {
 
   // Get bookings for mentee
   async getBookingsForMentee(
-    menteeId: number,
+    menteeId: string,
     status?: string,
     startDate?: string,
     endDate?: string
@@ -26,7 +26,7 @@ export const bookingService = {
 
   // Get bookings for mentor
   async getBookingsForMentor(
-    mentorId: number,
+    mentorId: string,
     status?: string,
     startDate?: string,
     endDate?: string
@@ -41,13 +41,13 @@ export const bookingService = {
   },
 
   // Get single booking
-  async getBookingById(bookingId: number): Promise<Booking> {
+  async getBookingById(bookingId: string): Promise<Booking> {
     const response = await api.get(`/bookings/${bookingId}`);
     return response.data;
   },
 
   // Confirm booking (mentor)
-  async confirmBooking(bookingId: number, mentorId: number): Promise<Booking> {
+  async confirmBooking(bookingId: string, mentorId: string): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/confirm`, {
       mentorId,
     });
@@ -56,8 +56,8 @@ export const bookingService = {
 
   // Cancel booking (mentee)
   async cancelBookingByMentee(
-    bookingId: number,
-    menteeId: number
+    bookingId: string,
+    menteeId: string
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/cancel-mentee`, {
       menteeId,
@@ -67,8 +67,8 @@ export const bookingService = {
 
   // Cancel booking (mentor)
   async cancelBookingByMentor(
-    bookingId: number,
-    mentorId: number
+    bookingId: string,
+    mentorId: string
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/cancel-mentor`, {
       mentorId,
@@ -77,15 +77,15 @@ export const bookingService = {
   },
 
   // Complete booking
-  async completeBooking(bookingId: number): Promise<Booking> {
+  async completeBooking(bookingId: string): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/complete`);
     return response.data;
   },
 
   // Update meeting link
   async updateMeetingLink(
-    bookingId: number,
-    mentorId: number,
+    bookingId: string,
+    mentorId: string,
     meetingLink: string
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/meeting-link`, {
@@ -97,7 +97,7 @@ export const bookingService = {
 
   // Get available time slots for a mentor
   async getAvailableTimeSlots(
-    mentorId: number,
+    mentorId: string,
     startDate?: string,
     endDate?: string
   ): Promise<TimeSlot[]> {

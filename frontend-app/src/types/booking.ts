@@ -1,16 +1,16 @@
 export interface TimeSlot {
-  id: number;
-  mentorId: number;
+  id: string;
+  mentorId: string;
   startTime: string;
   endTime: string;
   status: "AVAILABLE" | "BOOKED" | "UNAVAILABLE";
 }
 
 export interface Booking {
-  id: number;
-  mentorId: number;
-  menteeId: number;
-  timeSlotId: number;
+  id: string;
+  mentorId: string;
+  menteeId: string;
+  timeSlotId: string;
   status:
     | "PENDING"
     | "CONFIRMED"
@@ -29,7 +29,7 @@ export interface Booking {
   completedAt?: string;
   cancelledAt?: string;
   mentor?: {
-    id: number;
+    id: string;
     title: string;
     user: {
       firstName: string;
@@ -39,7 +39,7 @@ export interface Booking {
     };
   };
   mentee?: {
-    id: number;
+    id: string;
     user: {
       firstName: string;
       lastName: string;
@@ -49,15 +49,15 @@ export interface Booking {
   };
   timeSlot?: TimeSlot;
   review?: {
-    id: number;
+    id: string;
     rating: number;
     comment?: string;
   };
 }
 
 export interface CreateBookingData {
-  menteeId: number;
-  mentorId: number;
-  timeSlotId: number;
+  menteeId: string;
+  mentorId: string;
+  timeSlotId: string;
   notes?: string;
 }

@@ -39,34 +39,34 @@ export const profileService = {
   },
 
   // Categories
-  getCategories: async (): Promise<{ categories: Array<{ id: number; name: string; slug: string; description?: string }> }> => {
+  getCategories: async (): Promise<{ categories: Array<{ id: string; name: string; slug: string; description?: string }> }> => {
     const response = await api.get('/profiles/categories');
     return response.data;
   },
 
   // Skills
-  getSkills: async (): Promise<{ skills: Array<{ id: number; name: string }> }> => {
+  getSkills: async (): Promise<{ skills: Array<{ id: string; name: string }> }> => {
     const response = await api.get('/profiles/skills');
     return response.data;
   },
 
-  addCategoryToMentorProfile: async (categoryId: number): Promise<{ message: string }> => {
+  addCategoryToMentorProfile: async (categoryId: string): Promise<{ message: string }> => {
     const response = await api.post('/profiles/mentor/categories', { categoryId });
     return response.data;
   },
 
-  removeCategoryFromMentorProfile: async (categoryId: number): Promise<{ message: string }> => {
+  removeCategoryFromMentorProfile: async (categoryId: string): Promise<{ message: string }> => {
     const response = await api.delete(`/profiles/mentor/categories/${categoryId}`);
     return response.data;
   },
 
   // Skills
-  addSkillToMentorProfile: async (skillId?: number, skillName?: string): Promise<MentorProfile> => {
+  addSkillToMentorProfile: async (skillId?: string, skillName?: string): Promise<MentorProfile> => {
     const response = await api.post('/profiles/mentor/skills', { skillId, skillName });
     return response.data.profile;
   },
 
-  removeSkillFromMentorProfile: async (skillId: number): Promise<{ message: string }> => {
+  removeSkillFromMentorProfile: async (skillId: string): Promise<{ message: string }> => {
     const response = await api.delete(`/profiles/mentor/skills/${skillId}`);
     return response.data;
   },

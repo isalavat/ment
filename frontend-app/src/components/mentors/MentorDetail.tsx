@@ -35,7 +35,7 @@ export const MentorDetail: React.FC = () => {
       setLoading(true);
       setError("");
       try {
-        const data = await mentorService.getMentorById(parseInt(id));
+        const data = await mentorService.getMentorById(id);
         setMentor(data);
       } catch (err: any) {
         setError(err.response?.data?.error || "Failed to fetch mentor details");

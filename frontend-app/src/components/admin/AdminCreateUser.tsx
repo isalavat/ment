@@ -10,7 +10,7 @@ export const AdminCreateUser: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState<'user' | 'profile'>('user');
-  const [createdUserId, setCreatedUserId] = useState<number | null>(null);
+  const [createdUserId, setCreatedUserId] = useState<string | null>(null);
 
   const [userData, setUserData] = useState<CreateUserData>({
     email: '',

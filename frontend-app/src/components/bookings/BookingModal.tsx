@@ -7,12 +7,12 @@ import { AlertDialog } from "../common/AlertDialog";
 import "./BookingModal.css";
 
 interface BookingModalProps {
-  mentorId: number;
+  mentorId: string;
   mentorName: string;
   mentorTitle: string;
   hourlyRate: number;
   currency: string;
-  menteeId: number;
+  menteeId: string;
   onClose: () => void;
   onSuccess: () => void;
 }

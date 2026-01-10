@@ -124,7 +124,7 @@ export const Bookings: React.FC = () => {
     }
   };
 
-  const handleConfirmBooking = (bookingId: number) => {
+  const handleConfirmBooking = (bookingId: string) => {
     if (!user?.mentorProfileId) return;
 
     setConfirmDialog({
@@ -155,7 +155,7 @@ export const Bookings: React.FC = () => {
     });
   };
 
-  const handleCancelBooking = (bookingId: number) => {
+  const handleCancelBooking = (bookingId: string) => {
     setConfirmDialog({
       isOpen: true,
       title: "Cancel Booking",

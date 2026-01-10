@@ -1,8 +1,8 @@
 import axios from './api';
 
 export interface MentorProfile {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   title: string;
   bio: string;
   yearsExperience: number;
@@ -11,7 +11,7 @@ export interface MentorProfile {
   avgRating: number;
   totalReviews: number;
   user: {
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -19,13 +19,13 @@ export interface MentorProfile {
   };
   skills: Array<{
     skill: {
-      id: number;
+      id: string;
       name: string;
     };
   }>;
   categories: Array<{
     category: {
-      id: number;
+      id: string;
       name: string;
       slug: string;
     };
@@ -61,7 +61,7 @@ export const mentorService = {
   },
   
   // Get a single mentor by ID
-  getMentorById: async (id: number): Promise<MentorProfile> => {
+  getMentorById: async (id: string): Promise<MentorProfile> => {
     const response = await axios.get(`/profiles/mentors/${id}`);
     return response.data.mentor;
   }

@@ -39,11 +39,11 @@ export const AdminUserDetail: React.FC = () => {
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
   const [mentorSkills, setMentorSkills] = useState<any[]>([]);
   const [newSkillName, setNewSkillName] = useState('');
-  const [selectedSkillId, setSelectedSkillId] = useState<number | ''>('');
+  const [selectedSkillId, setSelectedSkillId] = useState<string>('');
 
-  const [availableCategories, setAvailableCategories] = useState<Array<{ id: number; name: string; slug: string; description?: string }>>([]);
+  const [availableCategories, setAvailableCategories] = useState<Array<{ id: string; name: string; slug: string; description?: string }>>([]);
   const [mentorCategories, setMentorCategories] = useState<any[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | ''>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
 
   useEffect(() => {
     if (id) {
@@ -57,7 +57,7 @@ export const AdminUserDetail: React.FC = () => {
     try {
       setLoading(true);
       setError('');
-      const data = await adminService.getUser(parseInt(id!));
+      const data = await adminService.getUser(id!);
       setUser(data);
       
       // Populate user data
@@ -146,7 +146,7 @@ export const AdminUserDetail: React.FC = () => {
       setError('');
       setSuccess('');
       
-      await adminService.updateUser(parseInt(id!), userData);
+      await adminService.updateUser(id!, userData);
       setSuccess('User updated successfully');
       loadUser();
     } catch (err: any) {
@@ -168,15 +168,15 @@ export const AdminUserDetail: React.FC = () => {
       
       if (user.role === 'MENTOR') {
         if (user.mentorProfile) {
-          await adminService.updateMentorProfile(parseInt(id!), mentorProfile);
+          await adminService.updateMentorProfile(id!, mentorProfile);
         } else {
-          await adminService.createMentorProfile(parseInt(id!), mentorProfile as any);
+          await adminService.createMentorProfile(id!, mentorProfile as any);
         }
       } else if (user.role === 'MENTEE') {
         if (user.menteeProfile) {
-          await adminService.updateMenteeProfile(parseInt(id!), menteeProfile);
+          await adminService.updateMenteeProfile(id!, menteeProfile);
         } else {
-          await adminService.createMenteeProfile(parseInt(id!), menteeProfile);
+          await adminService.createMenteeProfile(id!, menteeProfile);
         }
       }
       
@@ -198,8 +198,8 @@ export const AdminUserDetail: React.FC = () => {
     try {
       setError('');
       const updatedProfile = await adminService.addSkillToMentor(
-        parseInt(id!), 
-        selectedSkillId ? Number(selectedSkillId) : undefined,
+        id!, 
+        selectedSkillId,
         newSkillName || undefined
       );
       
@@ -213,10 +213,10 @@ export const AdminUserDetail: React.FC = () => {
     }
   };
 
-  const handleRemoveSkill = async (skillId: number) => {
+  const handleRemoveSkill = async (skillId: string) => {
     try {
       setError('');
-      await adminService.removeSkillFromMentor(parseInt(id!), skillId);
+      await adminService.removeSkillFromMentor(id!, skillId);
       setMentorSkills(prev => prev.filter(ms => ms.skill.id !== skillId));
       setSuccess('Skill removed successfully');
     } catch (err: any) {
@@ -233,8 +233,8 @@ export const AdminUserDetail: React.FC = () => {
     try {
       setError('');
       const updatedProfile = await adminService.addCategoryToMentor(
-        parseInt(id!),
-        Number(selectedCategoryId)
+        id!,
+        selectedCategoryId
       );
       
       console.log('Updated profile after adding category:', updatedProfile);
@@ -253,10 +253,10 @@ export const AdminUserDetail: React.FC = () => {
     }
   };
 
-  const handleRemoveCategory = async (categoryId: number) => {
+  const handleRemoveCategory = async (categoryId: string) => {
     try {
       setError('');
-      await adminService.removeCategoryFromMentor(parseInt(id!), categoryId);
+      await adminService.removeCategoryFromMentor(id!, categoryId);
       setMentorCategories(prev => prev.filter(mc => mc.category.id !== categoryId));
       setSuccess('Category removed successfully');
     } catch (err: any) {
@@ -529,7 +529,7 @@ export const AdminUserDetail: React.FC = () => {
                           <select
                             className="form-select"
                             value={selectedSkillId}
-                            onChange={(e) => setSelectedSkillId(e.target.value ? Number(e.target.value) : '')}
+                            onChange={(e) => setSelectedSkillId(e.target.value)}
                           >
                             <option value="">Select existing skill...</option>
                             {availableSkills.map(skill => (
@@ -599,7 +599,7 @@ export const AdminUserDetail: React.FC = () => {
                           <select
                             className="form-select"
                             value={selectedCategoryId}
-                            onChange={(e) => setSelectedCategoryId(e.target.value ? Number(e.target.value) : '')}
+                            onChange={(e) => setSelectedCategoryId(e.target.value)}
                           >
                             <option value="">Select category...</option>
                             {availableCategories
