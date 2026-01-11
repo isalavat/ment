@@ -1,9 +1,12 @@
 import { ITokenService, Tokens } from "../services/token.service";
+import { User, UserRole } from "../domain/user/User";
 import { IPasswordHasher } from "../services/password-hasher";
 import { Transaction } from "../Transaction";
-import { getPrismaClient } from "../infra/PrismaTransaction";
-
-type UserRole = "MENTEE" | "MENTOR" | "ADMIN"
+import { HashedPassword } from "../domain/user/HashedPassword";
+import { UserRepository } from "../domain/user/UserRepository";
+import { UserId } from "../domain/user/UserId";
+import { Email } from "../domain/user/Email";
+import { UserAlreadyExistsError } from "./UserAlreadyExistsError";
 
 export type CreateUserDTO = {
     email: string,
@@ -24,13 +27,10 @@ type RegisteredUser = {
     tokens: Tokens
 }
 
-export class EmailAlreadyTakenError extends Error {
-    readonly code = 'EMAIL_ALREADY_TAKEN'
-}
-
 export class RegisterUserUseCase {
     constructor(
-        private transaction: Transaction,
+        private readonly transaction: Transaction,
+        private readonly userRepository: UserRepository,
         private readonly tokenService: ITokenService,
         private readonly hasher: IPasswordHasher
     ) { }
@@ -38,33 +38,27 @@ export class RegisterUserUseCase {
     //should be transaction
     async execute(dto: CreateUserDTO): Promise<RegisteredUser> {
         return await this.transaction.run(async () => {
-            const exists = await getPrismaClient().user.findUnique({ where: { email: dto.email } });
+            const email = Email.from(dto.email);
+            const existed = await this.userRepository.existsByEmail(email)
 
-            if (exists) {
-                throw new EmailAlreadyTakenError('Email already in use');
+            if (existed) {
+                throw new UserAlreadyExistsError(email.value);
             }
 
             const hashedPassword = await this.hasher.hash(dto.password);
-            //TODO: Use Domain Object and repository
-            const createdUser = await getPrismaClient().user.create({
-                data: {
-                    email: dto.email,
-                    passwordHash: hashedPassword,
-                    role: dto.role,
-                    firstName: dto.firstName,
-                    lastName: dto.lastName
-                }
-            });
             
-            const tokens = await this.tokenService.generate({ id: createdUser.id, email: createdUser.email });
+            const user = User.create(UserId.generate(), email, dto.firstName, dto.lastName, HashedPassword.fromHash(hashedPassword), dto.role);
+            await this.userRepository.save(user);
+
+            const tokens = await this.tokenService.generate({ id: user.id.value, email: user.email.value });
 
             return {
                 user: {
-                    id: createdUser.id,
-                    firstName: createdUser.firstName,
-                    lastName: createdUser.lastName,
-                    email: createdUser.email,
-                    role: createdUser.role
+                    id: user.id.value,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email.value,
+                    role: user.role
                 },
                 tokens,
             }
