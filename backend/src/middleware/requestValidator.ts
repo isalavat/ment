@@ -1,15 +1,13 @@
 import { Request, Response, NextFunction } from "express"
 import z from "zod"
-import logger from "../lib/logger"
+import { RequestValidationError } from "../controllers/RequestValidationError"
 
 export const validateBody = <T extends z.ZodTypeAny>(schema: T) =>
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: Request, _: Response, next: NextFunction) => {
         const { data, error, success } = await schema.safeParseAsync(req.body)
         if (!success) {
-            logger.error(`Validation Error`)
-            return res.status(400).json({ error: z.flattenError(error) })
+            throw new RequestValidationError(error);
         }
-
         req.body = data
         next()
     }

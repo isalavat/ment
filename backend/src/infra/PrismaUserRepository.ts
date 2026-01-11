@@ -1,10 +1,9 @@
 import { User } from "../domain/user/User";
 import { User as PrismaUser } from '@prisma/client'
 import { UserRepository } from "../domain/user/UserRepository";
-import { HashedPassword } from "../domain/user/HashedPassword";
-import { prisma } from "../../prisma/client";
-import { UserId } from "../domain/user/UserId";
-import { Email } from "../domain/user/Email";
+import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
+import { UserId } from "../domain/user/value-objects/UserId";
+import { Email } from "../domain/user/value-objects/Email";
 import { getPrismaClient } from "./Prisma";
 
 export class PrismaUserRepository implements UserRepository {
@@ -23,8 +22,8 @@ export class PrismaUserRepository implements UserRepository {
     }
 
     async existsByEmail(email: Email): Promise<boolean> {
-        const result = await getPrismaClient().user.findUnique({ where: { email: email.value} });
-        if(result === null){
+        const result = await getPrismaClient().user.findUnique({ where: { email: email.value } });
+        if (result === null) {
             return false;
         }
         return true;

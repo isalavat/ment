@@ -1,4 +1,5 @@
 import { v7 as uuid7, validate as uuidValidate } from 'uuid'
+import { InvalidUserIdFormatError } from '../errors/InvalidUserIdFormatError';
 
 export class UserId {
     private constructor(public readonly value: string) { }
@@ -9,7 +10,7 @@ export class UserId {
 
     static fromString(id: string): UserId {
         if (!uuidValidate(id)) {
-            throw new Error('Invalid ID format');
+            throw new InvalidUserIdFormatError();
         }
         return new UserId(id);
     }

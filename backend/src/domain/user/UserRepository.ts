@@ -1,4 +1,4 @@
-import { Email } from "./Email";
+import { Email } from "./value-objects/Email";
 import { User } from "./User";
 
 export interface UserRepository{
