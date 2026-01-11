@@ -1,6 +1,6 @@
 export interface MentorProfile {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   bio: string;
   title: string;
   yearsExperience: number;
@@ -12,7 +12,7 @@ export interface MentorProfile {
   updatedAt: string;
   categories?: Array<{
     category: {
-      id: number;
+      id: string;
       name: string;
       slug: string;
       description?: string;
@@ -20,15 +20,15 @@ export interface MentorProfile {
   }>;
   skills?: Array<{
     skill: {
-      id: number;
+      id: string;
       name: string;
     };
   }>;
 }
 
 export interface MenteeProfile {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   bio: string | null;
   goals: string | null;
   createdAt: string;

@@ -211,7 +211,7 @@ router.get("/mentors/:id", async (req, res) => {
     const { id } = req.params;
     
     const mentor = await prisma.mentorProfile.findUnique({
-      where: { id: parseInt(id) },
+      where: { id },
       include: {
         user: {
           select: {
@@ -350,7 +350,7 @@ router.post("/mentor/categories", requireAuth, async (req: AuthedRequest, res) =
     await prisma.mentorCategory.create({
       data: {
         mentorId: profile.id,
-        categoryId: parseInt(categoryId)
+        categoryId
       }
     });
     return res.json({ message: "Category added successfully" });
@@ -382,7 +382,7 @@ router.delete("/mentor/categories/:categoryId", requireAuth, async (req: AuthedR
       where: {
         mentorId_categoryId: {
           mentorId: profile.id,
-          categoryId: parseInt(categoryId)
+          categoryId
         }
       }
     });
@@ -490,7 +490,7 @@ router.delete("/mentor/skills/:skillId", requireAuth, async (req: AuthedRequest,
       where: {
         mentorId_skillId: {
           mentorId: profile.id,
-          skillId: parseInt(skillId)
+          skillId
         }
       }
     });

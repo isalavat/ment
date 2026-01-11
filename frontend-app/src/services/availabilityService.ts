@@ -1,8 +1,8 @@
 import api from "./api";
 
 export interface Availability {
-  id: number;
-  mentorId: number;
+  id: string;
+  mentorId: string;
   dayOfWeek: number;
   startTime: string;
   endTime: string;
@@ -13,7 +13,7 @@ export interface Availability {
 }
 
 export interface CreateAvailabilityData {
-  mentorId: number;
+  mentorId: string;
   dayOfWeek?: number;
   startTime: string;
   endTime: string;
@@ -38,7 +38,7 @@ export const availabilityService = {
 
   // Create weekly schedule
   async createWeeklySchedule(
-    mentorId: number,
+    mentorId: string,
     schedule: WeeklyScheduleSlot[]
   ): Promise<{ count: number; message: string }> {
     const response = await api.post("/availability/weekly", {
@@ -49,14 +49,14 @@ export const availabilityService = {
   },
 
   // Get all availabilities for mentor
-  async getAvailabilitiesForMentor(mentorId: number): Promise<Availability[]> {
+  async getAvailabilitiesForMentor(mentorId: string): Promise<Availability[]> {
     const response = await api.get(`/availability/mentor/${mentorId}`);
     return response.data;
   },
 
   // Get recurring availabilities
   async getRecurringAvailabilities(
-    mentorId: number,
+    mentorId: string,
     dayOfWeek?: number
   ): Promise<Availability[]> {
     const params: any = {};
@@ -71,8 +71,8 @@ export const availabilityService = {
 
   // Update availability
   async updateAvailability(
-    id: number,
-    mentorId: number,
+    id: string,
+    mentorId: string,
     data: Partial<CreateAvailabilityData>
   ): Promise<Availability> {
     const response = await api.patch(`/availability/${id}`, {
@@ -84,8 +84,8 @@ export const availabilityService = {
 
   // Delete availability
   async deleteAvailability(
-    id: number,
-    mentorId: number
+    id: string,
+    mentorId: string
   ): Promise<{ success: boolean; message: string }> {
     const response = await api.delete(`/availability/${id}`, {
       data: { mentorId },
@@ -95,7 +95,7 @@ export const availabilityService = {
 
   // Generate time slots from availability
   async generateTimeSlots(
-    mentorId: number,
+    mentorId: string,
     startDate: string,
     endDate: string,
     slotDuration?: number
@@ -111,7 +111,7 @@ export const availabilityService = {
 
   // Get time slots for mentor
   async getTimeSlotsForMentor(
-    mentorId: number,
+    mentorId: string,
     startDate?: string,
     endDate?: string,
     status?: string
@@ -129,8 +129,8 @@ export const availabilityService = {
 
   // Delete time slot
   async deleteTimeSlot(
-    slotId: number,
-    mentorId: number
+    slotId: string,
+    mentorId: string
   ): Promise<{ success: boolean; message: string }> {
     const response = await api.delete(`/time-slots/${slotId}`, {
       data: { mentorId },
@@ -140,8 +140,8 @@ export const availabilityService = {
 
   // Update time slot status
   async updateTimeSlotStatus(
-    slotId: number,
-    mentorId: number,
+    slotId: string,
+    mentorId: string,
     status: string
   ): Promise<any> {
     const response = await api.patch(`/time-slots/${slotId}/status`, {

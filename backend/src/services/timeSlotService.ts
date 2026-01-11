@@ -3,7 +3,7 @@ import { prisma } from "../../prisma/client";
 
 
 interface GenerateTimeSlotsOptions {
-  mentorId: number;
+  mentorId: string;
   startDate: Date;
   endDate: Date;
   slotDuration?: number; // in minutes, default 60
@@ -31,7 +31,7 @@ export const timeSlotService = {
     }
 
     const slotsToCreate: Array<{
-      mentorId: number;
+      mentorId: string;
       startTime: Date;
       endTime: Date;
       status: SlotStatus;
@@ -124,16 +124,16 @@ export const timeSlotService = {
     date: Date,
     startTimeStr: string,
     endTimeStr: string,
-    mentorId: number,
+    mentorId: string,
     slotDuration: number
   ): Array<{
-    mentorId: number;
+    mentorId: string;
     startTime: Date;
     endTime: Date;
     status: SlotStatus;
   }> {
     const slots: Array<{
-      mentorId: number;
+      mentorId: string;
       startTime: Date;
       endTime: Date;
       status: SlotStatus;
@@ -175,7 +175,7 @@ export const timeSlotService = {
   /**
    * Get available time slots for a mentor
    */
-  async getAvailableSlots(mentorId: number, startDate?: Date, endDate?: Date) {
+  async getAvailableSlots(mentorId: string, startDate?: Date, endDate?: Date) {
     const where: any = {
       mentorId,
       status: SlotStatus.AVAILABLE,
@@ -201,7 +201,7 @@ export const timeSlotService = {
    * Get all time slots for a mentor (any status)
    */
   async getAllSlotsForMentor(
-    mentorId: number,
+    mentorId: string,
     startDate?: Date,
     endDate?: Date,
     status?: SlotStatus
@@ -248,7 +248,7 @@ export const timeSlotService = {
   /**
    * Update time slot status
    */
-  async updateSlotStatus(slotId: number, status: SlotStatus, mentorId: number) {
+  async updateSlotStatus(slotId: string, status: SlotStatus, mentorId: string) {
     const slot = await prisma.timeSlot.findUnique({
       where: { id: slotId },
       include: { booking: true },
@@ -276,7 +276,7 @@ export const timeSlotService = {
   /**
    * Delete a time slot (only if not booked)
    */
-  async deleteSlot(slotId: number, mentorId: number) {
+  async deleteSlot(slotId: string, mentorId: string) {
     const slot = await prisma.timeSlot.findUnique({
       where: { id: slotId },
       include: { booking: true },
@@ -304,7 +304,7 @@ export const timeSlotService = {
   /**
    * Bulk delete time slots for a mentor (only available ones)
    */
-  async bulkDeleteSlots(mentorId: number, startDate: Date, endDate: Date) {
+  async bulkDeleteSlots(mentorId: string, startDate: Date, endDate: Date) {
     const result = await prisma.timeSlot.deleteMany({
       where: {
         mentorId,
@@ -325,7 +325,7 @@ export const timeSlotService = {
   /**
    * Get time slot by ID
    */
-  async getSlotById(slotId: number) {
+  async getSlotById(slotId: string) {
     const slot = await prisma.timeSlot.findUnique({
       where: { id: slotId },
       include: {

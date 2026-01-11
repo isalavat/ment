@@ -55,7 +55,7 @@ export const BookingDetail: React.FC = () => {
 
     try {
       setLoading(true);
-      const data = await bookingService.getBookingById(parseInt(id));
+      const data = await bookingService.getBookingById(id);
       setBooking(data);
       setError("");
     } catch (err: any) {

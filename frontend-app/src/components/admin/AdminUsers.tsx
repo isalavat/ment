@@ -45,7 +45,7 @@ export const AdminUsers: React.FC = () => {
     setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
   };
 
-  const handleDelete = async (userId: number) => {
+  const handleDelete = async (userId: string) => {
     if (!window.confirm('Are you sure you want to delete this user?')) {
       return;
     }

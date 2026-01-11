@@ -136,7 +136,7 @@ export const AvailabilityManager: React.FC = () => {
     }
   };
 
-  const handleDeleteAvailability = async (id: number) => {
+  const handleDeleteAvailability = async (id: string) => {
     if (!user?.mentorProfileId) return;
     if (!window.confirm("Delete this availability?")) return;
 

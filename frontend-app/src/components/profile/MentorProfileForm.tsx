@@ -15,7 +15,7 @@ export const MentorProfileForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [mentorProfileId, setMentorProfileId] = useState<number | null>(null);
+  const [mentorProfileId, setMentorProfileId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     bio: "",
     title: "",
@@ -24,22 +24,22 @@ export const MentorProfileForm: React.FC = () => {
     currency: "USD",
   });
   const [categories, setCategories] = useState<
-    Array<{ id: number; name: string; slug: string }>
+    Array<{ id: string; name: string; slug: string }>
   >([]);
   const [selectedCategories, setSelectedCategories] = useState<
-    Array<{ category: { id: number; name: string; slug: string } }>
+    Array<{ category: { id: string; name: string; slug: string } }>
   >([]);
   const [availableCategories, setAvailableCategories] = useState<
-    Array<{ id: number; name: string; slug: string }>
+    Array<{ id: string; name: string; slug: string }>
   >([]);
 
   const [availableSkills, setAvailableSkills] = useState<
-    Array<{ id: number; name: string }>
+    Array<{ id: string; name: string }>
   >([]);
   const [selectedSkills, setSelectedSkills] = useState<
-    Array<{ skill: { id: number; name: string } }>
+    Array<{ skill: { id: string; name: string } }>
   >([]);
-  const [selectedSkillId, setSelectedSkillId] = useState<number | "">("");
+  const [selectedSkillId, setSelectedSkillId] = useState<string>("");
   const [newSkillName, setNewSkillName] = useState("");
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export const MentorProfileForm: React.FC = () => {
     });
   };
 
-  const handleAddCategory = async (categoryId: number) => {
+  const handleAddCategory = async (categoryId: string) => {
     try {
       setError(null);
       setSuccess(null);
@@ -144,7 +144,7 @@ export const MentorProfileForm: React.FC = () => {
     }
   };
 
-  const handleRemoveCategory = async (categoryId: number) => {
+  const handleRemoveCategory = async (categoryId: string) => {
     try {
       setError(null);
       setSuccess(null);
@@ -166,7 +166,7 @@ export const MentorProfileForm: React.FC = () => {
       setError(null);
       setSuccess(null);
       const updatedProfile = await profileService.addSkillToMentorProfile(
-        selectedSkillId ? Number(selectedSkillId) : undefined,
+        selectedSkillId,
         newSkillName || undefined
       );
 
@@ -182,7 +182,7 @@ export const MentorProfileForm: React.FC = () => {
     }
   };
 
-  const handleRemoveSkill = async (skillId: number) => {
+  const handleRemoveSkill = async (skillId: string) => {
     try {
       setError(null);
       setSuccess(null);
@@ -347,7 +347,7 @@ export const MentorProfileForm: React.FC = () => {
                         value={selectedSkillId}
                         onChange={(e) =>
                           setSelectedSkillId(
-                            e.target.value ? Number(e.target.value) : ""
+                            e.target.value 
                           )
                         }
                       >
@@ -443,7 +443,7 @@ export const MentorProfileForm: React.FC = () => {
                         defaultValue=""
                         onChange={(e) => {
                           if (e.target.value) {
-                            handleAddCategory(parseInt(e.target.value));
+                            handleAddCategory(e.target.value);
                             e.target.value = "";
                           }
                         }}

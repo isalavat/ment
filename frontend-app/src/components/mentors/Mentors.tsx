@@ -9,7 +9,7 @@ export const Mentors: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [mentors, setMentors] = useState<MentorProfile[]>([]);
-  const [skills, setSkills] = useState<Array<{ id: number; name: string }>>([]);
+  const [skills, setSkills] = useState<Array<{ id: string; name: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);

@@ -2,7 +2,7 @@ import { prisma } from "../../prisma/client";
 
 
 interface CreateAvailabilityData {
-  mentorId: number;
+  mentorId: string;
   dayOfWeek?: number; // 0-6 for recurring
   startTime: string; // "HH:mm" format
   endTime: string; // "HH:mm" format
@@ -82,7 +82,7 @@ export const availabilityService = {
   /**
    * Get all availabilities for a mentor
    */
-  async getAvailabilitiesForMentor(mentorId: number) {
+  async getAvailabilitiesForMentor(mentorId: string) {
     return prisma.availability.findMany({
       where: { mentorId },
       orderBy: [{ isRecurring: "desc" }, { dayOfWeek: "asc" }],
@@ -92,7 +92,7 @@ export const availabilityService = {
   /**
    * Get a single availability by ID
    */
-  async getAvailabilityById(id: number) {
+  async getAvailabilityById(id: string) {
     const availability = await prisma.availability.findUnique({
       where: { id },
       include: {
@@ -120,8 +120,8 @@ export const availabilityService = {
    * Update an availability
    */
   async updateAvailability(
-    id: number,
-    mentorId: number,
+    id: string,
+    mentorId: string,
     data: UpdateAvailabilityData
   ) {
     const availability = await prisma.availability.findUnique({
@@ -169,7 +169,7 @@ export const availabilityService = {
   /**
    * Delete an availability
    */
-  async deleteAvailability(id: number, mentorId: number) {
+  async deleteAvailability(id: string, mentorId: string) {
     const availability = await prisma.availability.findUnique({
       where: { id },
     });
@@ -192,7 +192,7 @@ export const availabilityService = {
   /**
    * Get recurring availabilities by day of week
    */
-  async getRecurringAvailabilities(mentorId: number, dayOfWeek?: number) {
+  async getRecurringAvailabilities(mentorId: string, dayOfWeek?: number) {
     const where: any = {
       mentorId,
       isRecurring: true,
@@ -211,7 +211,7 @@ export const availabilityService = {
   /**
    * Get specific date availabilities
    */
-  async getSpecificDateAvailabilities(mentorId: number, date?: Date) {
+  async getSpecificDateAvailabilities(mentorId: string, date?: Date) {
     const where: any = {
       mentorId,
       isRecurring: false,
@@ -240,7 +240,7 @@ export const availabilityService = {
    * Bulk create recurring weekly schedule for a mentor
    */
   async createWeeklySchedule(
-    mentorId: number,
+    mentorId: string,
     schedule: Array<{
       dayOfWeek: number;
       startTime: string;

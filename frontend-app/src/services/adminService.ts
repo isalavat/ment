@@ -1,7 +1,7 @@
 import axios from './api';
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   role: 'MENTEE' | 'MENTOR' | 'ADMIN';
   firstName: string;
@@ -9,13 +9,13 @@ export interface User {
   avatarUrl?: string;
   createdAt: string;
   mentorProfile?: {
-    id: number;
+    id: string;
     title: string;
     hourlyRate: number;
     avgRating: number;
   };
   menteeProfile?: {
-    id: number;
+    id: string;
   };
 }
 
@@ -74,7 +74,7 @@ export interface UpdateMenteeProfileData {
 }
 
 export interface Skill {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -91,7 +91,7 @@ export const adminService = {
   },
 
   // Get single user by ID
-  getUser: async (userId: number): Promise<User> => {
+  getUser: async (userId: string): Promise<User> => {
     const response = await axios.get(`/admin/users/${userId}`);
     return response.data.user;
   },
@@ -103,36 +103,36 @@ export const adminService = {
   },
 
   // Update user
-  updateUser: async (userId: number, data: UpdateUserData): Promise<User> => {
+  updateUser: async (userId: string, data: UpdateUserData): Promise<User> => {
     const response = await axios.put(`/admin/users/${userId}`, data);
     return response.data.user;
   },
 
   // Delete user
-  deleteUser: async (userId: number): Promise<void> => {
+  deleteUser: async (userId: string): Promise<void> => {
     await axios.delete(`/admin/users/${userId}`);
   },
 
   // Create mentor profile for user
-  createMentorProfile: async (userId: number, data: CreateMentorProfileData): Promise<any> => {
+  createMentorProfile: async (userId: string, data: CreateMentorProfileData): Promise<any> => {
     const response = await axios.post(`/admin/users/${userId}/mentor-profile`, data);
     return response.data.profile;
   },
 
   // Create mentee profile for user
-  createMenteeProfile: async (userId: number, data: CreateMenteeProfileData): Promise<any> => {
+  createMenteeProfile: async (userId: string, data: CreateMenteeProfileData): Promise<any> => {
     const response = await axios.post(`/admin/users/${userId}/mentee-profile`, data);
     return response.data.profile;
   },
 
   // Update mentor profile
-  updateMentorProfile: async (userId: number, data: UpdateMentorProfileData): Promise<any> => {
+  updateMentorProfile: async (userId: string, data: UpdateMentorProfileData): Promise<any> => {
     const response = await axios.put(`/admin/users/${userId}/mentor-profile`, data);
     return response.data.profile;
   },
 
   // Update mentee profile
-  updateMenteeProfile: async (userId: number, data: UpdateMenteeProfileData): Promise<any> => {
+  updateMenteeProfile: async (userId: string, data: UpdateMenteeProfileData): Promise<any> => {
     const response = await axios.put(`/admin/users/${userId}/mentee-profile`, data);
     return response.data.profile;
   },
@@ -150,7 +150,7 @@ export const adminService = {
   },
 
   // Add skill to mentor profile
-  addSkillToMentor: async (userId: number, skillId?: number, skillName?: string): Promise<any> => {
+  addSkillToMentor: async (userId: string, skillId?: string, skillName?: string): Promise<any> => {
     const response = await axios.post(`/admin/users/${userId}/mentor-profile/skills`, { 
       skillId, 
       skillName 
@@ -159,18 +159,18 @@ export const adminService = {
   },
 
   // Remove skill from mentor profile
-  removeSkillFromMentor: async (userId: number, skillId: number): Promise<void> => {
+  removeSkillFromMentor: async (userId: string, skillId: string): Promise<void> => {
     await axios.delete(`/admin/users/${userId}/mentor-profile/skills/${skillId}`);
   },
 
   // Add category to mentor profile
-  addCategoryToMentor: async (userId: number, categoryId: number): Promise<any> => {
+  addCategoryToMentor: async (userId: string, categoryId: string): Promise<any> => {
     const response = await axios.post(`/admin/users/${userId}/mentor-profile/categories`, { categoryId });
     return response.data.profile;
   },
 
   // Remove category from mentor profile
-  removeCategoryFromMentor: async (userId: number, categoryId: number): Promise<void> => {
+  removeCategoryFromMentor: async (userId: string, categoryId: string): Promise<void> => {
     await axios.delete(`/admin/users/${userId}/mentor-profile/categories/${categoryId}`);
   }
 };
