@@ -1,0 +1,29 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'backend/**' # Only triggers if files in /backend change
+  pull_request:
+    paths:
+      - 'backend/**'
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend # Ensures commands run inside the backend folder
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: Run Biome
+        run: biome ci .
