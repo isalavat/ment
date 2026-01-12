@@ -1,43 +1,42 @@
+import type { User as PrismaUser } from "@prisma/client";
 import { User } from "../domain/user/User";
-import { User as PrismaUser } from '@prisma/client'
-import { UserRepository } from "../domain/user/UserRepository";
+import type { UserRepository } from "../domain/user/UserRepository";
+import { Email } from "../domain/user/value-objects/Email";
 import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
 import { UserId } from "../domain/user/value-objects/UserId";
-import { Email } from "../domain/user/value-objects/Email";
 import { getPrismaClient } from "./Prisma";
 
 export class PrismaUserRepository implements UserRepository {
-    async save(user: User): Promise<User> {
-        const result = await getPrismaClient().user.create({
-            data: {
-                id: user.id.value,
-                email: user.email.value,
-                passwordHash: user.hashedPassword.value,
-                role: user.role,
-                firstName: user.firstName,
-                lastName: user.lastName
-            }
-        })
-        return this.toUser(result);
-    }
+	async save(user: User): Promise<User> {
+		const result = await getPrismaClient().user.create({
+			data: {
+				id: user.id.value,
+				email: user.email.value,
+				passwordHash: user.hashedPassword.value,
+				role: user.role,
+				firstName: user.firstName,
+				lastName: user.lastName,
+			},
+		});
+		return this.toUser(result);
+	}
 
-    async existsByEmail(email: Email): Promise<boolean> {
-        const result = await getPrismaClient().user.findUnique({ where: { email: email.value } });
-        if (result === null) {
-            return false;
-        }
-        return true;
-    }
+	async existsByEmail(email: Email): Promise<boolean> {
+		const result = await getPrismaClient().user.findUnique({ where: { email: email.value } });
+		if (result === null) {
+			return false;
+		}
+		return true;
+	}
 
-    private toUser(fromPrisma: PrismaUser): User {
-        return User.create(
-            UserId.fromString(fromPrisma.id),
-            Email.from(fromPrisma.email),
-            fromPrisma.firstName,
-            fromPrisma.lastName,
-            HashedPassword.fromHash(fromPrisma.passwordHash),
-            fromPrisma.role
-        )
-    }
-
+	private toUser(fromPrisma: PrismaUser): User {
+		return User.create(
+			UserId.fromString(fromPrisma.id),
+			Email.from(fromPrisma.email),
+			fromPrisma.firstName,
+			fromPrisma.lastName,
+			HashedPassword.fromHash(fromPrisma.passwordHash),
+			fromPrisma.role,
+		);
+	}
 }
