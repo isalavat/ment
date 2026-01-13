@@ -27,13 +27,9 @@ export class LoginUserUseCase {
 		return await this.transaction.run(async () => {
 			const user = await this.userRepository.findByEmail(Email.from(email));
 
-			if (user === null) {
-				throw new InvalidEmailOrPasswordError();
-			}
+			const isPasswordValid = await this.passwordHasher.verify(password, user?.hashedPassword ?? null);
 
-			const isPasswordValid = await this.passwordHasher.validate(password, user.hashedPassword);
-
-			if (!isPasswordValid) {
+			if (user === null || !isPasswordValid) {
 				throw new InvalidEmailOrPasswordError();
 			}
 
