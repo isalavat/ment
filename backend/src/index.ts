@@ -2,7 +2,7 @@ import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { prisma } from "../prisma/client";
 import { requireAuth } from "./middleware/auth";
-import { errorHandler } from "./middleware/errorHandler";
+import { ErrorHandler } from "./middleware/ErrorHandler";
 import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
 import availabilityRouter from "./routes/availability";
@@ -55,7 +55,7 @@ app.get("/hello", async (_: Request, res: Response, next: NextFunction) => {
 	}
 });
 
-app.use(errorHandler);
+app.use(ErrorHandler);
 
 const PORT = process.env.PORT ?? 3000;
 app.listen(PORT, () => {

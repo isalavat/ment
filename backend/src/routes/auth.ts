@@ -1,13 +1,13 @@
 import bcrypt from "bcryptjs";
 import { Router } from "express";
 import { prisma } from "../../prisma/client";
-import registerUser from "../controllers/register-user.route";
+import { RegisterUserController } from "../controllers/RegisterUserController";
 import { type AppJwtPayload, signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt";
 import logger from "../lib/logger";
 
 const router = Router();
 
-router.use(registerUser);
+router.use(RegisterUserController);
 
 // ...existing code...
 router.post("/login", async (req, res) => {

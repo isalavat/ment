@@ -1,14 +1,14 @@
 import type { User as PrismaUser } from "@prisma/client";
-import { User } from "../domain/user/User";
-import type { UserRepository } from "../domain/user/UserRepository";
-import { Email } from "../domain/user/value-objects/Email";
-import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
-import { UserId } from "../domain/user/value-objects/UserId";
-import { getPrismaClient } from "./Prisma";
+import { User } from "../../domain/user/User";
+import type { UserRepository } from "../../domain/user/UserRepository";
+import { Email } from "../../domain/user/value-objects/Email";
+import { HashedPassword } from "../../domain/user/value-objects/HashedPassword";
+import { UserId } from "../../domain/user/value-objects/UserId";
+import { PrismaClientGetway } from "../PrismaClientGetway";
 
 export class PrismaUserRepository implements UserRepository {
 	async save(user: User): Promise<User> {
-		const result = await getPrismaClient().user.create({
+		const result = await PrismaClientGetway().user.create({
 			data: {
 				id: user.id.value,
 				email: user.email.value,
@@ -22,7 +22,7 @@ export class PrismaUserRepository implements UserRepository {
 	}
 
 	async existsByEmail(email: Email): Promise<boolean> {
-		const result = await getPrismaClient().user.findUnique({ where: { email: email.value } });
+		const result = await PrismaClientGetway().user.findUnique({ where: { email: email.value } });
 		if (result === null) {
 			return false;
 		}

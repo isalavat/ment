@@ -1,11 +1,11 @@
 import type { NextFunction, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { RequestValidationError } from "../controllers/RequestValidationError";
 import { BaseError, InternalServerError } from "../lib/error";
 import logger from "../lib/logger";
 import type { AuthedRequest } from "./auth";
+import { RequestValidationError } from "./RequestValidationError";
 
-export const errorHandler = (err: BaseError, req: AuthedRequest, res: Response, _next: NextFunction) => {
+export const ErrorHandler = (err: BaseError, req: AuthedRequest, res: Response, _next: NextFunction) => {
 	const isUnexpected = !(err instanceof BaseError);
 
 	const logLevel = err.statusCode >= 500 || isUnexpected ? "error" : "warn";

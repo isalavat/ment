@@ -1,5 +1,5 @@
 import z from "zod";
-import type { CreateUserDTO } from "../use-cases/register-user.use-case";
+import type { CreateUserDTO } from "../use-cases/RegisterUserUseCase";
 
 export const CreateUserSchema: z.ZodType<CreateUserDTO> = z.strictObject({
 	email: z.email(),

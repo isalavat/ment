@@ -3,8 +3,8 @@ import type { UserRepository } from "../domain/user/UserRepository";
 import { Email } from "../domain/user/value-objects/Email";
 import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
 import { UserId } from "../domain/user/value-objects/UserId";
-import type { IPasswordHasher } from "../services/password-hasher";
-import type { ITokenService, Tokens } from "../services/token.service";
+import type { PasswordHasher } from "../services/PasswordHasher";
+import type { TokenService, Tokens } from "../services/TokenService";
 import type { Transaction } from "../Transaction";
 import { UserAlreadyExistsError } from "./UserAlreadyExistsError";
 
@@ -31,8 +31,8 @@ export class RegisterUserUseCase {
 	constructor(
 		private readonly transaction: Transaction,
 		private readonly userRepository: UserRepository,
-		private readonly tokenService: ITokenService,
-		private readonly hasher: IPasswordHasher,
+		private readonly tokenService: TokenService,
+		private readonly hasher: PasswordHasher,
 	) {}
 
 	async execute(dto: CreateUserDTO): Promise<RegisteredUser> {
