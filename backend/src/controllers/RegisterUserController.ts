@@ -1,10 +1,10 @@
 import { type Request, type Response, Router } from "express";
 import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
+import { BCrpytPasswordHasher } from "../infra/services/BCrpytPasswordHasher";
+import { JWTTokenService } from "../infra/services/JWTTokenService";
 import { PrismaTransaction } from "../infra/transaction/PrismaTransaction";
 import { validateBodyWith } from "../middleware/requestValidator";
 import { CreateUserSchema } from "../schemas/auth.schemas";
-import { BCrpytPasswordHasher } from "../services/PasswordHasher";
-import { JWTTokenService } from "../services/TokenService";
 import { type CreateUserDTO, RegisterUserUseCase } from "../use-cases/RegisterUserUseCase";
 
 export const RegisterUserController = Router().post(
