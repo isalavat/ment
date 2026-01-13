@@ -1,4 +1,4 @@
-import { BookingStatus, SlotStatus } from "@prisma/client";
+import { BookingStatus, type Prisma, SlotStatus } from "@prisma/client";
 import { prisma } from "../../prisma/client";
 
 interface CreateBookingData {
@@ -376,7 +376,7 @@ export const bookingService = {
 	 * Get bookings for a mentee
 	 */
 	async getBookingsForMentee(menteeId: string, filters?: BookingFilters) {
-		const where = { menteeId };
+		const where: Prisma.BookingWhereInput = { menteeId };
 
 		if (filters?.status) {
 			where.status = filters.status;
@@ -420,7 +420,7 @@ export const bookingService = {
 	 * Get bookings for a mentor
 	 */
 	async getBookingsForMentor(mentorId: string, filters?: BookingFilters) {
-		const where = { mentorId };
+		const where: Prisma.BookingWhereInput = { mentorId };
 
 		if (filters?.status) {
 			where.status = filters.status;
