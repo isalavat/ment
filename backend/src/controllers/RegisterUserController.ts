@@ -11,7 +11,7 @@ export const RegisterUserController = Router().post(
 	"/register",
 	validateBodyWith(CreateUserSchema),
 	async (req: Request<unknown, unknown, CreateUserDTO>, res: Response) => {
-		const dto = req.body;
+		const createUserDto = req.body;
 		const useCase = new RegisterUserUseCase(
 			new PrismaTransaction(),
 			new PrismaUserRepository(),
@@ -19,7 +19,7 @@ export const RegisterUserController = Router().post(
 			new BCrpytPasswordHasher(),
 		);
 
-		const { tokens, user } = await useCase.execute(dto);
+		const { tokens, user } = await useCase.execute(createUserDto);
 
 		return res.status(201).json({
 			accessToken: tokens.accessToken,
