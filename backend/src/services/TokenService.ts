@@ -4,11 +4,11 @@ import { signAccessToken, signRefreshToken } from "../lib/jwt";
 type UserInfo = { id: string; email: string };
 export type Tokens = { accessToken: string; refreshToken: string };
 
-export interface ITokenService {
+export interface TokenService {
 	generate(info: UserInfo): Promise<Tokens>;
 }
 
-export class JWTTokenService implements ITokenService {
+export class JWTTokenService implements TokenService {
 	async generate(info: UserInfo): Promise<Tokens> {
 		const accessToken = signAccessToken({ sub: info.id, email: info.email });
 		const refreshToken = signRefreshToken({ sub: info.id, email: info.email });

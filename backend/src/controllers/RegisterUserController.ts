@@ -3,9 +3,9 @@ import { PrismaTransaction } from "../infra/Prisma";
 import { PrismaUserRepository } from "../infra/PrismaUserRepository";
 import { validateBodyWith } from "../middleware/requestValidator";
 import { CreateUserSchema } from "../schemas/auth.schemas";
-import { BCrpytPasswordHasher } from "../services/password-hasher";
-import { JWTTokenService } from "../services/token.service";
-import { type CreateUserDTO, RegisterUserUseCase } from "../use-cases/register-user.use-case";
+import { BCrpytPasswordHasher } from "../services/PasswordHasher";
+import { JWTTokenService } from "../services/TokenService";
+import { type CreateUserDTO, RegisterUserUseCase } from "../use-cases/RegisterUserUseCase";
 
 export const RegisterUserController = Router().post(
 	"/register",
