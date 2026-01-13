@@ -1,7 +1,6 @@
 import { User, type UserRole } from "../domain/user/User";
 import type { UserRepository } from "../domain/user/UserRepository";
 import { Email } from "../domain/user/value-objects/Email";
-import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
 import { UserId } from "../domain/user/value-objects/UserId";
 import type { PasswordHasher } from "../services/PasswordHasher";
 import type { TokenService, Tokens } from "../services/TokenService";
@@ -46,14 +45,7 @@ export class RegisterUserUseCase {
 
 			const hashedPassword = await this.hasher.hash(dto.password);
 
-			const user = User.create(
-				UserId.generate(),
-				email,
-				dto.firstName,
-				dto.lastName,
-				HashedPassword.fromHash(hashedPassword),
-				dto.role,
-			);
+			const user = User.create(UserId.generate(), email, dto.firstName, dto.lastName, hashedPassword, dto.role);
 			await this.userRepository.save(user);
 
 			const tokens = await this.tokenService.generate({ id: user.id.value, email: user.email.value });
