@@ -1,4 +1,4 @@
-import { getPrismaClient } from "../infra/Prisma";
+import { PrismaClientGetway } from "../infra/PrismaClientGetway";
 import { signAccessToken, signRefreshToken } from "../lib/jwt";
 
 type UserInfo = { id: string; email: string };
@@ -13,7 +13,7 @@ export class JWTTokenService implements TokenService {
 		const accessToken = signAccessToken({ sub: info.id, email: info.email });
 		const refreshToken = signRefreshToken({ sub: info.id, email: info.email });
 
-		await getPrismaClient().refreshToken.create({ data: { token: refreshToken, userId: info.id } });
+		await PrismaClientGetway().refreshToken.create({ data: { token: refreshToken, userId: info.id } });
 
 		return { accessToken, refreshToken };
 	}

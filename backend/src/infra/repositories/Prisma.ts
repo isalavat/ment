@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { Prisma, PrismaClient } from "@prisma/client";
-import { prisma } from "../../prisma/client";
-import type { Transaction } from "../Transaction";
+import { prisma } from "../../../prisma/client";
+import type { Transaction } from "../../Transaction";
 
 const transactionalContext = new AsyncLocalStorage<{ tx: Prisma.TransactionClient }>();
 

@@ -1,6 +1,6 @@
 import { type Request, type Response, Router } from "express";
-import { PrismaTransaction } from "../infra/Prisma";
-import { PrismaUserRepository } from "../infra/PrismaUserRepository";
+import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
+import { PrismaTransaction } from "../infra/transaction/PrismaTransaction";
 import { validateBodyWith } from "../middleware/requestValidator";
 import { CreateUserSchema } from "../schemas/auth.schemas";
 import { BCrpytPasswordHasher } from "../services/PasswordHasher";
