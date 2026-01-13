@@ -1,0 +1,49 @@
+import type { UserRepository } from "../domain/user/UserRepository";
+import { Email } from "../domain/user/value-objects/Email";
+import type { PasswordHasher } from "../services/PasswordHasher";
+import type { TokenService, Tokens } from "../services/TokenService";
+import type { Transaction } from "../Transaction";
+import { InvalidEmailOrPasswordError } from "./InvalidEmailOrPasswordError";
+
+export type LoginDTO = {
+	email: string;
+	password: string;
+};
+
+export type LoginResultDTO = {
+	tokens: Tokens;
+};
+
+export class LoginUserUseCase {
+	constructor(
+		private readonly transaction: Transaction,
+		private readonly userRepository: UserRepository,
+		private readonly passwordHasher: PasswordHasher,
+		private readonly tokenService: TokenService,
+	) {}
+
+	async execute({ email, password }: LoginDTO): Promise<LoginResultDTO> {
+		return await this.transaction.run(async () => {
+			const user = await this.userRepository.findByEmail(Email.from(email));
+
+			if (user === null) {
+				throw new InvalidEmailOrPasswordError();
+			}
+
+			const isPasswordValid = await this.passwordHasher.validate(password, user.hashedPassword);
+
+			if (!isPasswordValid) {
+				throw new InvalidEmailOrPasswordError();
+			}
+
+			const { accessToken, refreshToken } = await this.tokenService.generate({
+				email: user.email.value,
+				id: user.id.value,
+			});
+
+			return {
+				tokens: { accessToken, refreshToken },
+			};
+		});
+	}
+}
