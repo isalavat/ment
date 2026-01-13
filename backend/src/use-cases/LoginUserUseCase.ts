@@ -1,7 +1,7 @@
 import type { UserRepository } from "../domain/user/UserRepository";
 import { Email } from "../domain/user/value-objects/Email";
 import type { PasswordHasher } from "../services/PasswordHasher";
-import type { TokenService, Tokens } from "../services/TokenService";
+import type { TokenService } from "../services/TokenService";
 import type { Transaction } from "../Transaction";
 import { InvalidEmailOrPasswordError } from "./InvalidEmailOrPasswordError";
 
@@ -11,7 +11,8 @@ export type LoginDTO = {
 };
 
 export type LoginResultDTO = {
-	tokens: Tokens;
+	accessToken: string;
+	refreshToken: string;
 };
 
 export class LoginUserUseCase {
@@ -36,13 +37,11 @@ export class LoginUserUseCase {
 				throw new InvalidEmailOrPasswordError();
 			}
 
-			const { accessToken, refreshToken } = await this.tokenService.generate({
-				email: user.email.value,
-				id: user.id.value,
-			});
+			const { accessToken, refreshToken } = await this.tokenService.generate(user.id, user.email);
 
 			return {
-				tokens: { accessToken, refreshToken },
+				accessToken,
+				refreshToken,
 			};
 		});
 	}

@@ -25,9 +25,7 @@ export const LoginUserController = Router().post(
 			new JWTTokenService(),
 		);
 
-		const {
-			tokens: { accessToken, refreshToken },
-		} = await useCase.execute(loginDto);
+		const { accessToken, refreshToken } = await useCase.execute(loginDto);
 
 		return res.status(StatusCodes.OK).json({ accessToken, refreshToken });
 	},
