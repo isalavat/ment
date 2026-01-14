@@ -1,6 +1,7 @@
 import { type Request, type Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
+import { PrismaRefreshTokenRepository } from "../infra/repositories/PrismaRefreshTokenRepository";
 import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
 import { BCrpytPasswordHasher } from "../infra/services/BCrpytPasswordHasher";
 import { JWTTokenService } from "../infra/services/JWTTokenService";
@@ -23,6 +24,7 @@ export const LoginUserController = Router().post(
 			new PrismaUserRepository(),
 			new BCrpytPasswordHasher(),
 			new JWTTokenService(),
+			new PrismaRefreshTokenRepository(),
 		);
 
 		const { accessToken, refreshToken } = await useCase.execute(loginDto);
