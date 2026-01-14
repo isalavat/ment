@@ -1,16 +1,28 @@
-import type { Email } from "../../domain/user/value-objects/Email";
-import type { UserId } from "../../domain/user/value-objects/UserId";
-import { signAccessToken, signRefreshToken } from "../../lib/jwt";
-import type { TokenService, Tokens } from "../../services/TokenService";
-import { PrismaClientGetway } from "../PrismaClientGetway";
+import { RefreshToken } from "../../domain/token/RefreshToken";
+import { AccessToken } from "../../domain/token/value-objects/AccessToken";
+import { RefreshTokenId } from "../../domain/token/value-objects/RefreshTokenId";
+import { Email } from "../../domain/user/value-objects/Email";
+import { UserId } from "../../domain/user/value-objects/UserId";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../../lib/jwt";
+import type { TokenPayload, TokenService, Tokens } from "../../services/TokenService";
 
 export class JWTTokenService implements TokenService {
-	async generate(userId: UserId, email: Email): Promise<Tokens> {
+	generate(userId: UserId, email: Email): Tokens {
 		const accessToken = signAccessToken({ sub: userId.value, email: email.value });
 		const refreshToken = signRefreshToken({ sub: userId.value, email: email.value });
 
-		await PrismaClientGetway().refreshToken.create({ data: { token: refreshToken, userId: userId.value } });
+		return {
+			accessToken: AccessToken.create(accessToken),
+			refreshToken: RefreshToken.build(RefreshTokenId.generate(), refreshToken, userId, null),
+		};
+	}
 
-		return { accessToken, refreshToken };
+	verify(rawRefreshToken: string): TokenPayload {
+		const { sub, email, type } = verifyRefreshToken(rawRefreshToken);
+		return {
+			sub: UserId.fromString(sub),
+			email: Email.from(email),
+			type,
+		};
 	}
 }

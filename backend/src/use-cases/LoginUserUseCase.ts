@@ -1,3 +1,4 @@
+import type { RefreshTokenRepository } from "../domain/token/RefreshTokenRepostory";
 import type { UserRepository } from "../domain/user/UserRepository";
 import { Email } from "../domain/user/value-objects/Email";
 import type { PasswordHasher } from "../services/PasswordHasher";
@@ -21,6 +22,7 @@ export class LoginUserUseCase {
 		private readonly userRepository: UserRepository,
 		private readonly passwordHasher: PasswordHasher,
 		private readonly tokenService: TokenService,
+		private readonly refreshTokenRepository: RefreshTokenRepository,
 	) {}
 
 	async execute({ email, password }: LoginDTO): Promise<LoginResultDTO> {
@@ -33,11 +35,12 @@ export class LoginUserUseCase {
 				throw new InvalidEmailOrPasswordError();
 			}
 
-			const { accessToken, refreshToken } = await this.tokenService.generate(user.id, user.email);
+			const { accessToken, refreshToken } = this.tokenService.generate(user.id, user.email);
+			await this.refreshTokenRepository.save(refreshToken);
 
 			return {
-				accessToken,
-				refreshToken,
+				accessToken: accessToken.toString(),
+				refreshToken: refreshToken.token,
 			};
 		});
 	}

@@ -1,3 +1,4 @@
+import type { RefreshTokenRepository } from "../domain/token/RefreshTokenRepostory";
 import { User, type UserRole } from "../domain/user/User";
 import type { UserRepository } from "../domain/user/UserRepository";
 import { Email } from "../domain/user/value-objects/Email";
@@ -34,7 +35,8 @@ export class RegisterUserUseCase {
 		private readonly transaction: Transaction,
 		private readonly userRepository: UserRepository,
 		private readonly tokenService: TokenService,
-		private readonly hasher: PasswordHasher,
+		private readonly passwordHasher: PasswordHasher,
+		private readonly refreshTokenRepository: RefreshTokenRepository,
 	) {}
 
 	async execute(dto: CreateUserDTO): Promise<RegisteredUser> {
@@ -46,12 +48,13 @@ export class RegisterUserUseCase {
 				throw new UserAlreadyExistsError(email.value);
 			}
 
-			const hashedPassword = await this.hasher.hash(dto.password);
+			const hashedPassword = await this.passwordHasher.hash(dto.password);
 
 			const user = User.create(UserId.generate(), email, dto.firstName, dto.lastName, hashedPassword, dto.role);
 			await this.userRepository.save(user);
 
-			const { accessToken, refreshToken } = await this.tokenService.generate(user.id, user.email);
+			const { accessToken, refreshToken } = this.tokenService.generate(user.id, user.email);
+			await this.refreshTokenRepository.save(refreshToken);
 
 			return {
 				user: {
@@ -62,8 +65,8 @@ export class RegisterUserUseCase {
 					role: user.role,
 				},
 				tokens: {
-					accessToken,
-					refreshToken,
+					accessToken: accessToken.toString(),
+					refreshToken: refreshToken.token,
 				},
 			};
 		});
