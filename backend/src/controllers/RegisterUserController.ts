@@ -1,4 +1,5 @@
 import { type Request, type Response, Router } from "express";
+import { StatusCodes } from "http-status-codes";
 import z from "zod";
 import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
 import { BCrpytPasswordHasher } from "../infra/services/BCrpytPasswordHasher";
@@ -29,7 +30,7 @@ export const RegisterUserController = Router().post(
 
 		const { tokens, user } = await useCase.execute(createUserDto);
 
-		return res.status(201).json({
+		return res.status(StatusCodes.CREATED).json({
 			accessToken: tokens.accessToken,
 			refreshToken: tokens.refreshToken,
 			user,
