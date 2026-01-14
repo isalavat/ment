@@ -12,11 +12,11 @@ export abstract class BaseError extends Error {
 }
 
 export abstract class DomainError extends BaseError {
-	public readonly statusCode = StatusCodes.UNPROCESSABLE_ENTITY;
+	public readonly statusCode: StatusCodes = StatusCodes.UNPROCESSABLE_ENTITY;
 }
 
 export abstract class ApplicationError extends BaseError {
-	public readonly statusCode = StatusCodes.CONFLICT;
+	public readonly statusCode: StatusCodes = StatusCodes.CONFLICT;
 }
 
 export class InternalServerError extends BaseError {
