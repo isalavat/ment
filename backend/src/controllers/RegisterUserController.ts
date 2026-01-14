@@ -1,11 +1,19 @@
 import { type Request, type Response, Router } from "express";
+import z from "zod";
 import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
 import { BCrpytPasswordHasher } from "../infra/services/BCrpytPasswordHasher";
 import { JWTTokenService } from "../infra/services/JWTTokenService";
 import { PrismaTransaction } from "../infra/transaction/PrismaTransaction";
 import { validateBodyWith } from "../middleware/requestValidator";
-import { CreateUserSchema } from "../schemas/auth.schemas";
 import { type CreateUserDTO, RegisterUserUseCase } from "../use-cases/RegisterUserUseCase";
+
+const CreateUserSchema: z.ZodType<CreateUserDTO> = z.strictObject({
+	email: z.email(),
+	password: z.string(),
+	firstName: z.string("first name is required"),
+	lastName: z.string(),
+	role: z.literal(["MENTEE", "MENTOR", "ADMIN"]),
+});
 
 export const RegisterUserController = Router().post(
 	"/register",
