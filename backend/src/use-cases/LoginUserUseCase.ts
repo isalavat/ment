@@ -3,7 +3,7 @@ import { Email } from "../domain/user/value-objects/Email";
 import type { PasswordHasher } from "../services/PasswordHasher";
 import type { TokenService } from "../services/TokenService";
 import type { Transaction } from "../Transaction";
-import { InvalidEmailOrPasswordError } from "./InvalidEmailOrPasswordError";
+import { InvalidEmailOrPasswordError } from "./errors/InvalidEmailOrPasswordError";
 
 export type LoginDTO = {
 	email: string;

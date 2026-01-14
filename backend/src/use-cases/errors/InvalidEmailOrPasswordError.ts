@@ -1,4 +1,4 @@
-import { ApplicationError } from "../lib/error";
+import { ApplicationError } from "../../lib/error";
 
 export class InvalidEmailOrPasswordError extends ApplicationError {
 	public readonly code = "INVALID_EMAIL_OR_PASSWORD";

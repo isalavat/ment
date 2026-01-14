@@ -5,7 +5,7 @@ import { UserId } from "../domain/user/value-objects/UserId";
 import type { PasswordHasher } from "../services/PasswordHasher";
 import type { TokenService } from "../services/TokenService";
 import type { Transaction } from "../Transaction";
-import { UserAlreadyExistsError } from "./UserAlreadyExistsError";
+import { UserAlreadyExistsError } from "./errors/UserAlreadyExistsError";
 
 export type CreateUserDTO = {
 	email: string;
