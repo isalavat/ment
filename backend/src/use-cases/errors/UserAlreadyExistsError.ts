@@ -1,4 +1,4 @@
-import { ApplicationError } from "../lib/error";
+import { ApplicationError } from "../../lib/error";
 
 export class UserAlreadyExistsError extends ApplicationError {
 	public readonly code = "APP_USER_EXISTS";

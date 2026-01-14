@@ -1,12 +1,11 @@
 import { User, type UserRole } from "../domain/user/User";
 import type { UserRepository } from "../domain/user/UserRepository";
 import { Email } from "../domain/user/value-objects/Email";
-import { HashedPassword } from "../domain/user/value-objects/HashedPassword";
 import { UserId } from "../domain/user/value-objects/UserId";
 import type { PasswordHasher } from "../services/PasswordHasher";
-import type { TokenService, Tokens } from "../services/TokenService";
+import type { TokenService } from "../services/TokenService";
 import type { Transaction } from "../Transaction";
-import { UserAlreadyExistsError } from "./UserAlreadyExistsError";
+import { UserAlreadyExistsError } from "./errors/UserAlreadyExistsError";
 
 export type CreateUserDTO = {
 	email: string;
@@ -24,7 +23,10 @@ type RegisteredUser = {
 		lastName: string;
 		role: UserRole;
 	};
-	tokens: Tokens;
+	tokens: {
+		accessToken: string;
+		refreshToken: string;
+	};
 };
 
 export class RegisterUserUseCase {
@@ -46,17 +48,10 @@ export class RegisterUserUseCase {
 
 			const hashedPassword = await this.hasher.hash(dto.password);
 
-			const user = User.create(
-				UserId.generate(),
-				email,
-				dto.firstName,
-				dto.lastName,
-				HashedPassword.fromHash(hashedPassword),
-				dto.role,
-			);
+			const user = User.create(UserId.generate(), email, dto.firstName, dto.lastName, hashedPassword, dto.role);
 			await this.userRepository.save(user);
 
-			const tokens = await this.tokenService.generate({ id: user.id.value, email: user.email.value });
+			const { accessToken, refreshToken } = await this.tokenService.generate(user.id, user.email);
 
 			return {
 				user: {
@@ -66,7 +61,10 @@ export class RegisterUserUseCase {
 					email: user.email.value,
 					role: user.role,
 				},
-				tokens,
+				tokens: {
+					accessToken,
+					refreshToken,
+				},
 			};
 		});
 	}
