@@ -33,6 +33,13 @@ export class PrismaRefreshTokenRepository implements RefreshTokenRepository {
 		return result ? this.toRefreshToken(result) : null;
 	}
 
+	async revoke(rawToken: string) {
+		await PrismaClientGetway().refreshToken.updateMany({
+			where: { token: rawToken, revokedAt: null },
+			data: { revokedAt: new Date() },
+		});
+	}
+
 	private toRefreshToken(prismaResult: PrismaRefreshToken): RefreshToken {
 		return RefreshToken.build(
 			RefreshTokenId.fromString(prismaResult.id),
