@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { LoginUserController } from "../controllers/LoginUserController";
-import { LogoutUserController } from "../controllers/LogoutUserController";
-import { RegisterUserController } from "../controllers/RegisterUserController";
-import { RotateSessionController } from "../controllers/RotateSessionController";
+import { LoginUserController } from "../controllers/auth/LoginUserController";
+import { LogoutUserController } from "../controllers/auth/LogoutUserController";
+import { RegisterUserController } from "../controllers/auth/RegisterUserController";
+import { RotateSessionController } from "../controllers/auth/RotateSessionController";
 
 const router = Router();
 
