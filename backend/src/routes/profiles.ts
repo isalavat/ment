@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { Router } from "express";
 import { prisma } from "../../prisma/client";
 import { type AuthedRequest, requireAuth } from "../middleware/auth";
-import { mentorController } from "../controllers/mentor/MentorsController";
+import { mentorController } from "../controllers/mentor/MentorController";
 
 const router = Router();
 
