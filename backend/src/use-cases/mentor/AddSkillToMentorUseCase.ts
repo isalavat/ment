@@ -1,9 +1,11 @@
 import type { MentorProfile } from "../../domain/mentor/MentorProfile";
 import type { MentorProfileRepository } from "../../domain/mentor/MentorProfileRepository";
 import type { SkillRepository } from "../../domain/skill/SkillRepository";
+import type { Transaction } from "../../Transaction";
 
 export class AddSkillToMentorUseCase {
   constructor(
+    private readonly transaction: Transaction,
     private readonly mentorRepository: MentorProfileRepository,
     private readonly skillRepository: SkillRepository
   ) {}
@@ -12,20 +14,22 @@ export class AddSkillToMentorUseCase {
     userId: string,
     input: { skillId?: string; skillName?: string }
   ): Promise<MentorProfile> {
-    let skillId = input.skillId;
+    return this.transaction.run(async () => {
+      let skillId = input.skillId;
 
-    if (input.skillName) {
-      let skill = await this.skillRepository.findByName(input.skillName);
-      if (!skill) {
-        skill = await this.skillRepository.create(input.skillName);
+      if (input.skillName) {
+        let skill = await this.skillRepository.findByName(input.skillName);
+        if (!skill) {
+          skill = await this.skillRepository.create(input.skillName);
+        }
+        skillId = skill.id;
       }
-      skillId = skill.id;
-    }
 
-    if (!skillId) {
-      throw new Error("Either skillId or skillName is required");
-    }
+      if (!skillId) {
+        throw new Error("Either skillId or skillName is required");
+      }
 
-    return this.mentorRepository.addSkill(userId, skillId);
+      return this.mentorRepository.addSkill(userId, skillId);
+    });
   }
 }

@@ -4,9 +4,11 @@ import {
   CreateMentorData,
 } from "../../domain/mentor/MentorProfileRepository";
 import { UserRepository } from "../../domain/user/UserRepository";
+import type { Transaction } from "../../Transaction";
 
 export class CreateMentorProfileUseCase {
   constructor(
+    private readonly transaction: Transaction,
     private mentorProfileRepo: MentorProfileRepository,
     private userRepo: UserRepository
   ) {}
@@ -15,17 +17,19 @@ export class CreateMentorProfileUseCase {
     userId: string,
     data: CreateMentorData
   ): Promise<MentorProfile> {
-    const user = await this.userRepo.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
-    if (user.role !== "MENTOR") {
-      throw new Error("User must have MENTOR role");
-    }
-    const existing = await this.mentorProfileRepo.findByUserId(userId);
-    if (existing) {
-      throw new Error("Mentor profile already exists");
-    }
-    return this.mentorProfileRepo.create(userId, data);
+    return this.transaction.run(async () => {
+      const user = await this.userRepo.findById(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (user.role !== "MENTOR") {
+        throw new Error("User must have MENTOR role");
+      }
+      const existing = await this.mentorProfileRepo.findByUserId(userId);
+      if (existing) {
+        throw new Error("Mentor profile already exists");
+      }
+      return this.mentorProfileRepo.create(userId, data);
+    });
   }
 }

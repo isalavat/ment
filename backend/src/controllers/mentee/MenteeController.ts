@@ -6,6 +6,7 @@ import {
 } from "../../middleware/auth";
 import { PrismaMenteeRepository } from "../../infra/repositories/PrismaMenteeProfileRepository";
 import { PrismaUserRepository } from "../../infra/repositories/PrismaUserRepository";
+import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
 import { ReadAllMenteesUseCase } from "../../use-cases/mentee/ReadAllMenteesUseCase";
 import { ReadMenteeByUserIdUseCase } from "../../use-cases/mentee/ReadMenteeByUserIdUseCase";
 import { CreateMenteeProfileUseCase } from "../../use-cases/mentee/CreateMenteeProfileUseCase";
@@ -40,6 +41,7 @@ menteeController.post(
     const { bio, goals } = req.body;
     try {
       const useCase = new CreateMenteeProfileUseCase(
+        new PrismaTransaction(),
         new PrismaMenteeRepository(),
         new PrismaUserRepository()
       );
@@ -67,6 +69,7 @@ menteeController.put(
     const { bio, goals } = req.body;
     try {
       const useCase = new UpdateMenteeByUserIdUseCase(
+        new PrismaTransaction(),
         new PrismaMenteeRepository()
       );
       const updated = await useCase.execute(req.params.userId, { bio, goals });

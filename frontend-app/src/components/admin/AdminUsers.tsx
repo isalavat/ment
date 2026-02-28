@@ -407,7 +407,9 @@ export const AdminUsers: React.FC = () => {
 
             <div className="view-modal-body">
               {viewLoading ? (
-                <div style={{ textAlign: "center", padding: "var(--space-xxl)" }}>
+                <div
+                  style={{ textAlign: "center", padding: "var(--space-xxl)" }}
+                >
                   Loading profile...
                 </div>
               ) : viewData ? (
@@ -428,7 +430,9 @@ export const AdminUsers: React.FC = () => {
                         </div>
                         <div className="view-email">{viewData.email}</div>
                         <span
-                          className={`badge ${getRoleBadgeClass(viewData.role)}`}
+                          className={`badge ${getRoleBadgeClass(
+                            viewData.role
+                          )}`}
                         >
                           {viewData.role}
                         </span>
@@ -451,8 +455,8 @@ export const AdminUsers: React.FC = () => {
                           <div className="view-field">
                             <span className="view-label">Experience</span>
                             <span className="view-value">
-                              {(viewData.mentorProfile as any).yearsExperience ??
-                                "—"}{" "}
+                              {(viewData.mentorProfile as any)
+                                .yearsExperience ?? "—"}{" "}
                               yrs
                             </span>
                           </div>
@@ -467,9 +471,11 @@ export const AdminUsers: React.FC = () => {
                             <span className="view-label">Rating</span>
                             <span className="view-value">
                               ⭐{" "}
-                              {(viewData.mentorProfile as any).avgRating ?? "N/A"}{" "}
+                              {(viewData.mentorProfile as any).avgRating ??
+                                "N/A"}{" "}
                               (
-                              {(viewData.mentorProfile as any).totalReviews ?? 0}{" "}
+                              {(viewData.mentorProfile as any).totalReviews ??
+                                0}{" "}
                               reviews)
                             </span>
                           </div>

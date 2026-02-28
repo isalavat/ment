@@ -6,6 +6,7 @@ import {
 } from "../../middleware/auth";
 import { PrismaUserRepository } from "../../infra/repositories/PrismaUserRepository";
 import { BCrpytPasswordHasher } from "../../infra/services/BCrpytPasswordHasher";
+import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
 import { AdminCreateUserUseCase } from "../../use-cases/admin/AdminCreateUserUseCase";
 import { UpdateUserUseCase } from "../../use-cases/admin/UpdateUserUseCase";
 import { DeleteUserUseCase } from "../../use-cases/admin/DeleteUserUseCase";
@@ -28,6 +29,7 @@ userController.post("/users", async (req: AuthedRequest, res: Response) => {
 
   try {
     const useCase = new AdminCreateUserUseCase(
+      new PrismaTransaction(),
       new PrismaUserRepository(),
       new BCrpytPasswordHasher()
     );
@@ -57,6 +59,7 @@ userController.put("/users/:id", async (req: AuthedRequest, res: Response) => {
 
   try {
     const useCase = new UpdateUserUseCase(
+      new PrismaTransaction(),
       new PrismaUserRepository(),
       new BCrpytPasswordHasher()
     );
@@ -85,7 +88,10 @@ userController.delete(
   "/users/:id",
   async (req: AuthedRequest, res: Response) => {
     try {
-      const useCase = new DeleteUserUseCase(new PrismaUserRepository());
+      const useCase = new DeleteUserUseCase(
+        new PrismaTransaction(),
+        new PrismaUserRepository()
+      );
       await useCase.execute(req.user!.id, req.params.id);
       return res.json({ message: "User deleted successfully" });
     } catch (err: any) {

@@ -16,6 +16,7 @@ import { AddCategoryToMentorUseCase } from "../../use-cases/mentor/AddCategoryTo
 import { RemoveCategoryFromMentorUseCase } from "../../use-cases/mentor/RemoveCategoryFromMentorUseCase";
 import { PrismaSkillRepository } from "../../infra/repositories/PrismaSkillRepository";
 import { PrismaUserRepository } from "../../infra/repositories/PrismaUserRepository";
+import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
 import { toMentorProfileDto } from "./dto/MentorProfileDto";
 import { MentorProfile } from "../../domain/mentor/MentorProfile";
 
@@ -63,6 +64,7 @@ mentorController.put(
     const { bio, title, yearsExperience, hourlyRate, currency } = req.body;
     try {
       const useCase = new UpdateMentorByUserIdUseCase(
+        new PrismaTransaction(),
         new PrismaMentorRepository()
       );
       const updated = await useCase.execute(req.params.userId, {
@@ -89,6 +91,7 @@ mentorController.post(
     const { bio, title, yearsExperience, hourlyRate, currency } = req.body;
     try {
       const useCase = new CreateMentorProfileUseCase(
+        new PrismaTransaction(),
         new PrismaMentorRepository(),
         new PrismaUserRepository()
       );
@@ -122,6 +125,7 @@ mentorController.post(
     const { skillId, skillName } = req.body;
     try {
       const useCase = new AddSkillToMentorUseCase(
+        new PrismaTransaction(),
         new PrismaMentorRepository(),
         new PrismaSkillRepository()
       );

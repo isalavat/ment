@@ -5,6 +5,7 @@ import {
   requireAuth,
 } from "../../middleware/auth";
 import { PrismaSkillRepository } from "../../infra/repositories/PrismaSkillRepository";
+import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
 import { ReadAllSkillsUseCase } from "../../use-cases/skill/ReadAllSkillsUseCase";
 import { CreateSkillUseCase } from "../../use-cases/skill/CreateSkillUseCase";
 
@@ -22,7 +23,10 @@ skillController.post("/skills", async (req: AuthedRequest, res: Response) => {
   if (!name) return res.status(400).json({ error: "Skill name is required" });
 
   try {
-    const useCase = new CreateSkillUseCase(new PrismaSkillRepository());
+    const useCase = new CreateSkillUseCase(
+      new PrismaTransaction(),
+      new PrismaSkillRepository()
+    );
     const skill = await useCase.execute(name);
     return res.status(201).json({ skill: { id: skill.id, name: skill.name } });
   } catch (err: any) {
