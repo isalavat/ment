@@ -16,8 +16,27 @@ export type UpdateMentorData = {
 	currency?: string;
 };
 
+export type MentorFilters = {
+	categorySlug?: string;
+	skillName?: string;
+	minRating?: number;
+	minPrice?: number;
+	maxPrice?: number;
+	search?: string;
+	page: number;
+	limit: number;
+};
+
+export type PaginatedMentors = {
+	mentors: MentorProfile[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
 export interface MentorProfileRepository {
 	findAllMentorProfiles(): Promise<MentorProfile[]>;
+	findAllWithFilters(filters: MentorFilters): Promise<PaginatedMentors>;
 	findById(id: string): Promise<MentorProfile | null>;
 	findByUserId(userId: string): Promise<MentorProfile | null>;
 	create(userId: string, data: CreateMentorData): Promise<MentorProfile>;
