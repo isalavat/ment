@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { requireAdmin, requireAuth } from "../middleware/auth";
-import { mentorController } from "../controllers/mentor/MentorController";
 import { menteeController } from "../controllers/mentee/MenteeController";
-import { userController } from "../controllers/user/UserController";
+import { mentorController } from "../controllers/mentor/MentorController";
 import { skillController } from "../controllers/skill/SkillController";
+import { userController } from "../controllers/user/UserController";
+import { requireAdmin, requireAuth } from "../middleware/auth";
 
 const router = Router();
 
