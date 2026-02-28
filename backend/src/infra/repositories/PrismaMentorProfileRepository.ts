@@ -2,7 +2,9 @@ import type { Prisma } from "@prisma/client";
 import { MentorProfile } from "../../domain/mentor/MentorProfile";
 import type {
 	CreateMentorData,
+	MentorFilters,
 	MentorProfileRepository,
+	PaginatedMentors,
 	UpdateMentorData,
 } from "../../domain/mentor/MentorProfileRepository";
 import { User } from "../../domain/user/User";
@@ -80,6 +82,58 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 			orderBy: { createdAt: "desc" },
 		});
 		return profiles.map((profile) => this.toMentorProfile(profile));
+	}
+
+	async findAllWithFilters(filters: MentorFilters): Promise<PaginatedMentors> {
+		const { categorySlug, skillName, minRating, minPrice, maxPrice, search, page, limit } = filters;
+		const skip = (page - 1) * limit;
+
+		const where: Prisma.MentorProfileWhereInput = {};
+
+		if (minRating !== undefined) {
+			where.avgRating = { gte: minRating };
+		}
+		if (minPrice !== undefined || maxPrice !== undefined) {
+			where.hourlyRate = {
+				...(minPrice !== undefined && { gte: minPrice }),
+				...(maxPrice !== undefined && { lte: maxPrice }),
+			};
+		}
+		if (categorySlug) {
+			where.categories = { some: { category: { slug: categorySlug } } };
+		}
+		if (skillName) {
+			where.skills = { some: { skill: { name: { contains: skillName } } } };
+		}
+		if (search) {
+			where.OR = [
+				{ title: { contains: search } },
+				{ bio: { contains: search } },
+				{
+					user: {
+						OR: [{ firstName: { contains: search } }, { lastName: { contains: search } }],
+					},
+				},
+			];
+		}
+
+		const [profiles, total] = await Promise.all([
+			PrismaClientGetway().mentorProfile.findMany({
+				where,
+				skip,
+				take: limit,
+				include: mentorInclude,
+				orderBy: { avgRating: "desc" },
+			}),
+			PrismaClientGetway().mentorProfile.count({ where }),
+		]);
+
+		return {
+			mentors: profiles.map((p) => this.toMentorProfile(p)),
+			total,
+			page,
+			limit,
+		};
 	}
 
 	async addSkill(userId: string, skillId: string): Promise<MentorProfile> {
