@@ -11,7 +11,9 @@ import { HashedPassword } from "../../domain/user/value-objects/HashedPassword";
 import { UserId } from "../../domain/user/value-objects/UserId";
 import { PrismaClientGetway } from "../PrismaClientGetway";
 
-type MenteeRecordWithUser = Prisma.MenteeProfileGetPayload<{ include: { user: true } }>;
+type MenteeRecordWithUser = Prisma.MenteeProfileGetPayload<{
+	include: { user: true };
+}>;
 type PrismaUserRecord = MenteeRecordWithUser["user"];
 
 export class PrismaMenteeRepository implements MenteeProfileRepository {
