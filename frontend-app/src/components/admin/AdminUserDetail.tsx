@@ -1,49 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { adminService, User, UpdateUserData, UpdateMentorProfileData, UpdateMenteeProfileData, Skill } from '../../services/adminService';
-import { profileService } from '../../services/profileService';
-import { useLanguage } from '../../i18n/LanguageContext';
-import './AdminUsers.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  adminService,
+  User,
+  UpdateUserData,
+  UpdateMentorProfileData,
+  UpdateMenteeProfileData,
+  Skill,
+} from "../../services/adminService";
+import { profileService } from "../../services/profileService";
+import { useLanguage } from "../../i18n/LanguageContext";
+import "./AdminUsers.css";
 
 export const AdminUserDetail: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const roleFromState: string | undefined = (location.state as any)?.role;
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState<'user' | 'profile'>('user');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState<"user" | "profile">("user");
 
   const [userData, setUserData] = useState<UpdateUserData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: 'MENTEE'
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "MENTEE",
   });
 
   const [mentorProfile, setMentorProfile] = useState<UpdateMentorProfileData>({
-    bio: '',
-    title: '',
+    bio: "",
+    title: "",
     yearsExperience: 0,
     hourlyRate: 0,
-    currency: 'USD'
+    currency: "USD",
   });
 
   const [menteeProfile, setMenteeProfile] = useState<UpdateMenteeProfileData>({
-    bio: '',
-    goals: ''
+    bio: "",
+    goals: "",
   });
 
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
   const [mentorSkills, setMentorSkills] = useState<any[]>([]);
-  const [newSkillName, setNewSkillName] = useState('');
-  const [selectedSkillId, setSelectedSkillId] = useState<string>('');
+  const [newSkillName, setNewSkillName] = useState("");
+  const [selectedSkillId, setSelectedSkillId] = useState<string>("");
 
-  const [availableCategories, setAvailableCategories] = useState<Array<{ id: string; name: string; slug: string; description?: string }>>([]);
+  const [availableCategories, setAvailableCategories] = useState<
+    Array<{ id: string; name: string; slug: string; description?: string }>
+  >([]);
   const [mentorCategories, setMentorCategories] = useState<any[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
 
   useEffect(() => {
     if (id) {
@@ -56,33 +67,38 @@ export const AdminUserDetail: React.FC = () => {
   const loadUser = async () => {
     try {
       setLoading(true);
-      setError('');
-      const data = await adminService.getUser(id!);
+      setError("");
+      let data: User;
+      if (roleFromState === "MENTEE") {
+        data = await adminService.getMentee(id!);
+      } else {
+        data = await adminService.getMentor(id!);
+      }
       setUser(data);
-      
+
       // Populate user data
       setUserData({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        role: data.role
+        role: data.role,
       });
 
       // Populate profile data if exists
       if (data.mentorProfile) {
         setMentorProfile({
-          bio: (data.mentorProfile as any).bio || '',
-          title: (data.mentorProfile as any).title || '',
+          bio: (data.mentorProfile as any).bio || "",
+          title: (data.mentorProfile as any).title || "",
           yearsExperience: (data.mentorProfile as any).yearsExperience || 0,
           hourlyRate: parseFloat((data.mentorProfile as any).hourlyRate || 0),
-          currency: (data.mentorProfile as any).currency || 'USD'
+          currency: (data.mentorProfile as any).currency || "USD",
         });
-        
+
         // Load mentor skills
         if ((data.mentorProfile as any).skills) {
           setMentorSkills((data.mentorProfile as any).skills);
         }
-        
+
         // Load mentor categories
         if ((data.mentorProfile as any).categories) {
           setMentorCategories((data.mentorProfile as any).categories);
@@ -91,12 +107,12 @@ export const AdminUserDetail: React.FC = () => {
 
       if (data.menteeProfile) {
         setMenteeProfile({
-          bio: (data.menteeProfile as any).bio || '',
-          goals: (data.menteeProfile as any).goals || ''
+          bio: (data.menteeProfile as any).bio || "",
+          goals: (data.menteeProfile as any).goals || "",
         });
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load user');
+      setError(err.response?.data?.error || "Failed to load user");
     } finally {
       setLoading(false);
     }
@@ -107,7 +123,7 @@ export const AdminUserDetail: React.FC = () => {
       const skills = await adminService.getSkills();
       setAvailableSkills(skills);
     } catch (err) {
-      console.error('Failed to load skills', err);
+      console.error("Failed to load skills", err);
     }
   };
 
@@ -116,41 +132,48 @@ export const AdminUserDetail: React.FC = () => {
       const response = await profileService.getCategories();
       setAvailableCategories(response.categories);
     } catch (err) {
-      console.error('Failed to load categories', err);
+      console.error("Failed to load categories", err);
     }
   };
 
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleUserChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleMentorChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleMentorChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setMentorProfile(prev => ({ 
-      ...prev, 
-      [name]: name === 'yearsExperience' || name === 'hourlyRate' ? parseFloat(value) : value 
+    setMentorProfile((prev) => ({
+      ...prev,
+      [name]:
+        name === "yearsExperience" || name === "hourlyRate"
+          ? parseFloat(value)
+          : value,
     }));
   };
 
   const handleMenteeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setMenteeProfile(prev => ({ ...prev, [name]: value }));
+    setMenteeProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setSaving(true);
-      setError('');
-      setSuccess('');
-      
+      setError("");
+      setSuccess("");
+
       await adminService.updateUser(id!, userData);
-      setSuccess('User updated successfully');
+      setSuccess("User updated successfully");
       loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update user');
+      setError(err.response?.data?.error || "Failed to update user");
     } finally {
       setSaving(false);
     }
@@ -158,32 +181,32 @@ export const AdminUserDetail: React.FC = () => {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) return;
-    
+
     try {
       setSaving(true);
-      setError('');
-      setSuccess('');
-      
-      if (user.role === 'MENTOR') {
+      setError("");
+      setSuccess("");
+
+      if (user.role === "MENTOR") {
         if (user.mentorProfile) {
           await adminService.updateMentorProfile(id!, mentorProfile);
         } else {
           await adminService.createMentorProfile(id!, mentorProfile as any);
         }
-      } else if (user.role === 'MENTEE') {
+      } else if (user.role === "MENTEE") {
         if (user.menteeProfile) {
           await adminService.updateMenteeProfile(id!, menteeProfile);
         } else {
           await adminService.createMenteeProfile(id!, menteeProfile);
         }
       }
-      
-      setSuccess('Profile updated successfully');
+
+      setSuccess("Profile updated successfully");
       loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update profile');
+      setError(err.response?.data?.error || "Failed to update profile");
     } finally {
       setSaving(false);
     }
@@ -191,76 +214,78 @@ export const AdminUserDetail: React.FC = () => {
 
   const handleAddSkill = async () => {
     if (!newSkillName && !selectedSkillId) {
-      alert('Please select or enter a skill');
+      alert("Please select or enter a skill");
       return;
     }
 
     try {
-      setError('');
+      setError("");
       const updatedProfile = await adminService.addSkillToMentor(
-        id!, 
+        id!,
         selectedSkillId,
         newSkillName || undefined
       );
-      
+
       setMentorSkills(updatedProfile.skills);
-      setNewSkillName('');
-      setSelectedSkillId('');
-      setSuccess('Skill added successfully');
+      setNewSkillName("");
+      setSelectedSkillId("");
+      setSuccess("Skill added successfully");
       loadSkills(); // Reload skills list in case new one was created
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to add skill');
+      setError(err.response?.data?.error || "Failed to add skill");
     }
   };
 
   const handleRemoveSkill = async (skillId: string) => {
     try {
-      setError('');
+      setError("");
       await adminService.removeSkillFromMentor(id!, skillId);
-      setMentorSkills(prev => prev.filter(ms => ms.skill.id !== skillId));
-      setSuccess('Skill removed successfully');
+      setMentorSkills((prev) => prev.filter((ms) => ms.skill.id !== skillId));
+      setSuccess("Skill removed successfully");
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to remove skill');
+      setError(err.response?.data?.error || "Failed to remove skill");
     }
   };
 
   const handleAddCategory = async () => {
     if (!selectedCategoryId) {
-      alert('Please select a category');
+      alert("Please select a category");
       return;
     }
 
     try {
-      setError('');
+      setError("");
       const updatedProfile = await adminService.addCategoryToMentor(
         id!,
         selectedCategoryId
       );
-      
-      console.log('Updated profile after adding category:', updatedProfile);
-      
+
+      console.log("Updated profile after adding category:", updatedProfile);
+
       if (updatedProfile.categories) {
         setMentorCategories(updatedProfile.categories);
       }
-      setSelectedCategoryId('');
-      setSuccess('Category added successfully');
-      
+      setSelectedCategoryId("");
+      setSuccess("Category added successfully");
+
       // Reload user to ensure everything is in sync
       await loadUser();
     } catch (err: any) {
-      console.error('Error adding category:', err);
-      setError(err.response?.data?.error || 'Failed to add category');
+      console.error("Error adding category:", err);
+      setError(err.response?.data?.error || "Failed to add category");
     }
   };
 
   const handleRemoveCategory = async (categoryId: string) => {
     try {
-      setError('');
+      setError("");
       await adminService.removeCategoryFromMentor(id!, categoryId);
-      setMentorCategories(prev => prev.filter(mc => mc.category.id !== categoryId));
-      setSuccess('Category removed successfully');
+      setMentorCategories((prev) =>
+        prev.filter((mc) => mc.category.id !== categoryId)
+      );
+      setSuccess("Category removed successfully");
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to remove category');
+      setError(err.response?.data?.error || "Failed to remove category");
     }
   };
 
@@ -268,7 +293,10 @@ export const AdminUserDetail: React.FC = () => {
     return (
       <div className="content-area">
         <div className="card">
-          <div className="card-body" style={{ textAlign: 'center', padding: 'var(--space-xxl)' }}>
+          <div
+            className="card-body"
+            style={{ textAlign: "center", padding: "var(--space-xxl)" }}
+          >
             Loading user...
           </div>
         </div>
@@ -282,7 +310,10 @@ export const AdminUserDetail: React.FC = () => {
         <div className="card">
           <div className="card-body">
             <p>User not found</p>
-            <button className="btn btn-outline mt-md" onClick={() => navigate('/admin/users')}>
+            <button
+              className="btn btn-outline mt-md"
+              onClick={() => navigate("/admin/users")}
+            >
               Back to Users
             </button>
           </div>
@@ -295,46 +326,49 @@ export const AdminUserDetail: React.FC = () => {
     <div className="content-area">
       <div className="page-header">
         <div>
-          <button className="btn btn-outline btn-sm" onClick={() => navigate('/admin/users')}>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => navigate("/admin/users")}
+          >
             ← Back
           </button>
-          <h1 className="page-title mt-sm">Edit User: {user.firstName} {user.lastName}</h1>
+          <h1 className="page-title mt-sm">
+            Edit User: {user.firstName} {user.lastName}
+          </h1>
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger mb-md">{error}</div>
-      )}
+      {error && <div className="alert alert-danger mb-md">{error}</div>}
 
-      {success && (
-        <div className="alert alert-success mb-md">{success}</div>
-      )}
+      {success && <div className="alert alert-success mb-md">{success}</div>}
 
       {/* Tabs */}
       <div className="tabs mb-md">
         <button
-          className={`tab ${activeTab === 'user' ? 'active' : ''}`}
-          onClick={() => setActiveTab('user')}
+          className={`tab ${activeTab === "user" ? "active" : ""}`}
+          onClick={() => setActiveTab("user")}
         >
           User Details
         </button>
-        {(user.role === 'MENTOR' || user.role === 'MENTEE') && (
+        {(user.role === "MENTOR" || user.role === "MENTEE") && (
           <button
-            className={`tab ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
+            className={`tab ${activeTab === "profile" ? "active" : ""}`}
+            onClick={() => setActiveTab("profile")}
           >
-            {user.role === 'MENTOR' ? 'Mentor' : 'Mentee'} Profile
+            {user.role === "MENTOR" ? "Mentor" : "Mentee"} Profile
           </button>
         )}
       </div>
 
       <div className="card">
         <div className="card-body">
-          {activeTab === 'user' ? (
+          {activeTab === "user" ? (
             <form onSubmit={handleUpdateUser} className="admin-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="firstName" className="form-label">First Name *</label>
+                  <label htmlFor="firstName" className="form-label">
+                    First Name *
+                  </label>
                   <input
                     type="text"
                     id="firstName"
@@ -347,7 +381,9 @@ export const AdminUserDetail: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="lastName" className="form-label">Last Name *</label>
+                  <label htmlFor="lastName" className="form-label">
+                    Last Name *
+                  </label>
                   <input
                     type="text"
                     id="lastName"
@@ -360,7 +396,9 @@ export const AdminUserDetail: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="role" className="form-label">Role *</label>
+                  <label htmlFor="role" className="form-label">
+                    Role *
+                  </label>
                   <select
                     id="role"
                     name="role"
@@ -378,7 +416,9 @@ export const AdminUserDetail: React.FC = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="email" className="form-label">Email *</label>
+                  <label htmlFor="email" className="form-label">
+                    Email *
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -391,7 +431,9 @@ export const AdminUserDetail: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="password" className="form-label">New Password (leave blank to keep current)</label>
+                  <label htmlFor="password" className="form-label">
+                    New Password (leave blank to keep current)
+                  </label>
                   <input
                     type="password"
                     id="password"
@@ -407,23 +449,29 @@ export const AdminUserDetail: React.FC = () => {
                 <button
                   type="button"
                   className="btn btn-outline"
-                  onClick={() => navigate('/admin/users')}
+                  onClick={() => navigate("/admin/users")}
                   disabled={saving}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Update User'}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Update User"}
                 </button>
               </div>
             </form>
           ) : (
             <form onSubmit={handleUpdateProfile} className="admin-form">
-              {user.role === 'MENTOR' ? (
+              {user.role === "MENTOR" ? (
                 <>
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="title" className="form-label">Professional Title *</label>
+                      <label htmlFor="title" className="form-label">
+                        Professional Title *
+                      </label>
                       <input
                         type="text"
                         id="title"
@@ -437,7 +485,9 @@ export const AdminUserDetail: React.FC = () => {
                     </div>
 
                     <div className="form-group">
-                      <label htmlFor="yearsExperience" className="form-label">Years of Experience *</label>
+                      <label htmlFor="yearsExperience" className="form-label">
+                        Years of Experience *
+                      </label>
                       <input
                         type="number"
                         id="yearsExperience"
@@ -453,7 +503,9 @@ export const AdminUserDetail: React.FC = () => {
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="hourlyRate" className="form-label">Hourly Rate *</label>
+                      <label htmlFor="hourlyRate" className="form-label">
+                        Hourly Rate *
+                      </label>
                       <input
                         type="number"
                         id="hourlyRate"
@@ -468,7 +520,9 @@ export const AdminUserDetail: React.FC = () => {
                     </div>
 
                     <div className="form-group">
-                      <label htmlFor="currency" className="form-label">Currency</label>
+                      <label htmlFor="currency" className="form-label">
+                        Currency
+                      </label>
                       <input
                         type="text"
                         id="currency"
@@ -482,7 +536,9 @@ export const AdminUserDetail: React.FC = () => {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="bio" className="form-label">Bio *</label>
+                    <label htmlFor="bio" className="form-label">
+                      Bio *
+                    </label>
                     <textarea
                       id="bio"
                       name="bio"
@@ -498,7 +554,7 @@ export const AdminUserDetail: React.FC = () => {
                   {/* Skills Management */}
                   <div className="form-group">
                     <label className="form-label">Skills</label>
-                    
+
                     {/* Current Skills */}
                     <div className="skills-list mb-md">
                       {mentorSkills.length > 0 ? (
@@ -516,7 +572,12 @@ export const AdminUserDetail: React.FC = () => {
                           </div>
                         ))
                       ) : (
-                        <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
+                        <p
+                          style={{
+                            color: "var(--neutral-500)",
+                            fontSize: "var(--font-size-sm)",
+                          }}
+                        >
                           No skills added yet
                         </p>
                       )}
@@ -532,16 +593,24 @@ export const AdminUserDetail: React.FC = () => {
                             onChange={(e) => setSelectedSkillId(e.target.value)}
                           >
                             <option value="">Select existing skill...</option>
-                            {availableSkills.map(skill => (
+                            {availableSkills.map((skill) => (
                               <option key={skill.id} value={skill.id}>
                                 {skill.name}
                               </option>
                             ))}
                           </select>
                         </div>
-                        
-                        <div style={{ display: 'flex', alignItems: 'center', padding: '0 var(--space-md)' }}>
-                          <span style={{ color: 'var(--neutral-500)' }}>OR</span>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "0 var(--space-md)",
+                          }}
+                        >
+                          <span style={{ color: "var(--neutral-500)" }}>
+                            OR
+                          </span>
                         </div>
 
                         <div className="form-group" style={{ marginBottom: 0 }}>
@@ -568,7 +637,7 @@ export const AdminUserDetail: React.FC = () => {
                   {/* Categories Management */}
                   <div className="form-group">
                     <label className="form-label">Categories</label>
-                    
+
                     {/* Current Categories */}
                     <div className="skills-list mb-md">
                       {mentorCategories.length > 0 ? (
@@ -578,7 +647,9 @@ export const AdminUserDetail: React.FC = () => {
                             <button
                               type="button"
                               className="skill-remove"
-                              onClick={() => handleRemoveCategory(mc.category.id)}
+                              onClick={() =>
+                                handleRemoveCategory(mc.category.id)
+                              }
                               title="Remove category"
                             >
                               ×
@@ -586,7 +657,12 @@ export const AdminUserDetail: React.FC = () => {
                           </div>
                         ))
                       ) : (
-                        <p style={{ color: 'var(--neutral-500)', fontSize: 'var(--font-size-sm)' }}>
+                        <p
+                          style={{
+                            color: "var(--neutral-500)",
+                            fontSize: "var(--font-size-sm)",
+                          }}
+                        >
                           No categories assigned yet
                         </p>
                       )}
@@ -595,16 +671,26 @@ export const AdminUserDetail: React.FC = () => {
                     {/* Add Category */}
                     <div className="skill-add-form">
                       <div className="form-row">
-                        <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+                        <div
+                          className="form-group"
+                          style={{ marginBottom: 0, flex: 1 }}
+                        >
                           <select
                             className="form-select"
                             value={selectedCategoryId}
-                            onChange={(e) => setSelectedCategoryId(e.target.value)}
+                            onChange={(e) =>
+                              setSelectedCategoryId(e.target.value)
+                            }
                           >
                             <option value="">Select category...</option>
                             {availableCategories
-                              .filter(cat => !mentorCategories.some(mc => mc.category.id === cat.id))
-                              .map(category => (
+                              .filter(
+                                (cat) =>
+                                  !mentorCategories.some(
+                                    (mc) => mc.category.id === cat.id
+                                  )
+                              )
+                              .map((category) => (
                                 <option key={category.id} value={category.id}>
                                   {category.name}
                                 </option>
@@ -627,7 +713,9 @@ export const AdminUserDetail: React.FC = () => {
               ) : (
                 <>
                   <div className="form-group">
-                    <label htmlFor="bio" className="form-label">Bio</label>
+                    <label htmlFor="bio" className="form-label">
+                      Bio
+                    </label>
                     <textarea
                       id="bio"
                       name="bio"
@@ -640,7 +728,9 @@ export const AdminUserDetail: React.FC = () => {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="goals" className="form-label">Learning Goals</label>
+                    <label htmlFor="goals" className="form-label">
+                      Learning Goals
+                    </label>
                     <textarea
                       id="goals"
                       name="goals"
@@ -658,13 +748,21 @@ export const AdminUserDetail: React.FC = () => {
                 <button
                   type="button"
                   className="btn btn-outline"
-                  onClick={() => setActiveTab('user')}
+                  onClick={() => setActiveTab("user")}
                   disabled={saving}
                 >
                   Back to User Details
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : user.mentorProfile || user.menteeProfile ? 'Update Profile' : 'Create Profile'}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={saving}
+                >
+                  {saving
+                    ? "Saving..."
+                    : user.mentorProfile || user.menteeProfile
+                    ? "Update Profile"
+                    : "Create Profile"}
                 </button>
               </div>
             </form>
