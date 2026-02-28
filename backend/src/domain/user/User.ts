@@ -12,6 +12,7 @@ export class User {
 		public readonly lastName: string,
 		public readonly hashedPassword: HashedPassword,
 		public readonly role: UserRole,
+		public readonly avatarUrl: string | null = null,
 	) {}
 
 	static create(
@@ -21,7 +22,8 @@ export class User {
 		lastName: string,
 		hashedPassword: HashedPassword,
 		role: UserRole,
+		avatarUrl: string | null = null,
 	) {
-		return new User(id, email, firstName, lastName, hashedPassword, role);
+		return new User(id, email, firstName, lastName, hashedPassword, role, avatarUrl);
 	}
 }

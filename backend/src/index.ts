@@ -2,7 +2,7 @@ import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { prisma } from "../prisma/client";
 import { requireAuth } from "./middleware/auth";
-import { ErrorHandler } from "./middleware/ErrorHandler";
+import { ErrorHandler } from "./middleware/errorHandler";
 import adminRouter from "./routes/admin";
 import authRouter from "./routes/auth";
 import availabilityRouter from "./routes/availability";

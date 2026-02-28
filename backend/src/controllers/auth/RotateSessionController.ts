@@ -1,11 +1,11 @@
 import { type Request, type Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
-import { PrismaRefreshTokenRepository } from "../infra/repositories/PrismaRefreshTokenRepository";
-import { JWTTokenService } from "../infra/services/JWTTokenService";
-import { PrismaTransaction } from "../infra/transaction/PrismaTransaction";
-import { validateBodyWith } from "../middleware/requestValidator";
-import { RotateSessionUseCase } from "../use-cases/RotateSessionUseCase";
+import { PrismaRefreshTokenRepository } from "../../infra/repositories/PrismaRefreshTokenRepository";
+import { JWTTokenService } from "../../infra/services/JWTTokenService";
+import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
+import { validateBodyWith } from "../../middleware/requestValidator";
+import { RotateSessionUseCase } from "../../use-cases/RotateSessionUseCase";
 
 const RotateSessionSchema = z.strictObject({
 	refreshToken: z.string(),

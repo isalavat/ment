@@ -29,3 +29,23 @@ export class InternalServerError extends BaseError {
 		this.details = details;
 	}
 }
+
+export class NotFoundError extends BaseError {
+	public readonly code = "NOT_FOUND";
+	public readonly statusCode = StatusCodes.NOT_FOUND;
+}
+
+export class ConflictError extends BaseError {
+	public readonly code = "CONFLICT";
+	public readonly statusCode = StatusCodes.CONFLICT;
+}
+
+export class BadRequestError extends BaseError {
+	public readonly code = "BAD_REQUEST";
+	public readonly statusCode = StatusCodes.BAD_REQUEST;
+}
+
+export class ForbiddenError extends BaseError {
+	public readonly code = "FORBIDDEN";
+	public readonly statusCode = StatusCodes.FORBIDDEN;
+}

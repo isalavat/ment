@@ -1,9 +1,12 @@
 import type { Prisma } from "@prisma/client";
 import { Router } from "express";
 import { prisma } from "../../prisma/client";
+import { mentorController } from "../controllers/mentor/MentorController";
 import { type AuthedRequest, requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+router.use("/test", mentorController);
 
 router.post("/mentor", requireAuth, async (req: AuthedRequest, res) => {
 	const userId = req.user?.id;
@@ -255,7 +258,9 @@ router.put("/mentor", requireAuth, async (req: AuthedRequest, res) => {
 		data: {
 			...(bio !== undefined && { bio }),
 			...(title !== undefined && { title }),
-			...(yearsExperience !== undefined && { yearsExperience: parseInt(yearsExperience, 10) }),
+			...(yearsExperience !== undefined && {
+				yearsExperience: parseInt(yearsExperience, 10),
+			}),
 			...(hourlyRate !== undefined && { hourlyRate: parseFloat(hourlyRate) }),
 			...(currency !== undefined && { currency }),
 		},
@@ -327,7 +332,9 @@ router.post("/mentor/categories", requireAuth, async (req: AuthedRequest, res) =
 		return res.status(403).json({ error: "Only mentors can manage categories" });
 	}
 
-	const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+	const profile = await prisma.mentorProfile.findUnique({
+		where: { userId },
+	});
 	if (!profile) {
 		return res.status(404).json({ error: "Mentor profile not found" });
 	}
@@ -361,7 +368,9 @@ router.delete("/mentor/categories/:categoryId", requireAuth, async (req: AuthedR
 		return res.status(403).json({ error: "Only mentors can manage categories" });
 	}
 
-	const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+	const profile = await prisma.mentorProfile.findUnique({
+		where: { userId },
+	});
 	if (!profile) {
 		return res.status(404).json({ error: "Mentor profile not found" });
 	}
@@ -405,7 +414,9 @@ router.post("/mentor/skills", requireAuth, async (req: AuthedRequest, res) => {
 
 	// If skillName is provided, create or find the skill
 	if (skillName && !skillId) {
-		const existingSkill = await prisma.skill.findUnique({ where: { name: skillName } });
+		const existingSkill = await prisma.skill.findUnique({
+			where: { name: skillName },
+		});
 		if (existingSkill) {
 			finalSkillId = existingSkill.id;
 		} else {
@@ -469,7 +480,9 @@ router.delete("/mentor/skills/:skillId", requireAuth, async (req: AuthedRequest,
 		return res.status(403).json({ error: "Only mentors can manage skills" });
 	}
 
-	const profile = await prisma.mentorProfile.findUnique({ where: { userId } });
+	const profile = await prisma.mentorProfile.findUnique({
+		where: { userId },
+	});
 	if (!profile) {
 		return res.status(404).json({ error: "Mentor profile not found" });
 	}

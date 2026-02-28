@@ -1,13 +1,13 @@
 import { type Request, type Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
-import { PrismaRefreshTokenRepository } from "../infra/repositories/PrismaRefreshTokenRepository";
-import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
-import { BCrpytPasswordHasher } from "../infra/services/BCrpytPasswordHasher";
-import { JWTTokenService } from "../infra/services/JWTTokenService";
-import { PrismaTransaction } from "../infra/transaction/PrismaTransaction";
-import { validateBodyWith } from "../middleware/requestValidator";
-import { type LoginDTO, LoginUserUseCase } from "../use-cases/LoginUserUseCase";
+import { PrismaRefreshTokenRepository } from "../../infra/repositories/PrismaRefreshTokenRepository";
+import { PrismaUserRepository } from "../../infra/repositories/PrismaUserRepository";
+import { BCrpytPasswordHasher } from "../../infra/services/BCrpytPasswordHasher";
+import { JWTTokenService } from "../../infra/services/JWTTokenService";
+import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
+import { validateBodyWith } from "../../middleware/requestValidator";
+import { type LoginDTO, LoginUserUseCase } from "../../use-cases/LoginUserUseCase";
 
 const LoginSchema: z.ZodType<LoginDTO> = z.strictObject({
 	email: z.email(),

@@ -1,9 +1,9 @@
 import { type Request, type Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import z from "zod";
-import { PrismaRefreshTokenRepository } from "../infra/repositories/PrismaRefreshTokenRepository";
-import { validateBodyWith } from "../middleware/requestValidator";
-import { LogoutUserUseCase } from "../use-cases/LogoutUserUseCase";
+import { PrismaRefreshTokenRepository } from "../../infra/repositories/PrismaRefreshTokenRepository";
+import { validateBodyWith } from "../../middleware/requestValidator";
+import { LogoutUserUseCase } from "../../use-cases/LogoutUserUseCase";
 
 const LogoutUserSchema = z.strictObject({
 	refreshToken: z.string(),
