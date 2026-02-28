@@ -59,7 +59,7 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 
   async updateByUserId(
     userId: string,
-    data: UpdateMentorData
+    data: UpdateMentorData,
   ): Promise<MentorProfile> {
     const updated = await PrismaClientGetway().mentorProfile.update({
       where: { userId },
@@ -120,7 +120,7 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 
   async addCategory(
     userId: string,
-    categoryId: string
+    categoryId: string,
   ): Promise<MentorProfile> {
     const profile = await PrismaClientGetway().mentorProfile.findUnique({
       where: { userId },
@@ -167,7 +167,7 @@ export class PrismaMentorRepository implements MentorProfileRepository {
       fromPrisma.totalReviews,
       this.toUser(fromPrisma.user),
       fromPrisma.skills ?? [],
-      fromPrisma.categories ?? []
+      fromPrisma.categories ?? [],
     );
   }
 
@@ -178,7 +178,7 @@ export class PrismaMentorRepository implements MentorProfileRepository {
       fromPrisma.firstName,
       fromPrisma.lastName,
       HashedPassword.fromHash(fromPrisma.passwordHash),
-      fromPrisma.role
+      fromPrisma.role,
     );
   }
 }
