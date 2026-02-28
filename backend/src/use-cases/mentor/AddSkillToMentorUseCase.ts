@@ -2,6 +2,7 @@ import type { MentorProfile } from "../../domain/mentor/MentorProfile";
 import type { MentorProfileRepository } from "../../domain/mentor/MentorProfileRepository";
 import type { SkillRepository } from "../../domain/skill/SkillRepository";
 import type { Transaction } from "../../Transaction";
+import { BadRequestError } from "../../lib/error";
 
 export class AddSkillToMentorUseCase {
   constructor(
@@ -26,7 +27,7 @@ export class AddSkillToMentorUseCase {
       }
 
       if (!skillId) {
-        throw new Error("Either skillId or skillName is required");
+        throw new BadRequestError("Either skillId or skillName is required");
       }
 
       return this.mentorRepository.addSkill(userId, skillId);

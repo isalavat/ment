@@ -4,6 +4,7 @@ import type {
   UpdateMenteeData,
 } from "../../domain/mentee/MenteeProfileRepository";
 import type { Transaction } from "../../Transaction";
+import { NotFoundError } from "../../lib/error";
 
 export class UpdateMenteeByUserIdUseCase {
   constructor(
@@ -17,7 +18,7 @@ export class UpdateMenteeByUserIdUseCase {
   ): Promise<MenteeProfile> {
     return this.transaction.run(async () => {
       const existing = await this.menteeRepository.findByUserId(userId);
-      if (!existing) throw new Error("Mentee profile not found");
+      if (!existing) throw new NotFoundError("Mentee profile not found");
       return this.menteeRepository.updateByUserId(userId, data);
     });
   }

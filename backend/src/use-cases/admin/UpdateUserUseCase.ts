@@ -3,6 +3,7 @@ import type { UserRepository } from "../../domain/user/UserRepository";
 import { Email } from "../../domain/user/value-objects/Email";
 import type { PasswordHasher } from "../../services/PasswordHasher";
 import type { Transaction } from "../../Transaction";
+import { ConflictError, NotFoundError } from "../../lib/error";
 
 export type UpdateUserInput = {
   email?: string;
@@ -24,7 +25,7 @@ export class UpdateUserUseCase {
     return this.transaction.run(async () => {
       const current = await this.userRepository.findById(userId);
       if (!current) {
-        throw new Error("User not found");
+        throw new NotFoundError("User not found");
       }
 
       if (input.email) {
@@ -32,7 +33,7 @@ export class UpdateUserUseCase {
         if (newEmail.value !== current.email.value) {
           const taken = await this.userRepository.existsByEmail(newEmail);
           if (taken) {
-            throw new Error("Email already in use");
+            throw new ConflictError("Email already in use");
           }
         }
       }

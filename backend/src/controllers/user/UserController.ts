@@ -10,6 +10,7 @@ import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
 import { AdminCreateUserUseCase } from "../../use-cases/admin/AdminCreateUserUseCase";
 import { UpdateUserUseCase } from "../../use-cases/admin/UpdateUserUseCase";
 import { DeleteUserUseCase } from "../../use-cases/admin/DeleteUserUseCase";
+import { BadRequestError } from "../../lib/error";
 import { toUserDto } from "../auth/dto/UserDto";
 
 export const userController = Router();
@@ -57,51 +58,31 @@ userController.post("/users", async (req: AuthedRequest, res: Response) => {
 userController.put("/users/:id", async (req: AuthedRequest, res: Response) => {
   const { email, password, role, firstName, lastName, avatarUrl } = req.body;
 
-  try {
-    const useCase = new UpdateUserUseCase(
-      new PrismaTransaction(),
-      new PrismaUserRepository(),
-      new BCrpytPasswordHasher()
-    );
-    const user = await useCase.execute(req.params.id, {
-      email,
-      password,
-      role,
-      firstName,
-      lastName,
-      avatarUrl,
-    });
-    return res.json({ user: toUserDto(user) });
-  } catch (err: any) {
-    if (err.message === "User not found") {
-      return res.status(404).json({ error: err.message });
-    }
-    if (err.message === "Email already in use") {
-      return res.status(409).json({ error: err.message });
-    }
-    throw err;
-  }
+  const useCase = new UpdateUserUseCase(
+    new PrismaTransaction(),
+    new PrismaUserRepository(),
+    new BCrpytPasswordHasher()
+  );
+  const user = await useCase.execute(req.params.id, {
+    email,
+    password,
+    role,
+    firstName,
+    lastName,
+    avatarUrl,
+  });
+  return res.json({ user: toUserDto(user) });
 });
 
 // DELETE user
 userController.delete(
   "/users/:id",
   async (req: AuthedRequest, res: Response) => {
-    try {
-      const useCase = new DeleteUserUseCase(
-        new PrismaTransaction(),
-        new PrismaUserRepository()
-      );
-      await useCase.execute(req.user!.id, req.params.id);
-      return res.json({ message: "User deleted successfully" });
-    } catch (err: any) {
-      if (err.message === "Cannot delete your own account") {
-        return res.status(400).json({ error: err.message });
-      }
-      if (err.message === "User not found") {
-        return res.status(404).json({ error: err.message });
-      }
-      throw err;
-    }
+    const useCase = new DeleteUserUseCase(
+      new PrismaTransaction(),
+      new PrismaUserRepository()
+    );
+    await useCase.execute(req.user!.id, req.params.id);
+    return res.json({ message: "User deleted successfully" });
   }
 );

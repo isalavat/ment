@@ -4,6 +4,7 @@ import {
   UpdateMentorData,
 } from "../../domain/mentor/MentorProfileRepository";
 import type { Transaction } from "../../Transaction";
+import { NotFoundError } from "../../lib/error";
 
 export class UpdateMentorByUserIdUseCase {
   constructor(
@@ -18,7 +19,7 @@ export class UpdateMentorByUserIdUseCase {
     return this.transaction.run(async () => {
       const existing = await this.mentorProfileRepo.findByUserId(userId);
       if (!existing) {
-        throw new Error("Mentor profile not found");
+        throw new NotFoundError("Mentor profile not found");
       }
       return this.mentorProfileRepo.updateByUserId(userId, data);
     });

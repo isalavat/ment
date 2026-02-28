@@ -5,6 +5,7 @@ import {
 } from "../../domain/mentor/MentorProfileRepository";
 import { UserRepository } from "../../domain/user/UserRepository";
 import type { Transaction } from "../../Transaction";
+import { BadRequestError, ConflictError, NotFoundError } from "../../lib/error";
 
 export class CreateMentorProfileUseCase {
   constructor(
@@ -20,14 +21,14 @@ export class CreateMentorProfileUseCase {
     return this.transaction.run(async () => {
       const user = await this.userRepo.findById(userId);
       if (!user) {
-        throw new Error("User not found");
+        throw new NotFoundError("User not found");
       }
       if (user.role !== "MENTOR") {
-        throw new Error("User must have MENTOR role");
+        throw new BadRequestError("User must have MENTOR role");
       }
       const existing = await this.mentorProfileRepo.findByUserId(userId);
       if (existing) {
-        throw new Error("Mentor profile already exists");
+        throw new ConflictError("Mentor profile already exists");
       }
       return this.mentorProfileRepo.create(userId, data);
     });

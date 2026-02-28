@@ -9,6 +9,7 @@ import { Email } from "../../domain/user/value-objects/Email";
 import { HashedPassword } from "../../domain/user/value-objects/HashedPassword";
 import { UserId } from "../../domain/user/value-objects/UserId";
 import { PrismaClientGetway } from "../PrismaClientGetway";
+import { ConflictError, NotFoundError } from "../../lib/error";
 
 const mentorInclude = {
   user: true,
@@ -82,12 +83,12 @@ export class PrismaMentorRepository implements MentorProfileRepository {
     const profile = await PrismaClientGetway().mentorProfile.findUnique({
       where: { userId },
     });
-    if (!profile) throw new Error("Mentor profile not found");
+    if (!profile) throw new NotFoundError("Mentor profile not found");
 
     const exists = await PrismaClientGetway().mentorSkill.findUnique({
       where: { mentorId_skillId: { mentorId: profile.id, skillId } },
     });
-    if (exists) throw new Error("Skill already added to this mentor");
+    if (exists) throw new ConflictError("Skill already added to this mentor");
 
     await PrismaClientGetway().mentorSkill.create({
       data: { mentorId: profile.id, skillId },
@@ -104,7 +105,7 @@ export class PrismaMentorRepository implements MentorProfileRepository {
     const profile = await PrismaClientGetway().mentorProfile.findUnique({
       where: { userId },
     });
-    if (!profile) throw new Error("Mentor profile not found");
+    if (!profile) throw new NotFoundError("Mentor profile not found");
 
     await PrismaClientGetway().mentorSkill.delete({
       where: { mentorId_skillId: { mentorId: profile.id, skillId } },
@@ -118,12 +119,13 @@ export class PrismaMentorRepository implements MentorProfileRepository {
     const profile = await PrismaClientGetway().mentorProfile.findUnique({
       where: { userId },
     });
-    if (!profile) throw new Error("Mentor profile not found");
+    if (!profile) throw new NotFoundError("Mentor profile not found");
 
     const exists = await PrismaClientGetway().mentorCategory.findUnique({
       where: { mentorId_categoryId: { mentorId: profile.id, categoryId } },
     });
-    if (exists) throw new Error("Category already added to this mentor");
+    if (exists)
+      throw new ConflictError("Category already added to this mentor");
 
     await PrismaClientGetway().mentorCategory.create({
       data: { mentorId: profile.id, categoryId },
@@ -140,7 +142,7 @@ export class PrismaMentorRepository implements MentorProfileRepository {
     const profile = await PrismaClientGetway().mentorProfile.findUnique({
       where: { userId },
     });
-    if (!profile) throw new Error("Mentor profile not found");
+    if (!profile) throw new NotFoundError("Mentor profile not found");
 
     await PrismaClientGetway().mentorCategory.delete({
       where: { mentorId_categoryId: { mentorId: profile.id, categoryId } },
