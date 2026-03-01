@@ -22,7 +22,7 @@ userController.get("/users", async (req: AuthedRequest, res: Response) => {
 	const skip = (pageNum - 1) * limitNum;
 
 	const where: Prisma.UserWhereInput = {};
-	if (role && ["MENTEE", "MENTOR", "ADMIN"].includes(role)) {
+	if (role && ["USER", "MENTOR", "ADMIN"].includes(role)) {
 		where.role = role as UserRole;
 	}
 	if (search) {
@@ -49,7 +49,6 @@ userController.get("/users", async (req: AuthedRequest, res: Response) => {
 				mentorProfile: {
 					select: { id: true, title: true, hourlyRate: true, avgRating: true },
 				},
-				menteeProfile: { select: { id: true } },
 			},
 			orderBy: { createdAt: "desc" },
 		}),
@@ -78,7 +77,6 @@ userController.get("/users/:id", async (req: AuthedRequest, res: Response) => {
 					skills: { include: { skill: true } },
 				},
 			},
-			menteeProfile: true,
 		},
 	});
 	if (!user) throw new NotFoundError("User not found");
@@ -87,13 +85,13 @@ userController.get("/users/:id", async (req: AuthedRequest, res: Response) => {
 
 // POST create new user
 userController.post("/users", async (req: AuthedRequest, res: Response) => {
-	const { email, password, role, firstName, lastName, avatarUrl } = req.body;
+	const { email, password, role, firstName, lastName, avatarUrl, bio, goals } = req.body;
 
 	if (!email || !password || !role || !firstName || !lastName) {
 		return res.status(400).json({ error: "Missing required fields" });
 	}
 
-	if (!["MENTEE", "MENTOR", "ADMIN"].includes(role)) {
+	if (!["USER", "MENTOR", "ADMIN"].includes(role)) {
 		return res.status(400).json({ error: "Invalid role" });
 	}
 
@@ -108,14 +106,16 @@ userController.post("/users", async (req: AuthedRequest, res: Response) => {
 		firstName,
 		lastName,
 		role,
-		avatarUrl,
+		avatarUrl: avatarUrl || null,
+		bio: bio || null,
+		goals: goals || null,
 	});
 	return res.status(201).json({ user: toUserDto(user) });
 });
 
 // PUT update user
 userController.put("/users/:id", async (req: AuthedRequest, res: Response) => {
-	const { email, password, role, firstName, lastName, avatarUrl } = req.body;
+	const { email, password, role, firstName, lastName, avatarUrl, bio, goals } = req.body;
 
 	const useCase = new UpdateUserUseCase(
 		new PrismaTransaction(),
@@ -129,6 +129,8 @@ userController.put("/users/:id", async (req: AuthedRequest, res: Response) => {
 		firstName,
 		lastName,
 		avatarUrl,
+		bio: bio ?? null,
+		goals: goals ?? null,
 	});
 	return res.json({ user: toUserDto(user) });
 });

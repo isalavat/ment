@@ -3,19 +3,18 @@ import axios from "./api";
 export interface User {
   id: string;
   email: string;
-  role: "MENTEE" | "MENTOR" | "ADMIN";
+  role: "USER" | "MENTOR" | "ADMIN";
   firstName: string;
   lastName: string;
   avatarUrl?: string;
+  bio?: string | null;
+  goals?: string | null;
   createdAt: string;
   mentorProfile?: {
     id: string;
     title: string;
     hourlyRate: number;
     avgRating: number;
-  };
-  menteeProfile?: {
-    id: string;
   };
 }
 
@@ -32,19 +31,23 @@ export interface UsersResponse {
 export interface CreateUserData {
   email: string;
   password: string;
-  role: "MENTEE" | "MENTOR" | "ADMIN";
+  role: "USER" | "MENTOR" | "ADMIN";
   firstName: string;
   lastName: string;
   avatarUrl?: string;
+  bio?: string;
+  goals?: string;
 }
 
 export interface UpdateUserData {
   email?: string;
   password?: string;
-  role?: "MENTEE" | "MENTOR" | "ADMIN";
+  role?: "USER" | "MENTOR" | "ADMIN";
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
+  bio?: string | null;
+  goals?: string | null;
 }
 
 export interface CreateMentorProfileData {
@@ -55,22 +58,12 @@ export interface CreateMentorProfileData {
   currency?: string;
 }
 
-export interface CreateMenteeProfileData {
-  bio?: string;
-  goals?: string;
-}
-
 export interface UpdateMentorProfileData {
   bio?: string;
   title?: string;
   yearsExperience?: number;
   hourlyRate?: number;
   currency?: string;
-}
-
-export interface UpdateMenteeProfileData {
-  bio?: string;
-  goals?: string;
 }
 
 export interface Skill {
@@ -108,21 +101,6 @@ export const adminService = {
     };
   },
 
-  // Get all mentees from /admin/mentees
-  getMentees: async (): Promise<User[]> => {
-    const response = await axios.get("/admin/mentees");
-    const menteeProfiles: any[] = response.data.menteeProfiles ?? [];
-    return menteeProfiles.map((mp) => ({
-      id: mp.user.id,
-      email: mp.user.email,
-      firstName: mp.user.firstName,
-      lastName: mp.user.lastName,
-      role: mp.user.role,
-      createdAt: "",
-      menteeProfile: { id: mp.id },
-    }));
-  },
-
   // Get all users with optional filters
   getUsers: async (params?: {
     role?: string;
@@ -138,25 +116,6 @@ export const adminService = {
   getUser: async (userId: string): Promise<User> => {
     const response = await axios.get(`/admin/users/${userId}`);
     return response.data.user;
-  },
-
-  // Get single mentee by userId
-  getMentee: async (userId: string): Promise<User> => {
-    const response = await axios.get(`/admin/mentees/by-user/${userId}`);
-    const mp = response.data.menteeProfile;
-    return {
-      id: mp.user.id,
-      email: mp.user.email,
-      firstName: mp.user.firstName,
-      lastName: mp.user.lastName,
-      role: mp.user.role,
-      createdAt: "",
-      menteeProfile: {
-        id: mp.id,
-        bio: mp.bio,
-        goals: mp.goals,
-      } as any,
-    };
   },
 
   // Get single mentor by userId
@@ -205,37 +164,19 @@ export const adminService = {
   // Create mentor profile for user
   createMentorProfile: async (
     userId: string,
-    data: CreateMentorProfileData
+    data: CreateMentorProfileData,
   ): Promise<any> => {
     const response = await axios.post(`/admin/mentors/by-user/${userId}`, data);
     return response.data.mentorProfile;
   },
 
-  // Create mentee profile for user
-  createMenteeProfile: async (
-    userId: string,
-    data: CreateMenteeProfileData
-  ): Promise<any> => {
-    const response = await axios.post(`/admin/mentees/by-user/${userId}`, data);
-    return response.data.menteeProfile;
-  },
-
   // Update mentor profile
   updateMentorProfile: async (
     userId: string,
-    data: UpdateMentorProfileData
+    data: UpdateMentorProfileData,
   ): Promise<any> => {
     const response = await axios.put(`/admin/mentors/by-user/${userId}`, data);
     return response.data.mentorProfile;
-  },
-
-  // Update mentee profile
-  updateMenteeProfile: async (
-    userId: string,
-    data: UpdateMenteeProfileData
-  ): Promise<any> => {
-    const response = await axios.put(`/admin/mentees/by-user/${userId}`, data);
-    return response.data.menteeProfile;
   },
 
   // Get all skills
@@ -254,11 +195,11 @@ export const adminService = {
   addSkillToMentor: async (
     userId: string,
     skillId?: string,
-    skillName?: string
+    skillName?: string,
   ): Promise<any> => {
     const response = await axios.post(
       `/admin/mentors/by-user/${userId}/skills`,
-      { skillId, skillName }
+      { skillId, skillName },
     );
     return response.data.mentorProfile;
   },
@@ -266,7 +207,7 @@ export const adminService = {
   // Remove skill from mentor profile
   removeSkillFromMentor: async (
     userId: string,
-    skillId: string
+    skillId: string,
   ): Promise<void> => {
     await axios.delete(`/admin/mentors/by-user/${userId}/skills/${skillId}`);
   },
@@ -274,11 +215,11 @@ export const adminService = {
   // Add category to mentor profile
   addCategoryToMentor: async (
     userId: string,
-    categoryId: string
+    categoryId: string,
   ): Promise<any> => {
     const response = await axios.post(
       `/admin/mentors/by-user/${userId}/categories`,
-      { categoryId }
+      { categoryId },
     );
     return response.data.mentorProfile;
   },
@@ -286,10 +227,10 @@ export const adminService = {
   // Remove category from mentor profile
   removeCategoryFromMentor: async (
     userId: string,
-    categoryId: string
+    categoryId: string,
   ): Promise<void> => {
     await axios.delete(
-      `/admin/mentors/by-user/${userId}/categories/${categoryId}`
+      `/admin/mentors/by-user/${userId}/categories/${categoryId}`,
     );
   },
 };

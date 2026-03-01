@@ -104,9 +104,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="nav-section">
           <div className="nav-section-title">{t.nav.profile}</div>
 
-          {user?.role === "MENTEE" && (
+          {user?.role === "USER" && (
             <Link
-              to="/profile/mentee"
+              to="/profile/me"
               className="nav-item"
               onClick={handleLinkClick}
             >

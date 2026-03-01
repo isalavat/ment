@@ -109,12 +109,16 @@ function AppContent() {
             }
           />
           <Route
-            path="/profile/mentee"
+            path="/profile/me"
             element={
               <ProtectedRoute>
                 <MenteeProfileForm />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/profile/mentee"
+            element={<Navigate to="/profile/me" replace />}
           />
           <Route
             path="/profile/mentor"

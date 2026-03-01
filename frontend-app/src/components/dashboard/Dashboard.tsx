@@ -15,11 +15,10 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [recommendedMentors, setRecommendedMentors] = useState<MentorProfile[]>(
-    []
+    [],
   );
 
-  const isMentor = !!user?.mentorProfileId;
-  const isMentee = !!user?.menteeProfileId;
+  const isMentor = user?.role === "MENTOR" || !!user?.mentorProfileId;
 
   useEffect(() => {
     fetchDashboardData();
@@ -32,17 +31,15 @@ export const Dashboard: React.FC = () => {
       let bookingsData: Booking[] = [];
       if (isMentor && user?.mentorProfileId) {
         bookingsData = await bookingService.getBookingsForMentor(
-          user.mentorProfileId
+          user.mentorProfileId,
         );
-      } else if (isMentee && user?.menteeProfileId) {
-        bookingsData = await bookingService.getBookingsForMentee(
-          user.menteeProfileId
-        );
+      } else if (user?.id) {
+        bookingsData = await bookingService.getBookingsForMentee(user.id);
       }
       setBookings(bookingsData);
 
-      // Fetch recommended mentors (only for mentees)
-      if (isMentee) {
+      // Fetch recommended mentors (only for non-mentors)
+      if (!isMentor) {
         const response = await mentorService.getMentors();
         setRecommendedMentors(response.mentors.slice(0, 3)); // Top 3 mentors
       }
@@ -66,7 +63,7 @@ export const Dashboard: React.FC = () => {
     .sort(
       (a, b) =>
         new Date(a.timeSlot!.startTime).getTime() -
-        new Date(b.timeSlot!.startTime).getTime()
+        new Date(b.timeSlot!.startTime).getTime(),
     );
 
   const completedSessions = bookings.filter((b) => b.status === "COMPLETED");
@@ -77,26 +74,26 @@ export const Dashboard: React.FC = () => {
       (b) =>
         b.timeSlot &&
         b.status === "CONFIRMED" &&
-        new Date(b.timeSlot.endTime) < now
+        new Date(b.timeSlot.endTime) < now,
     )
     .sort(
       (a, b) =>
         new Date(b.timeSlot!.startTime).getTime() -
-        new Date(a.timeSlot!.startTime).getTime()
+        new Date(a.timeSlot!.startTime).getTime(),
     );
 
   // Combine completed and past confirmed for "Recent Sessions"
   const recentSessions = [...completedSessions, ...pastConfirmedSessions].sort(
     (a, b) =>
       new Date(b.timeSlot!.startTime).getTime() -
-      new Date(a.timeSlot!.startTime).getTime()
+      new Date(a.timeSlot!.startTime).getTime(),
   );
 
   const pendingSessions = bookings.filter((b) => b.status === "PENDING");
 
   const totalHours = completedSessions.reduce(
     (acc, b) => acc + b.duration / 60,
-    0
+    0,
   );
 
   const getInitials = (firstName?: string, lastName?: string) => {
@@ -236,14 +233,22 @@ export const Dashboard: React.FC = () => {
                               <div className="flex gap-sm">
                                 <div className="user-avatar">
                                   {getInitials(
-                                    person?.user?.firstName,
-                                    person?.user?.lastName
+                                    isMentor
+                                      ? booking.mentee?.firstName
+                                      : booking.mentor?.user?.firstName,
+                                    isMentor
+                                      ? booking.mentee?.lastName
+                                      : booking.mentor?.user?.lastName,
                                   )}
                                 </div>
                                 <div>
                                   <div style={{ fontWeight: 500 }}>
-                                    {person?.user?.firstName}{" "}
-                                    {person?.user?.lastName}
+                                    {isMentor
+                                      ? booking.mentee?.firstName
+                                      : booking.mentor?.user?.firstName}{" "}
+                                    {isMentor
+                                      ? booking.mentee?.lastName
+                                      : booking.mentor?.user?.lastName}
                                   </div>
                                   <div
                                     style={{
@@ -252,7 +257,7 @@ export const Dashboard: React.FC = () => {
                                     }}
                                   >
                                     {isMentor
-                                      ? person?.user?.email
+                                      ? booking.mentee?.email
                                       : booking.mentor?.title}
                                   </div>
                                 </div>
@@ -261,7 +266,7 @@ export const Dashboard: React.FC = () => {
                             <td>{booking.notes || "-"}</td>
                             <td>
                               {formatDateTime(
-                                booking.timeSlot?.startTime || ""
+                                booking.timeSlot?.startTime || "",
                               )}
                             </td>
                             <td>
@@ -357,14 +362,22 @@ export const Dashboard: React.FC = () => {
                               <div className="flex gap-sm">
                                 <div className="user-avatar">
                                   {getInitials(
-                                    person?.user?.firstName,
-                                    person?.user?.lastName
+                                    isMentor
+                                      ? booking.mentee?.firstName
+                                      : booking.mentor?.user?.firstName,
+                                    isMentor
+                                      ? booking.mentee?.lastName
+                                      : booking.mentor?.user?.lastName,
                                   )}
                                 </div>
                                 <div>
                                   <div style={{ fontWeight: 500 }}>
-                                    {person?.user?.firstName}{" "}
-                                    {person?.user?.lastName}
+                                    {isMentor
+                                      ? booking.mentee?.firstName
+                                      : booking.mentor?.user?.firstName}{" "}
+                                    {isMentor
+                                      ? booking.mentee?.lastName
+                                      : booking.mentor?.user?.lastName}
                                   </div>
                                   <div
                                     style={{
@@ -373,7 +386,7 @@ export const Dashboard: React.FC = () => {
                                     }}
                                   >
                                     {isMentor
-                                      ? person?.user?.email
+                                      ? booking.mentee?.email
                                       : booking.mentor?.title}
                                   </div>
                                 </div>
@@ -382,7 +395,7 @@ export const Dashboard: React.FC = () => {
                             <td>{booking.notes || "-"}</td>
                             <td>
                               {formatDateTime(
-                                booking.timeSlot?.startTime || ""
+                                booking.timeSlot?.startTime || "",
                               )}
                             </td>
                             <td>{booking.duration} min</td>
@@ -487,7 +500,12 @@ export const Dashboard: React.FC = () => {
                               }}
                             >
                               {t.dashboard.sessionWith}{" "}
-                              {person?.user?.firstName} {person?.user?.lastName}
+                              {isMentor
+                                ? booking.mentee?.firstName
+                                : booking.mentor?.user?.firstName}{" "}
+                              {isMentor
+                                ? booking.mentee?.lastName
+                                : booking.mentor?.user?.lastName}
                             </div>
                             <div
                               style={{
@@ -551,7 +569,7 @@ export const Dashboard: React.FC = () => {
                             <div className="user-avatar">
                               {getInitials(
                                 mentor.user?.firstName,
-                                mentor.user?.lastName
+                                mentor.user?.lastName,
                               )}
                             </div>
                             <div style={{ flex: 1 }}>

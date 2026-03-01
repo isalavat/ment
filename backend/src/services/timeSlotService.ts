@@ -217,14 +217,10 @@ export const timeSlotService = {
 				booking: {
 					include: {
 						mentee: {
-							include: {
-								user: {
-									select: {
-										firstName: true,
-										lastName: true,
-										email: true,
-									},
-								},
+							select: {
+								firstName: true,
+								lastName: true,
+								email: true,
 							},
 						},
 					},
@@ -321,15 +317,11 @@ export const timeSlotService = {
 				booking: {
 					include: {
 						mentee: {
-							include: {
-								user: {
-									select: {
-										firstName: true,
-										lastName: true,
-										email: true,
-										avatarUrl: true,
-									},
-								},
+							select: {
+								firstName: true,
+								lastName: true,
+								email: true,
+								avatarUrl: true,
 							},
 						},
 					},

@@ -13,17 +13,12 @@ export const MenteeProfileForm: React.FC = () => {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     bio: "",
     goals: "",
   });
 
   useEffect(() => {
-    if (user?.role !== "MENTEE") {
-      setError(t.profile.errors.onlyMentees);
-      return;
-    }
     loadProfile();
   }, [user]);
 
@@ -31,13 +26,10 @@ export const MenteeProfileForm: React.FC = () => {
     try {
       setLoading(true);
       const { user: userData } = await profileService.getMyProfile();
-      if (userData.menteeProfile) {
-        setFormData({
-          bio: userData.menteeProfile.bio || "",
-          goals: userData.menteeProfile.goals || "",
-        });
-        setIsEditing(true);
-      }
+      setFormData({
+        bio: userData.bio || "",
+        goals: userData.goals || "",
+      });
     } catch (err: any) {
       console.error("Error loading profile:", err);
     } finally {
@@ -51,12 +43,8 @@ export const MenteeProfileForm: React.FC = () => {
     setError(null);
 
     try {
-      if (isEditing) {
-        await profileService.updateMenteeProfile(formData);
-      } else {
-        await profileService.createMenteeProfile(formData);
-      }
-      // Refresh user data to get the new profile ID
+      await profileService.updateMyProfile(formData);
+      // Refresh user data to pick up bio/goals
       const updatedUser = await authService.fetchCurrenUser();
       login(updatedUser);
       navigate("/dashboard");
@@ -68,7 +56,7 @@ export const MenteeProfileForm: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({
       ...formData,
@@ -90,9 +78,7 @@ export const MenteeProfileForm: React.FC = () => {
           >
             ← {t.profile.common.back}
           </button>
-          <h1 className="page-title mt-sm">
-            {isEditing ? t.profile.mentee.titleEdit : t.profile.mentee.title}
-          </h1>
+          <h1 className="page-title mt-sm">{t.profile.mentee.titleEdit}</h1>
         </div>
       </div>
 
@@ -103,14 +89,13 @@ export const MenteeProfileForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="admin-form">
             <div className="form-group">
               <label htmlFor="bio" className="form-label">
-                {t.profile.mentee.bio} *
+                {t.profile.mentee.bio}
               </label>
               <textarea
                 id="bio"
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                required
                 rows={6}
                 className="form-textarea"
                 placeholder={t.profile.mentee.bioPlaceholder}
@@ -129,14 +114,13 @@ export const MenteeProfileForm: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="goals" className="form-label">
-                {t.profile.mentee.goals} *
+                {t.profile.mentee.goals}
               </label>
               <textarea
                 id="goals"
                 name="goals"
                 value={formData.goals}
                 onChange={handleChange}
-                required
                 rows={6}
                 className="form-textarea"
                 placeholder={t.profile.mentee.goalsPlaceholder}
@@ -169,9 +153,7 @@ export const MenteeProfileForm: React.FC = () => {
               >
                 {loading
                   ? t.profile.common.saving
-                  : isEditing
-                  ? t.profile.mentee.updateProfile
-                  : t.profile.mentee.createProfile}
+                  : t.profile.mentee.updateProfile}
               </button>
             </div>
           </form>

@@ -50,53 +50,34 @@ export const Bookings: React.FC = () => {
   });
 
   // Determine if user is viewing as mentor or mentee
-  const isMentor = !!user?.mentorProfileId;
-  const isMentee = !!user?.menteeProfileId;
-
-  console.log("Bookings - User:", {
-    user,
-    isMentor,
-    isMentee,
-    mentorProfileId: user?.mentorProfileId,
-  });
+  const isMentor = user?.role === "MENTOR" || !!user?.mentorProfileId;
 
   useEffect(() => {
     fetchBookings();
   }, [activeTab]);
 
   const fetchBookings = async () => {
-    // Check if user has either profile
-    if (!isMentee && !isMentor) {
-      setError("No profile found. Please create a mentee or mentor profile.");
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError("");
     try {
       let status: string | undefined;
       if (activeTab !== "ALL") {
         if (activeTab === "CANCELLED") {
-          // We'll filter cancelled bookings client-side
           status = undefined;
         } else {
           status = activeTab;
         }
       }
 
-      // Fetch bookings based on user role - prioritize mentor view if both profiles exist
+      // Fetch bookings based on user role
       let data: Booking[];
-      if (isMentor && user.mentorProfileId) {
+      if (isMentor && user?.mentorProfileId) {
         data = await bookingService.getBookingsForMentor(
           user.mentorProfileId,
-          status
+          status,
         );
-      } else if (isMentee && user.menteeProfileId) {
-        data = await bookingService.getBookingsForMentee(
-          user.menteeProfileId,
-          status
-        );
+      } else if (user?.id) {
+        data = await bookingService.getBookingsForMentee(user.id, status);
       } else {
         setError("Profile not found");
         setLoading(false);
@@ -108,8 +89,8 @@ export const Bookings: React.FC = () => {
       if (activeTab === "CANCELLED") {
         filteredData = data.filter(
           (b) =>
-            b.status === "CANCELLED_BY_MENTEE" ||
-            b.status === "CANCELLED_BY_MENTOR"
+            b.status === "CANCELLED_BY_USER" ||
+            b.status === "CANCELLED_BY_MENTOR",
         );
       } else if (activeTab !== "ALL") {
         filteredData = data.filter((b) => b.status === activeTab);
@@ -167,13 +148,10 @@ export const Bookings: React.FC = () => {
           if (isMentor && user?.mentorProfileId) {
             await bookingService.cancelBookingByMentor(
               bookingId,
-              user.mentorProfileId
+              user.mentorProfileId,
             );
-          } else if (isMentee && user?.menteeProfileId) {
-            await bookingService.cancelBookingByMentee(
-              bookingId,
-              user.menteeProfileId
-            );
+          } else if (user?.id) {
+            await bookingService.cancelBookingByMentee(bookingId, user.id);
           }
           fetchBookings();
           setAlertDialog({
@@ -225,7 +203,7 @@ export const Bookings: React.FC = () => {
         return "badge-warning";
       case "COMPLETED":
         return "badge-info";
-      case "CANCELLED_BY_MENTEE":
+      case "CANCELLED_BY_USER":
       case "CANCELLED_BY_MENTOR":
         return "badge-danger";
       default:
@@ -241,8 +219,8 @@ export const Bookings: React.FC = () => {
         return "Pending";
       case "COMPLETED":
         return "Completed";
-      case "CANCELLED_BY_MENTEE":
-        return isMentor ? "Cancelled by Mentee" : "Cancelled by You";
+      case "CANCELLED_BY_USER":
+        return isMentor ? "Cancelled by User" : "Cancelled by You";
       case "CANCELLED_BY_MENTOR":
         return isMentor ? "Cancelled by You" : "Cancelled by Mentor";
       default:
@@ -343,24 +321,24 @@ export const Bookings: React.FC = () => {
                     <div className="mentor-avatar">
                       {isMentor
                         ? getInitials(
-                            booking.mentee?.user?.firstName,
-                            booking.mentee?.user?.lastName
+                            booking.mentee?.firstName,
+                            booking.mentee?.lastName,
                           )
                         : getInitials(
                             booking.mentor?.user?.firstName,
-                            booking.mentor?.user?.lastName
+                            booking.mentor?.user?.lastName,
                           )}
                     </div>
                     <div className="booking-info">
                       <div className="booking-header-row">
                         <h3 className="mentor-name">
                           {isMentor
-                            ? `${booking.mentee?.user?.firstName} ${booking.mentee?.user?.lastName}`
+                            ? `${booking.mentee?.firstName} ${booking.mentee?.lastName}`
                             : `${booking.mentor?.user?.firstName} ${booking.mentor?.user?.lastName}`}
                         </h3>
                         <span
                           className={`badge ${getStatusBadgeClass(
-                            booking.status
+                            booking.status,
                           )}`}
                         >
                           {getStatusText(booking.status)}
@@ -368,7 +346,7 @@ export const Bookings: React.FC = () => {
                       </div>
                       <p className="mentor-title">
                         {isMentor
-                          ? booking.mentee?.user?.email
+                          ? booking.mentee?.email
                           : booking.mentor?.title}
                       </p>
                       {booking.notes && (
@@ -384,7 +362,7 @@ export const Bookings: React.FC = () => {
                           🕐{" "}
                           {booking.timeSlot &&
                             `${formatTime(
-                              booking.timeSlot.startTime
+                              booking.timeSlot.startTime,
                             )} - ${formatTime(booking.timeSlot.endTime)}`}
                         </div>
                         <div className="detail-item">

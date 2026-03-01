@@ -1,6 +1,5 @@
 import { type Response, Router } from "express";
 import { PrismaCategoryRepository } from "../../infra/repositories/PrismaCategoryRepository";
-import { PrismaMenteeRepository } from "../../infra/repositories/PrismaMenteeProfileRepository";
 import { PrismaMentorRepository } from "../../infra/repositories/PrismaMentorProfileRepository";
 import { PrismaSkillRepository } from "../../infra/repositories/PrismaSkillRepository";
 import { PrismaUserRepository } from "../../infra/repositories/PrismaUserRepository";
@@ -8,8 +7,6 @@ import { PrismaTransaction } from "../../infra/transaction/PrismaTransaction";
 import { ForbiddenError, NotFoundError } from "../../lib/error";
 import { type AuthedRequest, requireAuth } from "../../middleware/auth";
 import { ReadAllCategoriesUseCase } from "../../use-cases/category/ReadAllCategoriesUseCase";
-import { CreateMenteeProfileUseCase } from "../../use-cases/mentee/CreateMenteeProfileUseCase";
-import { UpdateMenteeByUserIdUseCase } from "../../use-cases/mentee/UpdateMenteeByUserIdUseCase";
 import { AddCategoryToMentorUseCase } from "../../use-cases/mentor/AddCategoryToMentorUseCase";
 import { AddSkillToMentorUseCase } from "../../use-cases/mentor/AddSkillToMentorUseCase";
 import { CreateMentorProfileUseCase } from "../../use-cases/mentor/CreateMentorProfileUseCase";
@@ -20,8 +17,8 @@ import { RemoveSkillFromMentorUseCase } from "../../use-cases/mentor/RemoveSkill
 import { UpdateMentorByUserIdUseCase } from "../../use-cases/mentor/UpdateMentorByUserIdUseCase";
 import { GetMyProfileUseCase } from "../../use-cases/profile/GetMyProfileUseCase";
 import { ReadAllSkillsUseCase } from "../../use-cases/skill/ReadAllSkillsUseCase";
+import { UpdateMyProfileUseCase } from "../../use-cases/user/UpdateMyProfileUseCase";
 import { toUserDto } from "../auth/dto/UserDto";
-import { toMenteeProfileDto } from "../mentee/dto/MenteeProfileDto";
 import { toMentorProfileDto } from "../mentor/dto/MentorProfileDto";
 
 export const profileController = Router();
@@ -29,19 +26,23 @@ export const profileController = Router();
 // GET /me — current user's full profile
 profileController.get("/me", requireAuth, async (req: AuthedRequest, res: Response) => {
 	if (!req.user?.id) throw new ForbiddenError("Not authenticated");
-	const useCase = new GetMyProfileUseCase(
-		new PrismaUserRepository(),
-		new PrismaMentorRepository(),
-		new PrismaMenteeRepository(),
-	);
-	const { user, mentorProfile, menteeProfile } = await useCase.execute(req.user.id);
+	const useCase = new GetMyProfileUseCase(new PrismaUserRepository(), new PrismaMentorRepository());
+	const { user, mentorProfile } = await useCase.execute(req.user.id);
 	return res.json({
 		user: {
 			...toUserDto(user),
 			mentorProfile: mentorProfile ? toMentorProfileDto(mentorProfile) : null,
-			menteeProfile: menteeProfile ? toMenteeProfileDto(menteeProfile) : null,
 		},
 	});
+});
+
+// PUT /me — update bio and goals for the logged-in user
+profileController.put("/me", requireAuth, async (req: AuthedRequest, res: Response) => {
+	if (!req.user?.id) throw new ForbiddenError("Not authenticated");
+	const { bio, goals } = req.body;
+	const useCase = new UpdateMyProfileUseCase(new PrismaUserRepository());
+	const user = await useCase.execute(req.user.id, { bio, goals });
+	return res.json({ user: toUserDto(user) });
 });
 
 // GET /mentors — public listing with filters
@@ -118,28 +119,6 @@ profileController.put("/mentor", requireAuth, async (req: AuthedRequest, res: Re
 		currency,
 	});
 	return res.json({ profile: toMentorProfileDto(profile) });
-});
-
-// POST /mentee — create mentee profile for the logged-in user
-profileController.post("/mentee", requireAuth, async (req: AuthedRequest, res: Response) => {
-	if (!req.user?.id) throw new ForbiddenError("Not authenticated");
-	const { bio, goals } = req.body;
-	const useCase = new CreateMenteeProfileUseCase(
-		new PrismaTransaction(),
-		new PrismaMenteeRepository(),
-		new PrismaUserRepository(),
-	);
-	const profile = await useCase.execute(req.user.id, { bio, goals });
-	return res.status(201).json({ profile: toMenteeProfileDto(profile) });
-});
-
-// PUT /mentee — update mentee profile for the logged-in user
-profileController.put("/mentee", requireAuth, async (req: AuthedRequest, res: Response) => {
-	if (!req.user?.id) throw new ForbiddenError("Not authenticated");
-	const { bio, goals } = req.body;
-	const useCase = new UpdateMenteeByUserIdUseCase(new PrismaTransaction(), new PrismaMenteeRepository());
-	const profile = await useCase.execute(req.user.id, { bio, goals });
-	return res.json({ profile: toMenteeProfileDto(profile) });
 });
 
 // GET /categories — public list of all categories

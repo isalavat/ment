@@ -1,6 +1,6 @@
 import type { User as PrismaUser } from "@prisma/client";
 import { User } from "../../domain/user/User";
-import type { UserRepository } from "../../domain/user/UserRepository";
+import type { UpdateProfileData, UserRepository } from "../../domain/user/UserRepository";
 import { Email } from "../../domain/user/value-objects/Email";
 import { HashedPassword } from "../../domain/user/value-objects/HashedPassword";
 import { UserId } from "../../domain/user/value-objects/UserId";
@@ -17,6 +17,8 @@ export class PrismaUserRepository implements UserRepository {
 				firstName: user.firstName,
 				lastName: user.lastName,
 				avatarUrl: user.avatarUrl,
+				bio: user.bio,
+				goals: user.goals,
 			},
 		});
 		return this.toUser(result);
@@ -56,6 +58,19 @@ export class PrismaUserRepository implements UserRepository {
 				firstName: user.firstName,
 				lastName: user.lastName,
 				avatarUrl: user.avatarUrl,
+				bio: user.bio,
+				goals: user.goals,
+			},
+		});
+		return this.toUser(result);
+	}
+
+	async updateProfile(userId: string, data: UpdateProfileData): Promise<User> {
+		const result = await PrismaClientGetway().user.update({
+			where: { id: userId },
+			data: {
+				bio: data.bio,
+				goals: data.goals,
 			},
 		});
 		return this.toUser(result);
@@ -74,6 +89,8 @@ export class PrismaUserRepository implements UserRepository {
 			HashedPassword.fromHash(fromPrisma.passwordHash),
 			fromPrisma.role,
 			fromPrisma.avatarUrl,
+			fromPrisma.bio,
+			fromPrisma.goals,
 		);
 	}
 }

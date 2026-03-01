@@ -7,6 +7,8 @@ export interface UserDto {
 	lastName: string;
 	role: UserRole;
 	avatarUrl: string | null;
+	bio: string | null;
+	goals: string | null;
 }
 
 export function toUserDto(user: User): UserDto {
@@ -17,5 +19,7 @@ export function toUserDto(user: User): UserDto {
 		lastName: user.lastName,
 		role: user.role,
 		avatarUrl: user.avatarUrl,
+		bio: user.bio,
+		goals: user.goals,
 	};
 }

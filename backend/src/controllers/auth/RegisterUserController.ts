@@ -14,7 +14,7 @@ const CreateUserSchema: z.ZodType<CreateUserDTO> = z.strictObject({
 	password: z.string(),
 	firstName: z.string("first name is required"),
 	lastName: z.string(),
-	role: z.literal(["MENTEE", "MENTOR", "ADMIN"]),
+	role: z.literal(["USER", "MENTOR", "ADMIN"]),
 });
 
 export const RegisterUserController = Router().post(

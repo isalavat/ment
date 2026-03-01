@@ -21,7 +21,7 @@ model Message {
 
 // ---------- Enums ----------
 enum UserRole {
-  MENTEE
+  USER
   MENTOR
   ADMIN
 }
@@ -30,7 +30,7 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   COMPLETED
-  CANCELLED_BY_MENTEE
+  CANCELLED_BY_USER
   CANCELLED_BY_MENTOR
 }
 
@@ -49,12 +49,16 @@ model User {
   firstName    String
   lastName     String
   avatarUrl    String?
+  bio          String?  @db.Text
+  goals        String?  @db.Text
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   refreshTokens RefreshToken[]
   mentorProfile MentorProfile?
-  menteeProfile MenteeProfile?
+  bookings      Booking[]
+  reviews       Review[]  @relation("UserReviews")
+  favorites     FavoriteMentor[]
 }
 
 model MentorProfile {
@@ -83,23 +87,6 @@ model MentorProfile {
 
   @@index([avgRating])
   @@index([hourlyRate])
-}
-
-// ---------- Mentee Profile ----------
-model MenteeProfile {
-  id     String @id @default(uuid(7))
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  bio   String? @db.Text
-  goals String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  bookings  Booking[]
-  reviews   Review[]         @relation("MenteeReviews")
-  favorites FavoriteMentor[]
 }
 
 // ---------- Categories & Skills ----------
@@ -186,7 +173,7 @@ model Booking {
   mentor   MentorProfile @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
   menteeId String
-  mentee   MenteeProfile @relation(fields: [menteeId], references: [id], onDelete: Cascade)
+  mentee   User    @relation(fields: [menteeId], references: [id], onDelete: Cascade)
 
   timeSlotId String   @unique
   timeSlot   TimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
@@ -226,7 +213,7 @@ model Review {
   mentor   MentorProfile @relation("MentorReviews", fields: [mentorId], references: [id], onDelete: Cascade)
 
   menteeId String
-  mentee   MenteeProfile @relation("MenteeReviews", fields: [menteeId], references: [id], onDelete: Cascade)
+  mentee   User          @relation("UserReviews", fields: [menteeId], references: [id], onDelete: Cascade)
 
   rating  Int // 1-5
   comment String? @db.Text
@@ -242,7 +229,7 @@ model FavoriteMentor {
   id String @id @default(uuid(7))
 
   menteeId String
-  mentee   MenteeProfile @relation(fields: [menteeId], references: [id], onDelete: Cascade)
+  mentee   User   @relation(fields: [menteeId], references: [id], onDelete: Cascade)
 
   mentorId String
 

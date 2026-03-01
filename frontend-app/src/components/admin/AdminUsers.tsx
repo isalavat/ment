@@ -10,9 +10,6 @@ export const AdminUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [mentees, setMentees] = useState<User[]>([]);
-  const [menteesLoading, setMenteesLoading] = useState(true);
-  const [menteesError, setMenteesError] = useState("");
   const [filters, setFilters] = useState({
     role: "",
     search: "",
@@ -35,27 +32,18 @@ export const AdminUsers: React.FC = () => {
 
   useEffect(() => {
     loadUsers();
-    loadMentees();
   }, [filters]);
-
-  const loadMentees = async () => {
-    try {
-      setMenteesLoading(true);
-      setMenteesError("");
-      const data = await adminService.getMentees();
-      setMentees(data);
-    } catch (err: any) {
-      setMenteesError(err.response?.data?.error || "Failed to load mentees");
-    } finally {
-      setMenteesLoading(false);
-    }
-  };
 
   const loadUsers = async () => {
     try {
       setLoading(true);
       setError("");
-      const response = await adminService.getMentors();
+      const response = await adminService.getUsers({
+        role: filters.role || undefined,
+        search: filters.search || undefined,
+        page: filters.page,
+        limit: filters.limit,
+      });
       setUsers(response.users);
       setPagination(response.pagination);
     } catch (err: any) {
@@ -72,7 +60,7 @@ export const AdminUsers: React.FC = () => {
   const handleDelete = async (userId: string, fullName: string) => {
     if (
       !window.confirm(
-        `Are you sure you want to delete "${fullName}"? This cannot be undone.`
+        `Are you sure you want to delete "${fullName}"? This cannot be undone.`,
       )
     ) {
       return;
@@ -81,7 +69,6 @@ export const AdminUsers: React.FC = () => {
     try {
       await adminService.deleteUser(userId);
       loadUsers();
-      loadMentees();
     } catch (err: any) {
       alert(err.response?.data?.error || "Failed to delete user");
     }
@@ -92,10 +79,7 @@ export const AdminUsers: React.FC = () => {
     setViewTarget({ userId, role });
     setViewLoading(true);
     try {
-      const data =
-        role === "MENTEE"
-          ? await adminService.getMentee(userId)
-          : await adminService.getMentor(userId);
+      const data = await adminService.getUser(userId);
       setViewData(data);
     } catch (err: any) {
       alert(err.response?.data?.error || "Failed to load profile");
@@ -116,7 +100,7 @@ export const AdminUsers: React.FC = () => {
         return "badge-danger";
       case "MENTOR":
         return "badge-success";
-      case "MENTEE":
+      case "USER":
         return "badge-primary";
       default:
         return "";
@@ -155,7 +139,7 @@ export const AdminUsers: React.FC = () => {
                 onChange={(e) => handleFilterChange("role", e.target.value)}
               >
                 <option value="">All Roles</option>
-                <option value="MENTEE">Mentee</option>
+                <option value="USER">User</option>
                 <option value="MENTOR">Mentor</option>
                 <option value="ADMIN">Admin</option>
               </select>
@@ -226,7 +210,7 @@ export const AdminUsers: React.FC = () => {
                             onClick={() =>
                               handleDelete(
                                 user.id,
-                                `${user.firstName} ${user.lastName}`
+                                `${user.firstName} ${user.lastName}`,
                               )
                             }
                             title="Delete"
@@ -263,12 +247,7 @@ export const AdminUsers: React.FC = () => {
                             ✓ Mentor
                           </span>
                         )}
-                        {user.menteeProfile && (
-                          <span className="profile-status success">
-                            ✓ Mentee
-                          </span>
-                        )}
-                        {!user.mentorProfile && !user.menteeProfile && (
+                        {!user.mentorProfile && (
                           <span className="profile-status muted">
                             No profile
                           </span>
@@ -312,84 +291,6 @@ export const AdminUsers: React.FC = () => {
         </>
       )}
 
-      {/* Mentees Section */}
-      <div className="page-header mt-lg">
-        <h2 className="page-title">Mentees</h2>
-      </div>
-
-      {menteesError && (
-        <div className="alert alert-danger mb-md">{menteesError}</div>
-      )}
-
-      {menteesLoading ? (
-        <div className="card">
-          <div
-            className="card-body"
-            style={{ textAlign: "center", padding: "var(--space-xxl)" }}
-          >
-            Loading mentees...
-          </div>
-        </div>
-      ) : (
-        <div className="card">
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Actions</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mentees.map((mentee) => (
-                  <tr key={mentee.id}>
-                    <td>
-                      <div className="action-buttons">
-                        <button
-                          className="btn-icon"
-                          onClick={() => handleView(mentee.id, mentee.role)}
-                          title="View profile"
-                        >
-                          👁️
-                        </button>
-                        <button
-                          className="btn-icon"
-                          onClick={() =>
-                            navigate(`/admin/users/${mentee.id}`, {
-                              state: { role: mentee.role },
-                            })
-                          }
-                          title="Edit"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          className="btn-icon btn-danger"
-                          onClick={() =>
-                            handleDelete(
-                              mentee.id,
-                              `${mentee.firstName} ${mentee.lastName}`
-                            )
-                          }
-                          title="Delete"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                    <td>
-                      {mentee.firstName} {mentee.lastName}
-                    </td>
-                    <td>{mentee.email}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       {/* View Profile Modal */}
       {viewTarget && (
         <div className="view-modal-overlay" onClick={closeView}>
@@ -431,7 +332,7 @@ export const AdminUsers: React.FC = () => {
                         <div className="view-email">{viewData.email}</div>
                         <span
                           className={`badge ${getRoleBadgeClass(
-                            viewData.role
+                            viewData.role,
                           )}`}
                         >
                           {viewData.role}
@@ -502,7 +403,7 @@ export const AdminUsers: React.FC = () => {
                                 >
                                   {ms.skill.name}
                                 </span>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
@@ -521,7 +422,7 @@ export const AdminUsers: React.FC = () => {
                                 >
                                   {mc.category.name}
                                 </span>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
@@ -529,32 +430,22 @@ export const AdminUsers: React.FC = () => {
                     </>
                   )}
 
-                  {/* Mentee profile */}
-                  {viewData.menteeProfile && (
+                  {/* User bio/goals */}
+                  {(viewData.bio || viewData.goals) && (
                     <div className="view-section">
-                      <h3 className="view-section-title">Mentee Profile</h3>
-                      {(viewData.menteeProfile as any).bio ? (
+                      <h3 className="view-section-title">Profile</h3>
+                      {viewData.bio && (
                         <div className="view-field">
                           <span className="view-label">Bio</span>
-                          <p className="view-bio">
-                            {(viewData.menteeProfile as any).bio}
-                          </p>
+                          <p className="view-bio">{viewData.bio}</p>
                         </div>
-                      ) : null}
-                      {(viewData.menteeProfile as any).goals ? (
+                      )}
+                      {viewData.goals && (
                         <div className="view-field mt-md">
                           <span className="view-label">Learning Goals</span>
-                          <p className="view-bio">
-                            {(viewData.menteeProfile as any).goals}
-                          </p>
+                          <p className="view-bio">{viewData.goals}</p>
                         </div>
-                      ) : null}
-                      {!(viewData.menteeProfile as any).bio &&
-                        !(viewData.menteeProfile as any).goals && (
-                          <p style={{ color: "var(--neutral-500)" }}>
-                            No profile information yet.
-                          </p>
-                        )}
+                      )}
                     </div>
                   )}
                 </>

@@ -57,7 +57,6 @@ export const MentorDetail: React.FC = () => {
   const handleBookSession = () => {
     console.log("Book Session clicked", {
       user,
-      menteeProfileId: user?.menteeProfileId,
     });
 
     if (!user) {
@@ -67,17 +66,6 @@ export const MentorDetail: React.FC = () => {
         message: "Please log in to book a session",
         type: "warning",
         onCloseAction: () => navigate("/login"),
-      });
-      return;
-    }
-
-    if (!user.menteeProfileId) {
-      setAlertDialog({
-        isOpen: true,
-        title: "Profile Required",
-        message: "You need to create a mentee profile first",
-        type: "warning",
-        onCloseAction: () => navigate("/profile/mentee"),
       });
       return;
     }
@@ -492,14 +480,14 @@ export const MentorDetail: React.FC = () => {
       </div>
 
       {/* Booking Modal */}
-      {showBookingModal && mentor && user?.menteeProfileId && (
+      {showBookingModal && mentor && user?.id && (
         <BookingModal
           mentorId={mentor.id}
           mentorName={`${mentor.user?.firstName} ${mentor.user?.lastName}`}
           mentorTitle={mentor.title || ""}
           hourlyRate={mentor.hourlyRate || 0}
           currency={mentor.currency || "USD"}
-          menteeId={user.menteeProfileId}
+          menteeId={user.id}
           onClose={() => setShowBookingModal(false)}
           onSuccess={handleBookingSuccess}
         />
