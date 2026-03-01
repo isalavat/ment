@@ -1,361 +1,575 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { adminService, CreateUserData, CreateMentorProfileData, CreateMenteeProfileData } from '../../services/adminService';
-import { useLanguage } from '../../i18n/LanguageContext';
-import './AdminUsers.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  adminService,
+  CreateUserData,
+  CreateMentorProfileData,
+  Skill,
+} from "../../services/adminService";
+import { profileService } from "../../services/profileService";
+import "./AdminUsers.css";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 export const AdminCreateUser: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [step, setStep] = useState<'user' | 'profile'>('user');
-  const [createdUserId, setCreatedUserId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<Category[]>(
+    [],
+  );
+  const [selectedSkills, setSelectedSkills] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+  const [selectedCategories, setSelectedCategories] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+  const [selectedSkillId, setSelectedSkillId] = useState("");
+  const [newSkillName, setNewSkillName] = useState("");
 
   const [userData, setUserData] = useState<CreateUserData>({
-    email: '',
-    password: '',
-    role: 'MENTEE',
-    firstName: '',
-    lastName: '',
-    avatarUrl: ''
+    email: "",
+    password: "",
+    role: "USER",
+    firstName: "",
+    lastName: "",
+    avatarUrl: "",
+    bio: "",
+    goals: "",
   });
 
-  const [mentorProfile, setMentorProfile] = useState<CreateMentorProfileData>({
-    bio: '',
-    title: '',
+  const [mentorData, setMentorData] = useState<CreateMentorProfileData>({
+    title: "",
+    bio: "",
     yearsExperience: 0,
     hourlyRate: 0,
-    currency: 'USD'
+    currency: "USD",
   });
 
-  const [menteeProfile, setMenteeProfile] = useState<CreateMenteeProfileData>({
-    bio: '',
-    goals: ''
-  });
+  useEffect(() => {
+    adminService.getSkills().then(setAvailableSkills).catch(console.error);
+    profileService
+      .getCategories()
+      .then((res) => setAvailableCategories(res.categories))
+      .catch(console.error);
+  }, []);
 
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleUserChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleMentorChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleMentorChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setMentorProfile(prev => ({ ...prev, [name]: name === 'yearsExperience' || name === 'hourlyRate' ? parseFloat(value) : value }));
+    setMentorData((prev) => ({
+      ...prev,
+      [name]:
+        name === "yearsExperience" || name === "hourlyRate"
+          ? parseFloat(value) || 0
+          : value,
+    }));
   };
 
-  const handleMenteeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setMenteeProfile(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      setLoading(true);
-      setError('');
-      
-      const user = await adminService.createUser(userData);
-      setCreatedUserId(user.id);
-      
-      if (userData.role === 'ADMIN') {
-        // No profile needed for admin
-        navigate('/admin/users');
-        return;
-      }
-      
-      // Move to profile creation step
-      setStep('profile');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create user');
-    } finally {
-      setLoading(false);
+  const handleAddCategory = (categoryId: string) => {
+    const cat = availableCategories.find((c) => c.id === categoryId);
+    if (cat && !selectedCategories.some((sc) => sc.id === cat.id)) {
+      setSelectedCategories((prev) => [
+        ...prev,
+        { id: cat.id, name: cat.name },
+      ]);
     }
   };
 
-  const handleCreateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!createdUserId) return;
-    
-    try {
-      setLoading(true);
-      setError('');
-      
-      if (userData.role === 'MENTOR') {
-        await adminService.createMentorProfile(createdUserId, mentorProfile);
-      } else if (userData.role === 'MENTEE') {
-        await adminService.createMenteeProfile(createdUserId, menteeProfile);
+  const handleRemoveCategory = (categoryId: string) => {
+    setSelectedCategories((prev) => prev.filter((c) => c.id !== categoryId));
+  };
+
+  const handleAddSkill = () => {
+    if (selectedSkillId) {
+      const skill = availableSkills.find((s) => s.id === selectedSkillId);
+      if (skill && !selectedSkills.some((ss) => ss.id === skill.id)) {
+        setSelectedSkills((prev) => [
+          ...prev,
+          { id: skill.id, name: skill.name },
+        ]);
       }
-      
-      navigate('/admin/users');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create profile');
-    } finally {
-      setLoading(false);
+      setSelectedSkillId("");
+    } else if (newSkillName.trim()) {
+      const name = newSkillName.trim();
+      if (
+        !selectedSkills.some(
+          (ss) => ss.name.toLowerCase() === name.toLowerCase(),
+        )
+      ) {
+        setSelectedSkills((prev) => [...prev, { id: "", name }]);
+      }
+      setNewSkillName("");
     }
   };
 
-  const handleSkipProfile = () => {
-    navigate('/admin/users');
+  const handleRemoveSkill = (key: string) => {
+    setSelectedSkills((prev) => prev.filter((s) => (s.id || s.name) !== key));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const role = userData.role;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const user = await adminService.createUser({
+        ...userData,
+        avatarUrl: userData.avatarUrl || undefined,
+        bio: userData.bio || undefined,
+        goals: userData.goals || undefined,
+      });
+
+      if (role === "MENTOR") {
+        await adminService.createMentorProfile(user.id, mentorData);
+
+        await Promise.all([
+          ...selectedSkills.map((s) =>
+            s.id
+              ? adminService.addSkillToMentor(user.id, s.id)
+              : adminService.addSkillToMentor(user.id, undefined, s.name),
+          ),
+          ...selectedCategories.map((c) =>
+            adminService.addCategoryToMentor(user.id, c.id),
+          ),
+        ]);
+      }
+
+      navigate("/admin/users");
+    } catch (err: any) {
+      setError(
+        err.response?.data?.error || err.message || "Failed to create user",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="content-area">
       <div className="page-header">
         <div>
-          <button className="btn btn-outline btn-sm" onClick={() => navigate('/admin/users')}>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => navigate("/admin/users")}
+          >
             ← Back
           </button>
           <h1 className="page-title mt-sm">Create New User</h1>
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger mb-md">{error}</div>
-      )}
+      {error && <div className="alert alert-danger mb-md">{error}</div>}
 
       <div className="card">
         <div className="card-body">
-          {/* Step Indicator */}
-          <div className="step-indicator mb-lg">
-            <div className={`step ${step === 'user' ? 'active' : 'completed'}`}>
-              <div className="step-number">1</div>
-              <div className="step-label">User Details</div>
+          <form onSubmit={handleSubmit} className="admin-form">
+            {/* ── User Details ── */}
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName" className="form-label">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  className="form-input"
+                  value={userData.firstName}
+                  onChange={handleUserChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="lastName" className="form-label">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  className="form-input"
+                  value={userData.lastName}
+                  onChange={handleUserChange}
+                  required
+                />
+              </div>
             </div>
-            <div className="step-line"></div>
-            <div className={`step ${step === 'profile' ? 'active' : ''}`}>
-              <div className="step-number">2</div>
-              <div className="step-label">Profile (Optional)</div>
-            </div>
-          </div>
 
-          {step === 'user' ? (
-            <form onSubmit={handleCreateUser} className="admin-form">
-              <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email *
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="form-input"
+                value={userData.email}
+                onChange={handleUserChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password *
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="form-input"
+                value={userData.password}
+                onChange={handleUserChange}
+                required
+                minLength={6}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="role" className="form-label">
+                Role *
+              </label>
+              <select
+                id="role"
+                name="role"
+                className="form-select"
+                value={userData.role}
+                onChange={handleUserChange}
+                required
+              >
+                <option value="USER">User</option>
+                <option value="MENTOR">Mentor</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="avatarUrl" className="form-label">
+                Avatar URL (optional)
+              </label>
+              <input
+                type="text"
+                id="avatarUrl"
+                name="avatarUrl"
+                className="form-input"
+                value={userData.avatarUrl}
+                onChange={handleUserChange}
+                placeholder="https://example.com/avatar.jpg"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="bio" className="form-label">
+                Bio (optional)
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                className="form-textarea"
+                rows={2}
+                value={userData.bio}
+                onChange={handleUserChange}
+                placeholder="Short bio or description..."
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="goals" className="form-label">
+                Goals (optional)
+              </label>
+              <textarea
+                id="goals"
+                name="goals"
+                className="form-textarea"
+                rows={2}
+                value={userData.goals}
+                onChange={handleUserChange}
+                placeholder="User's goals or objectives..."
+              />
+            </div>
+
+            {/* ── Mentor Profile ── */}
+            {userData.role === "MENTOR" && (
+              <>
+                <hr className="my-md" />
+                <h3 className="mb-md">Mentor Profile</h3>
+
                 <div className="form-group">
-                  <label htmlFor="firstName" className="form-label">First Name *</label>
+                  <label htmlFor="title" className="form-label">
+                    Professional Title *
+                  </label>
                   <input
                     type="text"
-                    id="firstName"
-                    name="firstName"
+                    id="title"
+                    name="title"
                     className="form-input"
-                    value={userData.firstName}
-                    onChange={handleUserChange}
+                    value={mentorData.title}
+                    onChange={handleMentorChange}
                     required
+                    placeholder="e.g., Senior Software Engineer"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="lastName" className="form-label">Last Name *</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    className="form-input"
-                    value={userData.lastName}
-                    onChange={handleUserChange}
+                  <label htmlFor="mentorBio" className="form-label">
+                    Mentor Bio *
+                  </label>
+                  <textarea
+                    id="mentorBio"
+                    name="bio"
+                    className="form-textarea"
+                    rows={4}
+                    value={mentorData.bio}
+                    onChange={handleMentorChange}
                     required
+                    placeholder="Experience, expertise, what mentees can expect..."
                   />
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">Email *</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  className="form-input"
-                  value={userData.email}
-                  onChange={handleUserChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password" className="form-label">Password *</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  className="form-input"
-                  value={userData.password}
-                  onChange={handleUserChange}
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="role" className="form-label">Role *</label>
-                <select
-                  id="role"
-                  name="role"
-                  className="form-select"
-                  value={userData.role}
-                  onChange={handleUserChange}
-                  required
-                >
-                  <option value="MENTEE">Mentee</option>
-                  <option value="MENTOR">Mentor</option>
-                  <option value="ADMIN">Admin</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="avatarUrl" className="form-label">Avatar URL (optional)</label>
-                <input
-                  type="url"
-                  id="avatarUrl"
-                  name="avatarUrl"
-                  className="form-input"
-                  value={userData.avatarUrl}
-                  onChange={handleUserChange}
-                  placeholder="https://example.com/avatar.jpg"
-                />
-              </div>
-
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => navigate('/admin/users')}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Creating...' : 'Next: Create Profile'}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <form onSubmit={handleCreateProfile} className="admin-form">
-              <h3 className="mb-md">
-                {userData.role === 'MENTOR' ? 'Mentor Profile' : 'Mentee Profile'}
-              </h3>
-
-              {userData.role === 'MENTOR' ? (
-                <>
+                <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="title" className="form-label">Professional Title *</label>
+                    <label htmlFor="yearsExperience" className="form-label">
+                      Years of Experience *
+                    </label>
+                    <input
+                      type="number"
+                      id="yearsExperience"
+                      name="yearsExperience"
+                      className="form-input"
+                      value={mentorData.yearsExperience}
+                      onChange={handleMentorChange}
+                      required
+                      min="0"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="hourlyRate" className="form-label">
+                      Hourly Rate *
+                    </label>
+                    <input
+                      type="number"
+                      id="hourlyRate"
+                      name="hourlyRate"
+                      className="form-input"
+                      value={mentorData.hourlyRate}
+                      onChange={handleMentorChange}
+                      required
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="currency" className="form-label">
+                      Currency
+                    </label>
                     <input
                       type="text"
-                      id="title"
-                      name="title"
+                      id="currency"
+                      name="currency"
                       className="form-input"
-                      value={mentorProfile.title}
+                      value={mentorData.currency}
                       onChange={handleMentorChange}
-                      required
-                      placeholder="e.g., Senior Software Engineer"
+                      maxLength={3}
                     />
                   </div>
+                </div>
 
-                  <div className="form-group">
-                    <label htmlFor="bio" className="form-label">Bio *</label>
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      className="form-textarea"
-                      value={mentorProfile.bio}
-                      onChange={handleMentorChange}
-                      required
-                      rows={5}
-                      placeholder="Tell about your experience and expertise..."
-                    />
+                {/* Categories */}
+                <div className="form-group">
+                  <label className="form-label">Categories</label>
+                  <div className="skills-list mb-md">
+                    {selectedCategories.length > 0 ? (
+                      selectedCategories.map((cat) => (
+                        <div key={cat.id} className="skill-chip">
+                          <span>{cat.name}</span>
+                          <button
+                            type="button"
+                            className="skill-remove"
+                            onClick={() => handleRemoveCategory(cat.id)}
+                            title="Remove category"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p
+                        style={{
+                          color: "var(--neutral-500)",
+                          fontSize: "var(--font-size-sm)",
+                        }}
+                      >
+                        No categories selected
+                      </p>
+                    )}
                   </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="yearsExperience" className="form-label">Years of Experience *</label>
-                      <input
-                        type="number"
-                        id="yearsExperience"
-                        name="yearsExperience"
-                        className="form-input"
-                        value={mentorProfile.yearsExperience}
-                        onChange={handleMentorChange}
-                        required
-                        min="0"
-                      />
+                  <div className="skill-add-form">
+                    <div className="form-row">
+                      <div
+                        className="form-group"
+                        style={{ marginBottom: 0, flex: 1 }}
+                      >
+                        <select
+                          className="form-select"
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value)
+                              handleAddCategory(e.target.value);
+                          }}
+                        >
+                          <option value="">Select a category...</option>
+                          {availableCategories
+                            .filter(
+                              (cat) =>
+                                !selectedCategories.some(
+                                  (sc) => sc.id === cat.id,
+                                ),
+                            )
+                            .map((cat) => (
+                              <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
                     </div>
+                  </div>
+                </div>
 
-                    <div className="form-group">
-                      <label htmlFor="hourlyRate" className="form-label">Hourly Rate *</label>
-                      <input
-                        type="number"
-                        id="hourlyRate"
-                        name="hourlyRate"
-                        className="form-input"
-                        value={mentorProfile.hourlyRate}
-                        onChange={handleMentorChange}
-                        required
-                        min="0"
-                        step="0.01"
-                      />
+                {/* Skills */}
+                <div className="form-group">
+                  <label className="form-label">Skills</label>
+                  <div className="skills-list mb-md">
+                    {selectedSkills.length > 0 ? (
+                      selectedSkills.map((skill) => (
+                        <div
+                          key={skill.id || skill.name}
+                          className="skill-chip"
+                        >
+                          <span>{skill.name}</span>
+                          <button
+                            type="button"
+                            className="skill-remove"
+                            onClick={() =>
+                              handleRemoveSkill(skill.id || skill.name)
+                            }
+                            title="Remove skill"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p
+                        style={{
+                          color: "var(--neutral-500)",
+                          fontSize: "var(--font-size-sm)",
+                        }}
+                      >
+                        No skills added
+                      </p>
+                    )}
+                  </div>
+                  <div className="skill-add-form">
+                    <div className="form-row">
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <select
+                          className="form-select"
+                          value={selectedSkillId}
+                          onChange={(e) => setSelectedSkillId(e.target.value)}
+                        >
+                          <option value="">Select a skill...</option>
+                          {availableSkills
+                            .filter(
+                              (s) =>
+                                !selectedSkills.some((ss) => ss.id === s.id),
+                            )
+                            .map((skill) => (
+                              <option key={skill.id} value={skill.id}>
+                                {skill.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          padding: "0 var(--space-md)",
+                        }}
+                      >
+                        <span style={{ color: "var(--neutral-500)" }}>or</span>
+                      </div>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="Enter new skill name"
+                          value={newSkillName}
+                          onChange={(e) => setNewSkillName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddSkill();
+                            }
+                          }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={handleAddSkill}
+                      >
+                        Add Skill
+                      </button>
                     </div>
-
-                    <div className="form-group">
-                      <label htmlFor="currency" className="form-label">Currency</label>
-                      <input
-                        type="text"
-                        id="currency"
-                        name="currency"
-                        className="form-input"
-                        value={mentorProfile.currency}
-                        onChange={handleMentorChange}
-                        maxLength={3}
-                      />
-                    </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="bio" className="form-label">Bio</label>
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      className="form-textarea"
-                      value={menteeProfile.bio}
-                      onChange={handleMenteeChange}
-                      rows={5}
-                      placeholder="Tell about yourself..."
-                    />
-                  </div>
+                </div>
+              </>
+            )}
 
-                  <div className="form-group">
-                    <label htmlFor="goals" className="form-label">Learning Goals</label>
-                    <textarea
-                      id="goals"
-                      name="goals"
-                      className="form-textarea"
-                      value={menteeProfile.goals}
-                      onChange={handleMenteeChange}
-                      rows={5}
-                      placeholder="What do you want to learn?"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={handleSkipProfile}
-                  disabled={loading}
-                >
-                  Skip Profile
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Creating...' : 'Create Profile & Finish'}
-                </button>
-              </div>
-            </form>
-          )}
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => navigate("/admin/users")}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading
+                  ? "Creating..."
+                  : userData.role === "MENTOR"
+                    ? "Create User & Profile"
+                    : "Create User"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

@@ -15,7 +15,7 @@ export interface Booking {
     | "PENDING"
     | "CONFIRMED"
     | "COMPLETED"
-    | "CANCELLED_BY_MENTEE"
+    | "CANCELLED_BY_USER"
     | "CANCELLED_BY_MENTOR";
   notes?: string;
   hourlyRate: number;
@@ -40,12 +40,10 @@ export interface Booking {
   };
   mentee?: {
     id: string;
-    user: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      avatarUrl?: string;
-    };
+    firstName: string;
+    lastName: string;
+    email: string;
+    avatarUrl?: string;
   };
   timeSlot?: TimeSlot;
   review?: {

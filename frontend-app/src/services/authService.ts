@@ -30,7 +30,9 @@ export const authService = {
       role: userData.role,
       firstName: userData.firstName,
       lastName: userData.lastName,
-      menteeProfileId: userData.menteeProfile?.id,
+      avatarUrl: userData.avatarUrl ?? null,
+      bio: userData.bio ?? null,
+      goals: userData.goals ?? null,
       mentorProfileId: userData.mentorProfile?.id,
     };
     localStorage.setItem("user", JSON.stringify(user));

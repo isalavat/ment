@@ -44,7 +44,7 @@ export const BookingDetail: React.FC = () => {
     message: "",
   });
 
-  const isMentor = !!user?.mentorProfileId;
+  const isMentor = user?.role === "MENTOR" || !!user?.mentorProfileId;
 
   useEffect(() => {
     fetchBooking();
@@ -78,7 +78,7 @@ export const BookingDetail: React.FC = () => {
         try {
           await bookingService.confirmBooking(
             booking.id,
-            user.mentorProfileId!
+            user.mentorProfileId!,
           );
           fetchBooking();
           setAlertDialog({
@@ -114,13 +114,10 @@ export const BookingDetail: React.FC = () => {
           if (isMentor && user?.mentorProfileId) {
             await bookingService.cancelBookingByMentor(
               booking.id,
-              user.mentorProfileId
+              user.mentorProfileId,
             );
-          } else if (user?.menteeProfileId) {
-            await bookingService.cancelBookingByMentee(
-              booking.id,
-              user.menteeProfileId
-            );
+          } else if (user?.id) {
+            await bookingService.cancelBookingByMentee(booking.id, user.id);
           }
           fetchBooking();
           setAlertDialog({
@@ -150,7 +147,7 @@ export const BookingDetail: React.FC = () => {
       await bookingService.updateMeetingLink(
         booking.id,
         user.mentorProfileId,
-        meetingLink
+        meetingLink,
       );
       setShowMeetingLinkForm(false);
       fetchBooking();
@@ -234,7 +231,7 @@ export const BookingDetail: React.FC = () => {
         return "badge-warning";
       case "COMPLETED":
         return "badge-info";
-      case "CANCELLED_BY_MENTEE":
+      case "CANCELLED_BY_USER":
       case "CANCELLED_BY_MENTOR":
         return "badge-danger";
       default:
@@ -250,8 +247,8 @@ export const BookingDetail: React.FC = () => {
         return "Pending";
       case "COMPLETED":
         return "Completed";
-      case "CANCELLED_BY_MENTEE":
-        return isMentor ? "Cancelled by Mentee" : "Cancelled by You";
+      case "CANCELLED_BY_USER":
+        return isMentor ? "Cancelled by User" : "Cancelled by You";
       case "CANCELLED_BY_MENTOR":
         return isMentor ? "Cancelled by You" : "Cancelled by Mentor";
       default:
@@ -319,9 +316,9 @@ export const BookingDetail: React.FC = () => {
   }
 
   const otherPerson = isMentor ? booking.mentee : booking.mentor;
-  const otherPersonName = `${otherPerson?.user?.firstName || ""} ${
-    otherPerson?.user?.lastName || ""
-  }`;
+  const otherPersonName = isMentor
+    ? `${booking.mentee?.firstName || ""} ${booking.mentee?.lastName || ""}`
+    : `${booking.mentor?.user?.firstName || ""} ${booking.mentor?.user?.lastName || ""}`;
 
   return (
     <div className="content-area">
@@ -358,8 +355,12 @@ export const BookingDetail: React.FC = () => {
               style={{ width: "80px", height: "80px", fontSize: "24px" }}
             >
               {getInitials(
-                otherPerson?.user?.firstName,
-                otherPerson?.user?.lastName
+                isMentor
+                  ? booking.mentee?.firstName
+                  : booking.mentor?.user?.firstName,
+                isMentor
+                  ? booking.mentee?.lastName
+                  : booking.mentor?.user?.lastName,
               )}
             </div>
             <div>
@@ -378,9 +379,7 @@ export const BookingDetail: React.FC = () => {
                   color: "var(--neutral-600)",
                 }}
               >
-                {isMentor
-                  ? otherPerson?.user?.email
-                  : `with ${otherPersonName}`}
+                {isMentor ? booking.mentee?.email : `with ${otherPersonName}`}
               </p>
               {!isMentor && booking.mentor?.title && (
                 <p
@@ -449,7 +448,7 @@ export const BookingDetail: React.FC = () => {
                   <div style={{ fontSize: "var(--font-size-lg)" }}>
                     {booking.timeSlot &&
                       `${formatTime(booking.timeSlot.startTime)} - ${formatTime(
-                        booking.timeSlot.endTime
+                        booking.timeSlot.endTime,
                       )}`}
                   </div>
                 </div>
@@ -743,13 +742,13 @@ export const BookingDetail: React.FC = () => {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
-                        }
+                        },
                       )}
                     </div>
                   </div>
                 )}
 
-                {(booking.status === "CANCELLED_BY_MENTEE" ||
+                {(booking.status === "CANCELLED_BY_USER" ||
                   booking.status === "CANCELLED_BY_MENTOR") &&
                   booking.cancelledAt && (
                     <div>
@@ -768,7 +767,7 @@ export const BookingDetail: React.FC = () => {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
-                          }
+                          },
                         )}
                       </div>
                     </div>
@@ -791,7 +790,7 @@ export const BookingDetail: React.FC = () => {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
-                        }
+                        },
                       )}
                     </div>
                   </div>

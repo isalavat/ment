@@ -1,4 +1,4 @@
-export type UserRole = "MENTOR" | "MENTEE" | "ADMIN";
+export type UserRole = "MENTOR" | "USER" | "ADMIN";
 
 export interface User {
   id: string;
@@ -6,7 +6,9 @@ export interface User {
   role: UserRole;
   firstName: string;
   lastName: string;
-  menteeProfileId?: string;
+  avatarUrl?: string | null;
+  bio?: string | null;
+  goals?: string | null;
   mentorProfileId?: string;
 }
 

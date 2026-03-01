@@ -12,6 +12,8 @@ export type UpdateUserInput = {
 	lastName?: string;
 	role?: UserRole;
 	avatarUrl?: string | null;
+	bio?: string | null;
+	goals?: string | null;
 };
 
 export class UpdateUserUseCase {
@@ -49,6 +51,8 @@ export class UpdateUserUseCase {
 				updatedPassword,
 				input.role ?? current.role,
 				input.avatarUrl !== undefined ? input.avatarUrl : current.avatarUrl,
+				input.bio !== undefined ? input.bio : current.bio,
+				input.goals !== undefined ? input.goals : current.goals,
 			);
 
 			return this.userRepository.update(updated);

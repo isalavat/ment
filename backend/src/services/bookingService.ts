@@ -55,14 +55,11 @@ export const bookingService = {
 			throw new Error("Mentor profile not found");
 		}
 
-		// Verify mentee profile exists
-		const menteeProfile = await prisma.menteeProfile.findUnique({
+		// Verify the user exists
+		const menteeUser = await prisma.user.findUnique({
 			where: { id: menteeId },
 		});
-
-		if (!menteeProfile) {
-			throw new Error("Mentee profile not found");
-		}
+		if (!menteeUser) throw new Error("User not found");
 
 		// Calculate duration and total amount
 		const duration = Math.round((timeSlot.endTime.getTime() - timeSlot.startTime.getTime()) / (1000 * 60));
@@ -103,15 +100,11 @@ export const bookingService = {
 						},
 					},
 					mentee: {
-						include: {
-							user: {
-								select: {
-									firstName: true,
-									lastName: true,
-									email: true,
-									avatarUrl: true,
-								},
-							},
+						select: {
+							firstName: true,
+							lastName: true,
+							email: true,
+							avatarUrl: true,
 						},
 					},
 					timeSlot: true,
@@ -162,15 +155,11 @@ export const bookingService = {
 					},
 				},
 				mentee: {
-					include: {
-						user: {
-							select: {
-								firstName: true,
-								lastName: true,
-								email: true,
-								avatarUrl: true,
-							},
-						},
+					select: {
+						firstName: true,
+						lastName: true,
+						email: true,
+						avatarUrl: true,
 					},
 				},
 				timeSlot: true,
@@ -197,7 +186,7 @@ export const bookingService = {
 
 		if (
 			booking.status === BookingStatus.COMPLETED ||
-			booking.status === BookingStatus.CANCELLED_BY_MENTEE ||
+			booking.status === BookingStatus.CANCELLED_BY_USER ||
 			booking.status === BookingStatus.CANCELLED_BY_MENTOR
 		) {
 			throw new Error("Cannot cancel this booking");
@@ -215,7 +204,7 @@ export const bookingService = {
 			return tx.booking.update({
 				where: { id: bookingId },
 				data: {
-					status: BookingStatus.CANCELLED_BY_MENTEE,
+					status: BookingStatus.CANCELLED_BY_USER,
 					cancelledAt: new Date(),
 				},
 				include: {
@@ -232,15 +221,11 @@ export const bookingService = {
 						},
 					},
 					mentee: {
-						include: {
-							user: {
-								select: {
-									firstName: true,
-									lastName: true,
-									email: true,
-									avatarUrl: true,
-								},
-							},
+						select: {
+							firstName: true,
+							lastName: true,
+							email: true,
+							avatarUrl: true,
 						},
 					},
 					timeSlot: true,
@@ -268,7 +253,7 @@ export const bookingService = {
 
 		if (
 			booking.status === BookingStatus.COMPLETED ||
-			booking.status === BookingStatus.CANCELLED_BY_MENTEE ||
+			booking.status === BookingStatus.CANCELLED_BY_USER ||
 			booking.status === BookingStatus.CANCELLED_BY_MENTOR
 		) {
 			throw new Error("Cannot cancel this booking");
@@ -303,15 +288,11 @@ export const bookingService = {
 						},
 					},
 					mentee: {
-						include: {
-							user: {
-								select: {
-									firstName: true,
-									lastName: true,
-									email: true,
-									avatarUrl: true,
-								},
-							},
+						select: {
+							firstName: true,
+							lastName: true,
+							email: true,
+							avatarUrl: true,
 						},
 					},
 					timeSlot: true,
@@ -356,15 +337,11 @@ export const bookingService = {
 					},
 				},
 				mentee: {
-					include: {
-						user: {
-							select: {
-								firstName: true,
-								lastName: true,
-								email: true,
-								avatarUrl: true,
-							},
-						},
+					select: {
+						firstName: true,
+						lastName: true,
+						email: true,
+						avatarUrl: true,
 					},
 				},
 				timeSlot: true,
@@ -440,15 +417,11 @@ export const bookingService = {
 			where,
 			include: {
 				mentee: {
-					include: {
-						user: {
-							select: {
-								firstName: true,
-								lastName: true,
-								email: true,
-								avatarUrl: true,
-							},
-						},
+					select: {
+						firstName: true,
+						lastName: true,
+						email: true,
+						avatarUrl: true,
 					},
 				},
 				timeSlot: true,
@@ -480,15 +453,11 @@ export const bookingService = {
 					},
 				},
 				mentee: {
-					include: {
-						user: {
-							select: {
-								firstName: true,
-								lastName: true,
-								email: true,
-								avatarUrl: true,
-							},
-						},
+					select: {
+						firstName: true,
+						lastName: true,
+						email: true,
+						avatarUrl: true,
 					},
 				},
 				timeSlot: true,
@@ -536,15 +505,11 @@ export const bookingService = {
 					},
 				},
 				mentee: {
-					include: {
-						user: {
-							select: {
-								firstName: true,
-								lastName: true,
-								email: true,
-								avatarUrl: true,
-							},
-						},
+					select: {
+						firstName: true,
+						lastName: true,
+						email: true,
+						avatarUrl: true,
 					},
 				},
 				timeSlot: true,

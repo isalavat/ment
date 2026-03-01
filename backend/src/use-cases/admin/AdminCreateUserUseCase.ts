@@ -13,6 +13,8 @@ export type AdminCreateUserInput = {
 	lastName: string;
 	role: UserRole;
 	avatarUrl?: string | null;
+	bio?: string | null;
+	goals?: string | null;
 };
 
 export class AdminCreateUserUseCase {
@@ -41,6 +43,8 @@ export class AdminCreateUserUseCase {
 				hashedPassword,
 				input.role,
 				input.avatarUrl ?? null,
+				input.bio ?? null,
+				input.goals ?? null,
 			);
 
 			return this.userRepository.save(user);

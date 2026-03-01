@@ -1,8 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../i18n/LanguageContext';
-import './Header.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage } from "../../i18n/LanguageContext";
+import "./Header.css";
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -14,46 +14,46 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const navigate = useNavigate();
 
   const getInitials = () => {
-    if (!user) return '';
-    return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
+    if (!user) return "";
+    return `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase();
   };
 
   const getRoleBadgeClass = () => {
     switch (user?.role) {
-      case 'ADMIN':
-        return 'role-badge role-admin';
-      case 'MENTOR':
-        return 'role-badge role-mentor';
-      case 'MENTEE':
-        return 'role-badge role-mentee';
+      case "ADMIN":
+        return "role-badge role-admin";
+      case "MENTOR":
+        return "role-badge role-mentor";
+      case "USER":
+        return "role-badge role-mentee";
       default:
-        return 'role-badge';
+        return "role-badge";
     }
   };
 
   const getRoleLabel = () => {
     switch (user?.role) {
-      case 'ADMIN':
-        return 'Admin';
-      case 'MENTOR':
-        return 'Mentor';
-      case 'MENTEE':
-        return 'Mentee';
+      case "ADMIN":
+        return "Admin";
+      case "MENTOR":
+        return "Mentor";
+      case "USER":
+        return "Learner";
       default:
-        return '';
+        return "";
     }
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const goToProfile = () => {
-    if (user?.role === 'MENTOR') {
-      navigate('/profile/mentor');
-    } else if (user?.role === 'MENTEE') {
-      navigate('/profile/mentee');
+    if (user?.role === "MENTOR") {
+      navigate("/profile/mentor");
+    } else {
+      navigate("/profile/me");
     }
   };
 
@@ -66,20 +66,20 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
           ☰
         </button>
       </div>
-      
+
       <div className="header-right">
         <div className="user-menu" onClick={goToProfile}>
-          <div className="user-avatar">
-            {getInitials()}
-          </div>
+          <div className="user-avatar">{getInitials()}</div>
           <div className="user-info">
-            <span className="user-name">{user.firstName} {user.lastName}</span>
+            <span className="user-name">
+              {user.firstName} {user.lastName}
+            </span>
             <span className={getRoleBadgeClass()}>{getRoleLabel()}</span>
           </div>
         </div>
 
-        <button 
-          className="btn btn-outline btn-sm logout-btn" 
+        <button
+          className="btn btn-outline btn-sm logout-btn"
           onClick={handleLogout}
           title={t.nav.logout}
         >

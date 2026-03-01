@@ -26,26 +26,12 @@ export interface MentorProfile {
   }>;
 }
 
-export interface MenteeProfile {
-  id: string;
-  userId: string;
-  bio: string | null;
-  goals: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface CreateMentorProfileRequest {
   bio: string;
   title: string;
   yearsExperience: number;
   hourlyRate: number;
   currency?: string;
-}
-
-export interface CreateMenteeProfileRequest {
-  bio: string;
-  goals: string;
 }
 
 export interface UpdateMentorProfileRequest {
@@ -56,7 +42,7 @@ export interface UpdateMentorProfileRequest {
   currency?: string;
 }
 
-export interface UpdateMenteeProfileRequest {
+export interface UpdateMyProfileRequest {
   bio?: string;
   goals?: string;
 }
