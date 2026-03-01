@@ -162,7 +162,10 @@ profileController.post("/mentor/categories", requireAuth, async (req: AuthedRequ
 	const { categoryId } = req.body;
 	const useCase = new AddCategoryToMentorUseCase(new PrismaMentorRepository());
 	const updated = await useCase.execute(req.user.id, categoryId);
-	return res.json({ message: "Category added successfully", profile: toMentorProfileDto(updated) });
+	return res.json({
+		message: "Category added successfully",
+		profile: toMentorProfileDto(updated),
+	});
 });
 
 // DELETE /mentor/categories/:categoryId — remove a category from the logged-in mentor
