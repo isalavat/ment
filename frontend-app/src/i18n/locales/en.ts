@@ -226,13 +226,17 @@ export const en = {
     minutes: "min",
   },
   verification: {
-    pendingBanner: "Your mentor profile is pending admin review. You won't appear in search results until verified.",
+    pendingBanner:
+      "Your mentor profile is pending admin review. You won't appear in search results until verified.",
     rejectedBanner: "Your mentor profile was not approved.",
     rejectedReason: "Reason:",
     rejectedContact: "Please update your profile and contact support.",
-    incompleteBanner: "Your mentor profile is not complete yet. Please fill in all required information to submit for verification.",
-    verifiedBanner: "Your profile is verified and will appear in search results once you set your availability.",
-    pendingIncompleteBanner: "Your profile is pending, but you must add at least one skill and one category before admin can verify you.",
+    incompleteBanner:
+      "Your mentor profile is not complete yet. Please fill in all required information to submit for verification.",
+    verifiedBanner:
+      "Your profile is verified and will appear in search results once you set your availability.",
+    pendingIncompleteBanner:
+      "Your profile is pending, but you must add at least one skill and one category before admin can verify you.",
   },
   auth: {
     login: {

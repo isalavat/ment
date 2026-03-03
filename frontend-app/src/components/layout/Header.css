@@ -140,18 +140,18 @@
 }
 
 .role-admin {
-  background-color: #FFF4E6;
-  color: #F57C00;
+  background-color: #fff4e6;
+  color: #f57c00;
 }
 
 .role-mentor {
-  background-color: #E3F2FD;
-  color: #1976D2;
+  background-color: #e3f2fd;
+  color: #1976d2;
 }
 
 .role-mentee {
-  background-color: #F3E5F5;
-  color: #7B1FA2;
+  background-color: #f3e5f5;
+  color: #7b1fa2;
 }
 
 .verification-banner {
@@ -165,27 +165,27 @@
 }
 
 .verification-banner-verified {
-  background-color: #E8F5E9;
-  color: #1B5E20;
-  border-bottom: 1px solid #A5D6A7;
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border-bottom: 1px solid #a5d6a7;
 }
 
 .verification-banner-incomplete {
-  background-color: #E8F4FD;
-  color: #0277BD;
-  border-bottom: 1px solid #B3D9F5;
+  background-color: #e8f4fd;
+  color: #0277bd;
+  border-bottom: 1px solid #b3d9f5;
 }
 
 .verification-banner-pending {
-  background-color: #FFF8E1;
+  background-color: #fff8e1;
   color: #856404;
-  border-bottom: 1px solid #FFE082;
+  border-bottom: 1px solid #ffe082;
 }
 
 .verification-banner-rejected {
-  background-color: #FFEBEE;
-  color: #B71C1C;
-  border-bottom: 1px solid #FFCDD2;
+  background-color: #ffebee;
+  color: #b71c1c;
+  border-bottom: 1px solid #ffcdd2;
 }
 
 .logout-btn {
