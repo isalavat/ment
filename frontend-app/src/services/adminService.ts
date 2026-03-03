@@ -1,4 +1,5 @@
 import axios from "./api";
+import type { VerificationStatus } from "../types/profile";
 
 export interface User {
   id: string;
@@ -16,6 +17,28 @@ export interface User {
     hourlyRate: number;
     avgRating: number;
   };
+}
+
+export interface MentorProfileFull {
+  id: string;
+  title: string;
+  bio: string;
+  yearsExperience: number;
+  hourlyRate: number;
+  currency: string;
+  avgRating: number;
+  totalReviews: number;
+  verificationStatus: VerificationStatus;
+  rejectionReason: string | null;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+  };
+  skills: Array<{ skill: { id: string; name: string } }>;
+  categories: Array<{ category: { id: string; name: string; slug: string } }>;
 }
 
 export interface UsersResponse {
@@ -118,7 +141,7 @@ export const adminService = {
     return response.data.user;
   },
 
-  // Get single mentor by userId
+  // Get single mentor by userId (raw full profile)
   getMentor: async (userId: string): Promise<User> => {
     const response = await axios.get(`/admin/mentors/by-user/${userId}`);
     const mp = response.data.mentorProfile;
@@ -142,6 +165,12 @@ export const adminService = {
         categories: mp.categories,
       } as any,
     };
+  },
+
+  // Get the full raw mentor profile by userId (includes verificationStatus)
+  getMentorProfileFull: async (userId: string): Promise<MentorProfileFull> => {
+    const response = await axios.get(`/admin/mentors/by-user/${userId}`);
+    return response.data.mentorProfile;
   },
 
   // Create new user
@@ -232,5 +261,27 @@ export const adminService = {
     await axios.delete(
       `/admin/mentors/by-user/${userId}/categories/${categoryId}`,
     );
+  },
+
+  // Get all mentor profiles with optional verificationStatus filter
+  getMentorProfiles: async (
+    verificationStatus?: VerificationStatus,
+  ): Promise<MentorProfileFull[]> => {
+    const params = verificationStatus ? { verificationStatus } : undefined;
+    const response = await axios.get("/admin/mentors", { params });
+    return response.data.mentorProfiles ?? [];
+  },
+
+  // Verify or reject a mentor profile
+  verifyMentor: async (
+    mentorId: string,
+    action: "verify" | "reject",
+    rejectionReason?: string,
+  ): Promise<MentorProfileFull> => {
+    const response = await axios.patch(
+      `/admin/mentors/${mentorId}/verification`,
+      { action, rejectionReason },
+    );
+    return response.data.mentorProfile;
   },
 };

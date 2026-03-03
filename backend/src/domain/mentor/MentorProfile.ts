@@ -1,5 +1,7 @@
 import type { User } from "../user/User";
 
+export type VerificationStatus = "PENDING" | "VERIFIED" | "REJECTED";
+
 export class MentorProfile {
 	private constructor(
 		public readonly id: string,
@@ -15,6 +17,8 @@ export class MentorProfile {
 		public readonly categories: Array<{
 			category: { id: string; name: string; slug: string };
 		}>,
+		public readonly verificationStatus: VerificationStatus,
+		public readonly rejectionReason: string | null,
 	) {}
 
 	static create(
@@ -31,6 +35,8 @@ export class MentorProfile {
 		categories: Array<{
 			category: { id: string; name: string; slug: string };
 		}>,
+		verificationStatus: VerificationStatus = "PENDING",
+		rejectionReason: string | null = null,
 	): MentorProfile {
 		return new MentorProfile(
 			id,
@@ -44,6 +50,8 @@ export class MentorProfile {
 			user,
 			skills,
 			categories,
+			verificationStatus,
+			rejectionReason,
 		);
 	}
 }

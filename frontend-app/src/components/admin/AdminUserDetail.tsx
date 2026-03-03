@@ -6,6 +6,7 @@ import {
   UpdateUserData,
   UpdateMentorProfileData,
   Skill,
+  MentorProfileFull,
 } from "../../services/adminService";
 import { profileService } from "../../services/profileService";
 import "./AdminUsers.css";
@@ -49,6 +50,11 @@ export const AdminUserDetail: React.FC = () => {
   const [mentorCategories, setMentorCategories] = useState<any[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
+  const [mentorVerification, setMentorVerification] = useState<MentorProfileFull | null>(null);
+  const [verificationActionLoading, setVerificationActionLoading] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+
   useEffect(() => {
     if (id) {
       loadUser();
@@ -83,6 +89,12 @@ export const AdminUserDetail: React.FC = () => {
         });
         setMentorSkills(mp.skills || []);
         setMentorCategories(mp.categories || []);
+        try {
+          const fullProfile = await adminService.getMentorProfileFull(id!);
+          setMentorVerification(fullProfile);
+        } catch {
+          setMentorVerification(null);
+        }
       } else {
         setMentorProfile({
           bio: "",
@@ -93,6 +105,7 @@ export const AdminUserDetail: React.FC = () => {
         });
         setMentorSkills([]);
         setMentorCategories([]);
+        setMentorVerification(null);
       }
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to load user");
@@ -232,6 +245,39 @@ export const AdminUserDetail: React.FC = () => {
       setSuccess("Category removed");
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to remove category");
+    }
+  };
+
+  const handleVerify = async () => {
+    if (!mentorVerification) return;
+    if (!window.confirm(`Verify "${user?.firstName} ${user?.lastName}"? They will appear in search results once they set their availability.`)) return;
+    try {
+      setVerificationActionLoading(true);
+      setError("");
+      await adminService.verifyMentor(mentorVerification.id, "verify");
+      setSuccess("Mentor verified successfully");
+      await loadUser();
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to verify mentor");
+    } finally {
+      setVerificationActionLoading(false);
+    }
+  };
+
+  const handleRejectConfirm = async () => {
+    if (!mentorVerification) return;
+    try {
+      setVerificationActionLoading(true);
+      setError("");
+      await adminService.verifyMentor(mentorVerification.id, "reject", rejectReason || undefined);
+      setShowRejectModal(false);
+      setRejectReason("");
+      setSuccess("Mentor rejected");
+      await loadUser();
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to reject mentor");
+    } finally {
+      setVerificationActionLoading(false);
     }
   };
 
@@ -683,6 +729,59 @@ export const AdminUserDetail: React.FC = () => {
                         </div>
                       </div>
                     </div>
+
+                    {/* Verification */}
+                    {mentorVerification && (
+                      <>
+                        <hr className="my-md" />
+                        <h4 className="mb-md">Verification Status</h4>
+                        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)", flexWrap: "wrap" }}>
+                          <span
+                            className={`badge ${
+                              mentorVerification.verificationStatus === "VERIFIED"
+                                ? "badge-success"
+                                : mentorVerification.verificationStatus === "REJECTED"
+                                ? "badge-danger"
+                                : "badge-warning"
+                            }`}
+                          >
+                            {mentorVerification.verificationStatus}
+                          </span>
+                          {mentorVerification.verificationStatus !== "VERIFIED" && (
+                            <button
+                              type="button"
+                              className="btn btn-outline btn-sm"
+                              onClick={handleVerify}
+                              disabled={verificationActionLoading}
+                              style={{ color: "var(--color-success, #22c55e)" }}
+                            >
+                              Verify
+                            </button>
+                          )}
+                          {mentorVerification.verificationStatus !== "REJECTED" && (
+                            <button
+                              type="button"
+                              className="btn btn-danger btn-sm"
+                              onClick={() => { setRejectReason(""); setShowRejectModal(true); }}
+                              disabled={verificationActionLoading}
+                            >
+                              Reject
+                            </button>
+                          )}
+                        </div>
+                        {mentorVerification.verificationStatus === "REJECTED" && mentorVerification.rejectionReason && (
+                          <div
+                            style={{
+                              marginTop: "var(--space-sm)",
+                              fontSize: "var(--font-size-sm)",
+                              color: "var(--neutral-500)",
+                            }}
+                          >
+                            Reason: {mentorVerification.rejectionReason}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </>
                 )}
               </>
@@ -708,6 +807,43 @@ export const AdminUserDetail: React.FC = () => {
           </form>
         </div>
       </div>
+
+      {/* Reject Modal */}
+      {showRejectModal && (
+        <div className="view-modal-overlay" onClick={() => setShowRejectModal(false)}>
+          <div className="view-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="view-modal-header">
+              <h2>Reject {user?.firstName} {user?.lastName}</h2>
+              <button className="view-modal-close" onClick={() => setShowRejectModal(false)}>×</button>
+            </div>
+            <div className="view-modal-body">
+              <div className="form-group">
+                <label className="form-label">
+                  Rejection Reason{" "}
+                  <span style={{ color: "var(--neutral-500)", fontWeight: 400 }}>(optional — shown to the mentor)</span>
+                </label>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="e.g. Please add at least one category and skill before resubmitting."
+                />
+              </div>
+            </div>
+            <div className="view-modal-footer">
+              <button className="btn btn-outline" onClick={() => setShowRejectModal(false)}>Cancel</button>
+              <button
+                className="btn btn-danger"
+                onClick={handleRejectConfirm}
+                disabled={verificationActionLoading}
+              >
+                {verificationActionLoading ? "Rejecting..." : "Confirm Rejection"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

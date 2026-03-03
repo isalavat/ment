@@ -4,6 +4,7 @@ import { profileService } from "../../services/profileService";
 import { authService } from "../../services/authService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../i18n/LanguageContext";
+import type { VerificationStatus } from "../../types/profile";
 import "./ProfileForm.css";
 import "../admin/AdminUsers.css";
 
@@ -16,6 +17,8 @@ export const MentorProfileForm: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [mentorProfileId, setMentorProfileId] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
+  const [rejectionReason, setRejectionReason] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     bio: "",
     title: "",
@@ -84,9 +87,22 @@ export const MentorProfileForm: React.FC = () => {
           currency: userData.mentorProfile.currency,
         });
         setMentorProfileId(userData.mentorProfile.id);
-        setSelectedCategories(userData.mentorProfile.categories || []);
-        setSelectedSkills(userData.mentorProfile.skills || []);
+        const updatedCategories = userData.mentorProfile.categories || [];
+        const updatedSkills = userData.mentorProfile.skills || [];
+        setSelectedCategories(updatedCategories);
+        setSelectedSkills(updatedSkills);
+        setVerificationStatus(userData.mentorProfile.verificationStatus ?? null);
+        setRejectionReason(userData.mentorProfile.rejectionReason ?? null);
         setIsEditing(true);
+        if (user) {
+          const updatedAuthUser = {
+            ...user,
+            mentorHasSkills: updatedSkills.length > 0,
+            mentorHasCategories: updatedCategories.length > 0,
+          };
+          localStorage.setItem("user", JSON.stringify(updatedAuthUser));
+          login(updatedAuthUser);
+        }
       }
     } catch (err: any) {
       console.error("Error loading profile:", err);
@@ -172,6 +188,11 @@ export const MentorProfileForm: React.FC = () => {
 
       if (updatedProfile.skills) {
         setSelectedSkills(updatedProfile.skills);
+        if (user) {
+          const updatedAuthUser = { ...user, mentorHasSkills: updatedProfile.skills.length > 0 };
+          localStorage.setItem("user", JSON.stringify(updatedAuthUser));
+          login(updatedAuthUser);
+        }
       }
       setNewSkillName("");
       setSelectedSkillId("");
@@ -187,7 +208,13 @@ export const MentorProfileForm: React.FC = () => {
       setError(null);
       setSuccess(null);
       await profileService.removeSkillFromMentorProfile(skillId);
-      setSelectedSkills((prev) => prev.filter((s) => s.skill.id !== skillId));
+      const newSkills = selectedSkills.filter((s) => s.skill.id !== skillId);
+      setSelectedSkills(newSkills);
+      if (user) {
+        const updatedAuthUser = { ...user, mentorHasSkills: newSkills.length > 0 };
+        localStorage.setItem("user", JSON.stringify(updatedAuthUser));
+        login(updatedAuthUser);
+      }
       setSuccess(t.profile.common.skillRemoved);
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to remove skill");
@@ -218,9 +245,50 @@ export const MentorProfileForm: React.FC = () => {
 
       {success && <div className="alert alert-success mb-md">{success}</div>}
 
+      {verificationStatus === "PENDING" && (
+        <div className="alert alert-info mb-md">
+          Your mentor profile is under review. You will be notified once an admin verifies it.
+        </div>
+      )}
+      {verificationStatus === "VERIFIED" && (
+        <div className="alert alert-success mb-md">
+          Your profile is verified and will appear in search results once you set your availability.
+        </div>
+      )}
+      {verificationStatus === "REJECTED" && (
+        <div className="alert alert-danger mb-md">
+          Your profile was not approved.
+          {rejectionReason && <> Reason: <strong>{rejectionReason}</strong></>}
+          {" "}Please update your profile and contact support to request a new review.
+        </div>
+      )}
+
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit} className="admin-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Name</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
+                  readOnly
+                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Email</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={user?.email ?? ""}
+                  readOnly
+                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                />
+              </div>
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="title" className="form-label">

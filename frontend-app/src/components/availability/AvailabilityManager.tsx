@@ -19,7 +19,7 @@ const DAYS_OF_WEEK = [
 ];
 
 export const AvailabilityManager: React.FC = () => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const { t } = useLanguage();
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +65,11 @@ export const AvailabilityManager: React.FC = () => {
         user.mentorProfileId
       );
       setAvailabilities(data);
+      if (user) {
+        const updatedUser = { ...user, mentorHasAvailability: data.length > 0 };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        login(updatedUser);
+      }
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to load availabilities");
       console.error("Error loading availabilities:", err);

@@ -18,6 +18,7 @@ import { TimeSlotManager } from "./components/availability/TimeSlotManager";
 import { AdminUsers } from "./components/admin/AdminUsers";
 import { AdminCreateUser } from "./components/admin/AdminCreateUser";
 import { AdminUserDetail } from "./components/admin/AdminUserDetail";
+import { AdminMentors } from "./components/admin/AdminMentors";
 import "./App.css";
 import { Register } from "./components/auth/Register";
 
@@ -149,6 +150,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <AdminUserDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/mentors"
+            element={
+              <ProtectedRoute>
+                <AdminMentors />
               </ProtectedRoute>
             }
           />

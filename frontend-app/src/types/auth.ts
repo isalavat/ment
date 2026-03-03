@@ -10,6 +10,11 @@ export interface User {
   bio?: string | null;
   goals?: string | null;
   mentorProfileId?: string;
+  mentorVerificationStatus?: "PENDING" | "VERIFIED" | "REJECTED" | null;
+  mentorRejectionReason?: string | null;
+  mentorHasAvailability?: boolean;
+  mentorHasSkills?: boolean;
+  mentorHasCategories?: boolean;
 }
 
 export interface AuthResponse {

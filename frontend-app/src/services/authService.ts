@@ -23,6 +23,8 @@ export const authService = {
   async fetchCurrenUser(): Promise<User> {
     const response = await api.get<{ user: any }>("profiles/me");
     const userData = response.data.user;
+    const mentorProfileId = userData.mentorProfile?.id;
+
     // Extract just the user fields we need
     const user: User = {
       id: String(userData.id),
@@ -33,8 +35,22 @@ export const authService = {
       avatarUrl: userData.avatarUrl ?? null,
       bio: userData.bio ?? null,
       goals: userData.goals ?? null,
-      mentorProfileId: userData.mentorProfile?.id,
+      mentorProfileId,
+      mentorVerificationStatus: userData.mentorProfile?.verificationStatus ?? null,
+      mentorRejectionReason: userData.mentorProfile?.rejectionReason ?? null,
+      mentorHasSkills: (userData.mentorProfile?.skills?.length ?? 0) > 0,
+      mentorHasCategories: (userData.mentorProfile?.categories?.length ?? 0) > 0,
     };
+
+    if (mentorProfileId) {
+      try {
+        const availRes = await api.get<any[]>(`availability/mentor/${mentorProfileId}`);
+        user.mentorHasAvailability = availRes.data.length > 0;
+      } catch {
+        user.mentorHasAvailability = false;
+      }
+    }
+
     localStorage.setItem("user", JSON.stringify(user));
     return user;
   },
