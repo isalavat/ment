@@ -62,7 +62,7 @@ export const AvailabilityManager: React.FC = () => {
     setError("");
     try {
       const data = await availabilityService.getAvailabilitiesForMentor(
-        user.mentorProfileId
+        user.mentorProfileId,
       );
       setAvailabilities(data);
       if (user) {
@@ -130,7 +130,7 @@ export const AvailabilityManager: React.FC = () => {
     try {
       const result = await availabilityService.createWeeklySchedule(
         user.mentorProfileId,
-        schedule
+        schedule,
       );
       alert(result.message);
       setShowWeeklyForm(false);

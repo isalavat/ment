@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  adminService,
-  MentorProfileFull,
-} from "../../services/adminService";
+import { adminService, MentorProfileFull } from "../../services/adminService";
 import type { VerificationStatus } from "../../types/profile";
 import "./AdminUsers.css";
 
@@ -24,18 +21,18 @@ export const AdminMentors: React.FC = () => {
   const [mentors, setMentors] = useState<MentorProfileFull[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState<VerificationStatus | "">( "PENDING");
+  const [filter, setFilter] = useState<VerificationStatus | "">("PENDING");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [rejectTarget, setRejectTarget] = useState<MentorProfileFull | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<MentorProfileFull | null>(
+    null,
+  );
   const [rejectionReason, setRejectionReason] = useState("");
 
   const loadMentors = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
-      const data = await adminService.getMentorProfiles(
-        filter || undefined,
-      );
+      const data = await adminService.getMentorProfiles(filter || undefined);
       setMentors(data);
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to load mentors");
@@ -133,7 +130,11 @@ export const AdminMentors: React.FC = () => {
         <div className="card">
           <div
             className="card-body"
-            style={{ textAlign: "center", padding: "var(--space-xxl)", color: "var(--neutral-500)" }}
+            style={{
+              textAlign: "center",
+              padding: "var(--space-xxl)",
+              color: "var(--neutral-500)",
+            }}
           >
             No mentors with status "{filter || "any"}"
           </div>
@@ -259,11 +260,15 @@ export const AdminMentors: React.FC = () => {
 
       {/* Reject Modal */}
       {rejectTarget && (
-        <div className="view-modal-overlay" onClick={() => setRejectTarget(null)}>
+        <div
+          className="view-modal-overlay"
+          onClick={() => setRejectTarget(null)}
+        >
           <div className="view-modal" onClick={(e) => e.stopPropagation()}>
             <div className="view-modal-header">
               <h2>
-                Reject {rejectTarget.user.firstName} {rejectTarget.user.lastName}
+                Reject {rejectTarget.user.firstName}{" "}
+                {rejectTarget.user.lastName}
               </h2>
               <button
                 className="view-modal-close"
@@ -276,7 +281,9 @@ export const AdminMentors: React.FC = () => {
               <div className="form-group">
                 <label className="form-label">
                   Rejection Reason{" "}
-                  <span style={{ color: "var(--neutral-500)", fontWeight: 400 }}>
+                  <span
+                    style={{ color: "var(--neutral-500)", fontWeight: 400 }}
+                  >
                     (optional — shown to the mentor)
                   </span>
                 </label>
@@ -301,7 +308,9 @@ export const AdminMentors: React.FC = () => {
                 onClick={handleRejectConfirm}
                 disabled={actionLoading === rejectTarget.id}
               >
-                {actionLoading === rejectTarget.id ? "Rejecting..." : "Confirm Rejection"}
+                {actionLoading === rejectTarget.id
+                  ? "Rejecting..."
+                  : "Confirm Rejection"}
               </button>
             </div>
           </div>

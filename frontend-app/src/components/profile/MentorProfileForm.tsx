@@ -17,7 +17,8 @@ export const MentorProfileForm: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [mentorProfileId, setMentorProfileId] = useState<string | null>(null);
-  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus | null>(null);
+  const [verificationStatus, setVerificationStatus] =
+    useState<VerificationStatus | null>(null);
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     bio: "",
@@ -91,7 +92,9 @@ export const MentorProfileForm: React.FC = () => {
         const updatedSkills = userData.mentorProfile.skills || [];
         setSelectedCategories(updatedCategories);
         setSelectedSkills(updatedSkills);
-        setVerificationStatus(userData.mentorProfile.verificationStatus ?? null);
+        setVerificationStatus(
+          userData.mentorProfile.verificationStatus ?? null,
+        );
         setRejectionReason(userData.mentorProfile.rejectionReason ?? null);
         setIsEditing(true);
         if (user) {
@@ -136,7 +139,7 @@ export const MentorProfileForm: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData({
@@ -183,13 +186,16 @@ export const MentorProfileForm: React.FC = () => {
       setSuccess(null);
       const updatedProfile = await profileService.addSkillToMentorProfile(
         selectedSkillId,
-        newSkillName || undefined
+        newSkillName || undefined,
       );
 
       if (updatedProfile.skills) {
         setSelectedSkills(updatedProfile.skills);
         if (user) {
-          const updatedAuthUser = { ...user, mentorHasSkills: updatedProfile.skills.length > 0 };
+          const updatedAuthUser = {
+            ...user,
+            mentorHasSkills: updatedProfile.skills.length > 0,
+          };
           localStorage.setItem("user", JSON.stringify(updatedAuthUser));
           login(updatedAuthUser);
         }
@@ -211,7 +217,10 @@ export const MentorProfileForm: React.FC = () => {
       const newSkills = selectedSkills.filter((s) => s.skill.id !== skillId);
       setSelectedSkills(newSkills);
       if (user) {
-        const updatedAuthUser = { ...user, mentorHasSkills: newSkills.length > 0 };
+        const updatedAuthUser = {
+          ...user,
+          mentorHasSkills: newSkills.length > 0,
+        };
         localStorage.setItem("user", JSON.stringify(updatedAuthUser));
         login(updatedAuthUser);
       }
@@ -247,19 +256,27 @@ export const MentorProfileForm: React.FC = () => {
 
       {verificationStatus === "PENDING" && (
         <div className="alert alert-info mb-md">
-          Your mentor profile is under review. You will be notified once an admin verifies it.
+          Your mentor profile is under review. You will be notified once an
+          admin verifies it.
         </div>
       )}
       {verificationStatus === "VERIFIED" && (
         <div className="alert alert-success mb-md">
-          Your profile is verified and will appear in search results once you set your availability.
+          Your profile is verified and will appear in search results once you
+          set your availability.
         </div>
       )}
       {verificationStatus === "REJECTED" && (
         <div className="alert alert-danger mb-md">
           Your profile was not approved.
-          {rejectionReason && <> Reason: <strong>{rejectionReason}</strong></>}
-          {" "}Please update your profile and contact support to request a new review.
+          {rejectionReason && (
+            <>
+              {" "}
+              Reason: <strong>{rejectionReason}</strong>
+            </>
+          )}{" "}
+          Please update your profile and contact support to request a new
+          review.
         </div>
       )}
 
@@ -274,7 +291,10 @@ export const MentorProfileForm: React.FC = () => {
                   className="form-input"
                   value={`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
                   readOnly
-                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                  style={{
+                    background: "var(--neutral-100)",
+                    cursor: "default",
+                  }}
                 />
               </div>
               <div className="form-group">
@@ -284,7 +304,10 @@ export const MentorProfileForm: React.FC = () => {
                   className="form-input"
                   value={user?.email ?? ""}
                   readOnly
-                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                  style={{
+                    background: "var(--neutral-100)",
+                    cursor: "default",
+                  }}
                 />
               </div>
             </div>
@@ -413,11 +436,7 @@ export const MentorProfileForm: React.FC = () => {
                       <select
                         className="form-select"
                         value={selectedSkillId}
-                        onChange={(e) =>
-                          setSelectedSkillId(
-                            e.target.value 
-                          )
-                        }
+                        onChange={(e) => setSelectedSkillId(e.target.value)}
                       >
                         <option value="">{t.profile.common.selectSkill}</option>
                         {availableSkills.map((skill) => (
@@ -523,8 +542,8 @@ export const MentorProfileForm: React.FC = () => {
                           .filter(
                             (cat) =>
                               !selectedCategories.some(
-                                (sc) => sc.category.id === cat.id
-                              )
+                                (sc) => sc.category.id === cat.id,
+                              ),
                           )
                           .map((cat) => (
                             <option key={cat.id} value={cat.id}>
@@ -555,8 +574,8 @@ export const MentorProfileForm: React.FC = () => {
                 {loading
                   ? t.profile.common.saving
                   : isEditing
-                  ? t.profile.mentor.updateProfile
-                  : t.profile.mentor.createProfile}
+                    ? t.profile.mentor.updateProfile
+                    : t.profile.mentor.createProfile}
               </button>
             </div>
           </form>
