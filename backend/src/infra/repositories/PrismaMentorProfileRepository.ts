@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import type { VerificationStatus } from "../../domain/mentor/MentorProfile";
 import { MentorProfile } from "../../domain/mentor/MentorProfile";
 import type {
 	CreateMentorData,
@@ -76,8 +77,9 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 		return this.toMentorProfile(updated);
 	}
 
-	async findAllMentorProfiles(): Promise<MentorProfile[]> {
+	async findAllMentorProfiles(verificationStatus?: VerificationStatus): Promise<MentorProfile[]> {
 		const profiles = await PrismaClientGetway().mentorProfile.findMany({
+			where: verificationStatus ? { verificationStatus } : undefined,
 			include: mentorInclude,
 			orderBy: { createdAt: "desc" },
 		});
@@ -85,11 +87,28 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 	}
 
 	async findAllWithFilters(filters: MentorFilters): Promise<PaginatedMentors> {
-		const { categorySlug, skillName, minRating, minPrice, maxPrice, search, page, limit } = filters;
+		const {
+			categorySlug,
+			skillName,
+			minRating,
+			minPrice,
+			maxPrice,
+			search,
+			verificationStatus,
+			requireAvailability,
+			page,
+			limit,
+		} = filters;
 		const skip = (page - 1) * limit;
 
 		const where: Prisma.MentorProfileWhereInput = {};
 
+		if (verificationStatus) {
+			where.verificationStatus = verificationStatus;
+		}
+		if (requireAvailability) {
+			where.availabilities = { some: {} };
+		}
 		if (minRating !== undefined) {
 			where.avgRating = { gte: minRating };
 		}
@@ -134,6 +153,22 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 			page,
 			limit,
 		};
+	}
+
+	async verifyMentor(
+		mentorId: string,
+		status: "VERIFIED" | "REJECTED",
+		rejectionReason?: string,
+	): Promise<MentorProfile> {
+		const updated = await PrismaClientGetway().mentorProfile.update({
+			where: { id: mentorId },
+			data: {
+				verificationStatus: status,
+				rejectionReason: status === "REJECTED" ? (rejectionReason ?? null) : null,
+			},
+			include: mentorInclude,
+		});
+		return this.toMentorProfile(updated);
 	}
 
 	async addSkill(userId: string, skillId: string): Promise<MentorProfile> {
@@ -215,6 +250,8 @@ export class PrismaMentorRepository implements MentorProfileRepository {
 			this.toUser(fromPrisma.user),
 			fromPrisma.skills ?? [],
 			fromPrisma.categories ?? [],
+			fromPrisma.verificationStatus as VerificationStatus,
+			fromPrisma.rejectionReason ?? null,
 		);
 	}
 

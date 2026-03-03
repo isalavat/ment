@@ -87,6 +87,29 @@ export const MenteeProfileForm: React.FC = () => {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit} className="admin-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Name</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
+                  readOnly
+                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Email</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={user?.email ?? ""}
+                  readOnly
+                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                />
+              </div>
+            </div>
+
             <div className="form-group">
               <label htmlFor="bio" className="form-label">
                 {t.profile.mentee.bio}

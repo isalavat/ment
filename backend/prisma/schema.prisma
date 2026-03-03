@@ -40,6 +40,12 @@ enum SlotStatus {
   UNAVAILABLE
 }
 
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 // ---------- Auth & Core User ----------
 model User {
   id           String   @id @default(uuid(7))
@@ -76,6 +82,10 @@ model MentorProfile {
   avgRating    Float @default(0)
   totalReviews Int   @default(0)
 
+  // Verification
+  verificationStatus VerificationStatus @default(PENDING)
+  rejectionReason    String?            @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -87,6 +97,7 @@ model MentorProfile {
 
   @@index([avgRating])
   @@index([hourlyRate])
+  @@index([verificationStatus])
 }
 
 // ---------- Categories & Skills ----------

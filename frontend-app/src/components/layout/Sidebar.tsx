@@ -96,6 +96,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               <span className="nav-icon">⚙️</span>
               <span>{t.nav.admin.userManagement}</span>
             </Link>
+            <Link
+              to="/admin/mentors"
+              className="nav-item"
+              onClick={handleLinkClick}
+            >
+              <span className="nav-icon">✓</span>
+              <span>Mentor Verification</span>
+            </Link>
           </div>
         </nav>
       )}

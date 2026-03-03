@@ -1,5 +1,5 @@
 import { type Response, Router } from "express";
-import type { MentorProfile } from "../../domain/mentor/MentorProfile";
+import type { MentorProfile, VerificationStatus } from "../../domain/mentor/MentorProfile";
 import { PrismaMentorRepository } from "../../infra/repositories/PrismaMentorProfileRepository";
 import { PrismaSkillRepository } from "../../infra/repositories/PrismaSkillRepository";
 import { PrismaUserRepository } from "../../infra/repositories/PrismaUserRepository";
@@ -15,14 +15,16 @@ import { ReadMentorByUserIdUseCase } from "../../use-cases/mentor/ReadMentorByUs
 import { RemoveCategoryFromMentorUseCase } from "../../use-cases/mentor/RemoveCategoryFromMentorUseCase";
 import { RemoveSkillFromMentorUseCase } from "../../use-cases/mentor/RemoveSkillFromMentorUseCase";
 import { UpdateMentorByUserIdUseCase } from "../../use-cases/mentor/UpdateMentorByUserIdUseCase";
+import { VerifyMentorUseCase } from "../../use-cases/mentor/VerifyMentorUseCase";
 import { toMentorProfileDto } from "./dto/MentorProfileDto";
 
 export const mentorController = Router();
 mentorController.use(requireAuth, requireAdmin);
 
-mentorController.get("/mentors", async (_req: AuthedRequest, res: Response) => {
-	const readAllUsersUseCase = new ReadAllMentorsUseCase(new PrismaMentorRepository());
-	const mentorProfiles: MentorProfile[] = await readAllUsersUseCase.execute();
+mentorController.get("/mentors", async (req: AuthedRequest, res: Response) => {
+	const { verificationStatus } = req.query as Record<string, string>;
+	const useCase = new ReadAllMentorsUseCase(new PrismaMentorRepository());
+	const mentorProfiles: MentorProfile[] = await useCase.execute(verificationStatus as VerificationStatus | undefined);
 	const mentorProfileDtos = mentorProfiles.map(toMentorProfileDto);
 	return res.json({ mentorProfiles: mentorProfileDtos });
 });
@@ -38,6 +40,16 @@ mentorController.get("/mentors/:id", async (req: AuthedRequest, res: Response) =
 	const readMentorByIdUseCase = new ReadMentorByIdUseCase(new PrismaMentorRepository());
 	const mentorProfile = await readMentorByIdUseCase.execute(req.params.id);
 	if (!mentorProfile) throw new NotFoundError("Mentor not found");
+	return res.json({ mentorProfile: toMentorProfileDto(mentorProfile) });
+});
+
+mentorController.patch("/mentors/:id/verification", async (req: AuthedRequest, res: Response) => {
+	const { action, rejectionReason } = req.body;
+	if (action !== "verify" && action !== "reject") {
+		throw new BadRequestError('action must be "verify" or "reject"');
+	}
+	const useCase = new VerifyMentorUseCase(new PrismaTransaction(), new PrismaMentorRepository());
+	const mentorProfile = await useCase.execute({ mentorId: req.params.id, action, rejectionReason });
 	return res.json({ mentorProfile: toMentorProfileDto(mentorProfile) });
 });
 

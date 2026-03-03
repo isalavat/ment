@@ -1,4 +1,4 @@
-import type { MentorProfile } from "./MentorProfile";
+import type { MentorProfile, VerificationStatus } from "./MentorProfile";
 
 export type CreateMentorData = {
 	bio: string;
@@ -23,6 +23,8 @@ export type MentorFilters = {
 	minPrice?: number;
 	maxPrice?: number;
 	search?: string;
+	verificationStatus?: VerificationStatus;
+	requireAvailability?: boolean;
 	page: number;
 	limit: number;
 };
@@ -35,12 +37,13 @@ export type PaginatedMentors = {
 };
 
 export interface MentorProfileRepository {
-	findAllMentorProfiles(): Promise<MentorProfile[]>;
+	findAllMentorProfiles(verificationStatus?: VerificationStatus): Promise<MentorProfile[]>;
 	findAllWithFilters(filters: MentorFilters): Promise<PaginatedMentors>;
 	findById(id: string): Promise<MentorProfile | null>;
 	findByUserId(userId: string): Promise<MentorProfile | null>;
 	create(userId: string, data: CreateMentorData): Promise<MentorProfile>;
 	updateByUserId(userId: string, data: UpdateMentorData): Promise<MentorProfile>;
+	verifyMentor(mentorId: string, status: "VERIFIED" | "REJECTED", rejectionReason?: string): Promise<MentorProfile>;
 	addSkill(userId: string, skillId: string): Promise<MentorProfile>;
 	removeSkill(userId: string, skillId: string): Promise<void>;
 	addCategory(userId: string, categoryId: string): Promise<MentorProfile>;

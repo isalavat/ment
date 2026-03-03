@@ -8,6 +8,10 @@ export class ReadAllMentorsWithFiltersUseCase {
 	constructor(private readonly mentorRepo: MentorProfileRepository) {}
 
 	async execute(filters: MentorFilters): Promise<PaginatedMentors> {
-		return this.mentorRepo.findAllWithFilters(filters);
+		return this.mentorRepo.findAllWithFilters({
+			...filters,
+			verificationStatus: "VERIFIED",
+			requireAvailability: true,
+		});
 	}
 }

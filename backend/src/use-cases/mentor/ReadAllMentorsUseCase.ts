@@ -1,11 +1,10 @@
-import type { MentorProfile } from "../../domain/mentor/MentorProfile";
+import type { MentorProfile, VerificationStatus } from "../../domain/mentor/MentorProfile";
 import type { MentorProfileRepository } from "../../domain/mentor/MentorProfileRepository";
 
 export class ReadAllMentorsUseCase {
 	constructor(private mentorProfileRepo: MentorProfileRepository) {}
 
-	async execute(): Promise<MentorProfile[]> {
-		const mentorProfiles: MentorProfile[] = await this.mentorProfileRepo.findAllMentorProfiles();
-		return mentorProfiles;
+	async execute(verificationStatus?: VerificationStatus): Promise<MentorProfile[]> {
+		return this.mentorProfileRepo.findAllMentorProfiles(verificationStatus);
 	}
 }

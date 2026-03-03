@@ -1,3 +1,5 @@
+export type VerificationStatus = "PENDING" | "VERIFIED" | "REJECTED";
+
 export interface MentorProfile {
   id: string;
   userId: string;
@@ -8,6 +10,8 @@ export interface MentorProfile {
   currency: string;
   avgRating: number;
   totalReviews: number;
+  verificationStatus: VerificationStatus;
+  rejectionReason: string | null;
   createdAt: string;
   updatedAt: string;
   categories?: Array<{
