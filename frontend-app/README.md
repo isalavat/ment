@@ -50,6 +50,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 Create `frontend-app/.env` from `frontend-app/.env.example`.
 
 For quick test login to work, ensure:
+
 - `REACT_APP_TEST_USERS_PASSWORD` in frontend matches
 - `TEST_USERS_PASSWORD` in `backend/.env`
 

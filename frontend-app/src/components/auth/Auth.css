@@ -1,23 +1,23 @@
 .auth-btn {
-    width: 100%;
-    justify-content: center;
-    margin-top: var(--space-md);
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-md);
 }
 
 .auth-p {
-    color: var(--neutral-600);
-    font-size: var(--font-size-sm);
+  color: var(--neutral-600);
+  font-size: var(--font-size-sm);
 }
 
 .auth-text-block {
-    margin-top: var(--space-lg);
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--neutral-200);
-    text-align: center;
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--neutral-200);
+  text-align: center;
 }
 
 .auth-helper-text {
-    margin-top: var(--space-xs);
-    color: var(--neutral-600);
-    font-size: var(--font-size-xs);
+  margin-top: var(--space-xs);
+  color: var(--neutral-600);
+  font-size: var(--font-size-xs);
 }

@@ -77,7 +77,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       const slots = await bookingService.getAvailableTimeSlots(
         mentorId,
         startDate.toISOString(),
-        endDate.toISOString()
+        endDate.toISOString(),
       );
       setTimeSlots(slots);
 
@@ -116,7 +116,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     const futureSlots = await bookingService.getAvailableTimeSlots(
       mentorId,
       rangeStart.toISOString(),
-      rangeEnd.toISOString()
+      rangeEnd.toISOString(),
     );
 
     if (futureSlots.length === 0) {
@@ -342,11 +342,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           message={
             selectedSlot
               ? `Confirm booking for ${formatTime(
-                  selectedSlot.startTime
+                  selectedSlot.startTime,
                 )} - ${formatTime(selectedSlot.endTime)} on ${new Date(
-                  selectedSlot.startTime
+                  selectedSlot.startTime,
                 ).toLocaleDateString()}? Total: $${calculateAmount(
-                  selectedSlot
+                  selectedSlot,
                 )} ${currency}`
               : ""
           }
