@@ -3,10 +3,10 @@ name: Backend CI
 on:
   push:
     paths:
-      - 'backend/**' # Only triggers if files in /backend change
+      - "backend/**" # Only triggers if files in /backend change
   pull_request:
     paths:
-      - 'backend/**'
+      - "backend/**"
 
 jobs:
   code-quality:
@@ -26,4 +26,4 @@ jobs:
         with:
           version: latest
       - name: Run Biome
-        run: biome ci .
+        run: npx -y @biomejs/biome@latest ci .

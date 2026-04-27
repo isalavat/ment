@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/profileService";
 import { authService } from "../../services/authService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../i18n/LanguageContext";
 import type { VerificationStatus } from "../../types/profile";
+import { PageShell } from "../common/PageShell";
 import "./ProfileForm.css";
 import "../admin/AdminUsers.css";
 
@@ -16,7 +17,6 @@ export const MentorProfileForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [mentorProfileId, setMentorProfileId] = useState<string | null>(null);
   const [verificationStatus, setVerificationStatus] =
     useState<VerificationStatus | null>(null);
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
@@ -33,9 +33,6 @@ export const MentorProfileForm: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<
     Array<{ category: { id: string; name: string; slug: string } }>
   >([]);
-  const [availableCategories, setAvailableCategories] = useState<
-    Array<{ id: string; name: string; slug: string }>
-  >([]);
 
   const [availableSkills, setAvailableSkills] = useState<
     Array<{ id: string; name: string }>
@@ -45,27 +42,18 @@ export const MentorProfileForm: React.FC = () => {
   >([]);
   const [selectedSkillId, setSelectedSkillId] = useState<string>("");
   const [newSkillName, setNewSkillName] = useState("");
+  const onlyMentorsError = t.profile.errors.onlyMentors;
 
-  useEffect(() => {
-    if (user?.role !== "MENTOR") {
-      setError(t.profile.errors.onlyMentors);
-      return;
-    }
-    loadProfile();
-    loadCategories();
-    loadSkills();
-  }, [user]);
-
-  const loadSkills = async () => {
+  const loadSkills = useCallback(async () => {
     try {
       const { skills } = await profileService.getSkills();
       setAvailableSkills(skills);
     } catch (err) {
       console.error("Error loading skills:", err);
     }
-  };
+  }, []);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const { categories: allCategories } =
         await profileService.getCategories();
@@ -73,9 +61,9 @@ export const MentorProfileForm: React.FC = () => {
     } catch (err) {
       console.error("Error loading categories:", err);
     }
-  };
+  }, []);
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
       const { user: userData } = await profileService.getMyProfile();
@@ -87,7 +75,6 @@ export const MentorProfileForm: React.FC = () => {
           hourlyRate: userData.mentorProfile.hourlyRate,
           currency: userData.mentorProfile.currency,
         });
-        setMentorProfileId(userData.mentorProfile.id);
         const updatedCategories = userData.mentorProfile.categories || [];
         const updatedSkills = userData.mentorProfile.skills || [];
         setSelectedCategories(updatedCategories);
@@ -112,7 +99,17 @@ export const MentorProfileForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, login]);
+
+  useEffect(() => {
+    if (user?.role !== "MENTOR") {
+      setError(onlyMentorsError);
+      return;
+    }
+    void loadProfile();
+    void loadCategories();
+    void loadSkills();
+  }, [user?.role, onlyMentorsError, loadProfile, loadCategories, loadSkills]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,8 +232,9 @@ export const MentorProfileForm: React.FC = () => {
   }
 
   return (
-    <div className="content-area">
-      <div className="page-header">
+    <PageShell
+      title={isEditing ? t.profile.mentor.titleEdit : t.profile.mentor.title}
+      actions={
         <div>
           <button
             className="btn btn-outline btn-sm"
@@ -244,11 +242,9 @@ export const MentorProfileForm: React.FC = () => {
           >
             ← {t.profile.common.back}
           </button>
-          <h1 className="page-title mt-sm">
-            {isEditing ? t.profile.mentor.titleEdit : t.profile.mentor.title}
-          </h1>
         </div>
-      </div>
+      }
+    >
 
       {error && <div className="alert alert-danger mb-md">{error}</div>}
 
@@ -288,26 +284,18 @@ export const MentorProfileForm: React.FC = () => {
                 <label className="form-label">Name</label>
                 <input
                   type="text"
-                  className="form-input"
                   value={`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
                   readOnly
-                  style={{
-                    background: "var(--neutral-100)",
-                    cursor: "default",
-                  }}
+                  className="form-input profile-readonly-input"
                 />
               </div>
               <div className="form-group">
                 <label className="form-label">Email</label>
                 <input
                   type="text"
-                  className="form-input"
                   value={user?.email ?? ""}
                   readOnly
-                  style={{
-                    background: "var(--neutral-100)",
-                    cursor: "default",
-                  }}
+                  className="form-input profile-readonly-input"
                 />
               </div>
             </div>
@@ -418,12 +406,7 @@ export const MentorProfileForm: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <p
-                      style={{
-                        color: "var(--neutral-500)",
-                        fontSize: "var(--font-size-sm)",
-                      }}
-                    >
+                    <p className="profile-muted-text">
                       {t.profile.common.noSkillsYet}
                     </p>
                   )}
@@ -432,7 +415,7 @@ export const MentorProfileForm: React.FC = () => {
                 {/* Add New Skill */}
                 <div className="skill-add-form">
                   <div className="form-row">
-                    <div className="form-group" style={{ marginBottom: 0 }}>
+                    <div className="form-group form-group-no-margin">
                       <select
                         className="form-select"
                         value={selectedSkillId}
@@ -447,19 +430,13 @@ export const MentorProfileForm: React.FC = () => {
                       </select>
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "0 var(--space-md)",
-                      }}
-                    >
-                      <span style={{ color: "var(--neutral-500)" }}>
+                    <div className="profile-inline-separator">
+                      <span className="profile-muted-text">
                         {t.profile.common.orText}
                       </span>
                     </div>
 
-                    <div className="form-group" style={{ marginBottom: 0 }}>
+                    <div className="form-group form-group-no-margin">
                       <input
                         type="text"
                         className="form-input"
@@ -507,12 +484,7 @@ export const MentorProfileForm: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <p
-                      style={{
-                        color: "var(--neutral-500)",
-                        fontSize: "var(--font-size-sm)",
-                      }}
-                    >
+                    <p className="profile-muted-text">
                       {t.profile.common.noCategoriesYet}
                     </p>
                   )}
@@ -521,10 +493,7 @@ export const MentorProfileForm: React.FC = () => {
                 {/* Add Category */}
                 <div className="skill-add-form">
                   <div className="form-row">
-                    <div
-                      className="form-group"
-                      style={{ marginBottom: 0, flex: 1 }}
-                    >
+                    <div className="form-group form-group-no-margin form-group-flex">
                       <select
                         className="form-select"
                         defaultValue=""
@@ -581,6 +550,6 @@ export const MentorProfileForm: React.FC = () => {
           </form>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };

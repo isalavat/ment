@@ -197,6 +197,37 @@
   color: var(--neutral-600);
 }
 
+.profile-readonly-input {
+  background: var(--neutral-100);
+  cursor: default;
+}
+
+.profile-helper-text {
+  color: var(--neutral-500);
+  font-size: var(--font-size-sm);
+  display: block;
+  margin-top: var(--space-xs);
+}
+
+.profile-muted-text {
+  color: var(--neutral-500);
+  font-size: var(--font-size-sm);
+}
+
+.form-group-no-margin {
+  margin-bottom: 0;
+}
+
+.form-group-flex {
+  flex: 1;
+}
+
+.profile-inline-separator {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-md);
+}
+
 @media (max-width: 768px) {
   .profile-form-container {
     padding: var(--space-md);

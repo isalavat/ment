@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../services/authService";
 import { UserRole } from "../../types/auth";
-import "../../App.css";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { PlantIcon } from "../common/PlantIcon";
+import "./Auth.css";
 
 export const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,7 @@ export const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -29,7 +32,7 @@ export const Register: React.FC = () => {
     setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t.auth.register.passwordsDoNotMatch);
       return;
     }
     setLoading(true);
@@ -37,11 +40,11 @@ export const Register: React.FC = () => {
       const { confirmPassword, ...registerData } = formData;
       await authService.register(registerData);
       navigate("/login", {
-        state: { message: "Registration successful! Please login." },
+        state: { message: t.auth.register.registrationSuccess },
       });
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Registration failed. Please try again.",
+        err.response?.data?.message || t.auth.register.registrationFailed,
       );
     } finally {
       setLoading(false);
@@ -50,30 +53,18 @@ export const Register: React.FC = () => {
 
   return (
     <div className="card-container">
-      <div
-        className="card"
-        style={{ maxWidth: "480px", width: "100%", margin: "0" }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "var(--space-xl)" }}>
-          <div style={{ fontSize: "48px", marginBottom: "var(--space-md)" }}>
-            🎓
+      <div className="card w-full max-w-auth-card mx-auto auth-card">
+        <div className="auth-brand">
+          <div className="auth-brand-icon">
+            <PlantIcon size={54} className="auth-brand-icon-svg" />
           </div>
-          <h1
-            style={{
-              fontSize: "var(--font-size-xxl)",
-              marginBottom: "var(--space-xs)",
-            }}
-          >
-            Join MentorHub
-          </h1>
-          <p style={{ color: "var(--neutral-600)" }}>
-            Create your account to get started
-          </p>
+          <h1 className="auth-brand-title">{t.auth.register.title}</h1>
+          <p className="auth-brand-subtitle">{t.auth.register.subtitle}</p>
         </div>
         <form id="registerForm" onSubmit={handleSubmit}>
           <div className="grid grid-2">
             <div className="form-group">
-              <label className="form-label">First Name</label>
+              <label className="form-label">{t.auth.register.firstName}</label>
               <input
                 type="text"
                 name="firstName"
@@ -81,11 +72,11 @@ export const Register: React.FC = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                placeholder="Enter your first name"
+                placeholder={t.auth.register.firstNamePlaceholder}
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Last Name</label>
+              <label className="form-label">{t.auth.register.lastName}</label>
               <input
                 type="text"
                 name="lastName"
@@ -93,12 +84,12 @@ export const Register: React.FC = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                placeholder="Enter your last name"
+                placeholder={t.auth.register.lastNamePlaceholder}
               />
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label">{t.auth.register.email}</label>
             <input
               type="email"
               name="email"
@@ -106,12 +97,12 @@ export const Register: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              placeholder="Enter your email"
+              placeholder={t.auth.register.emailPlaceholder}
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label">{t.auth.register.password}</label>
             <input
               type="password"
               name="password"
@@ -119,12 +110,14 @@ export const Register: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Enter your password"
+              placeholder={t.auth.register.passwordPlaceholder}
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Confirm Password</label>
+            <label className="form-label">
+              {t.auth.register.confirmPassword}
+            </label>
             <input
               type="password"
               name="confirmPassword"
@@ -132,12 +125,12 @@ export const Register: React.FC = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              placeholder="Confirm your password"
+              placeholder={t.auth.register.confirmPasswordPlaceholder}
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Role</label>
+            <label className="form-label">{t.auth.register.role}</label>
             <select
               name="role"
               value={formData.role}
@@ -145,9 +138,9 @@ export const Register: React.FC = () => {
               required
               className="form-select"
             >
-              <option value="USER">Learner</option>
-              <option value="MENTOR">Mentor</option>
-              <option value="ADMIN">Admin (Temporary)</option>
+              <option value="USER">{t.auth.register.mentee}</option>
+              <option value="MENTOR">{t.auth.register.mentor}</option>
+              <option value="ADMIN">{t.auth.register.adminTemporary}</option>
             </select>
           </div>
 
@@ -158,12 +151,13 @@ export const Register: React.FC = () => {
             disabled={loading}
             className="btn btn-primary btn-lg auth-btn "
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? t.auth.register.registering : t.nav.register}
           </button>
         </form>
         <div className="auth-text-block">
           <p className="auth-p">
-            Already have an account? <Link to="/login">Login here</Link>
+            {t.auth.register.hasAccount}{" "}
+            <Link to="/login">{t.auth.register.loginHere}</Link>
           </p>
         </div>
       </div>

@@ -1,0 +1,106 @@
+:root {
+  color-scheme: light;
+
+  --font-family: "Inter", "Segoe UI", sans-serif;
+  --font-family-display: "Inter", "Segoe UI", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 0.9375rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+  --font-size-xxl: 2.25rem;
+  --line-height-tight: 1.2;
+  --line-height-base: 1.45;
+  --line-height-relaxed: 1.65;
+
+  --primary-blue: #4f7f5c;
+  --primary-blue-hover: #426b4c;
+  --secondary-blue: #a8b89f;
+  --success-green: #4f7f5c;
+  --warning-yellow: #d89b2c;
+  --danger-red: #d35c54;
+
+  --primary-50: #eef5ef;
+  --success-50: #eef6ef;
+  --warning-50: #fcf5e7;
+  --danger-50: #fcecec;
+
+  --neutral-50: #faf8f3;
+  --neutral-100: #f3efe7;
+  --neutral-150: #ebe5d9;
+  --neutral-200: #e4ddd1;
+  --neutral-300: #d2cab8;
+  --neutral-400: #b7ae9b;
+  --neutral-500: #938a79;
+  --neutral-600: #6d675b;
+  --neutral-700: #4b4a43;
+  --neutral-800: #29303a;
+  --neutral-900: #142033;
+
+  --surface-page: #f7f4ee;
+  --surface-base: #ffffff;
+  --surface-subtle: #f5f2eb;
+  --surface-elevated: #ffffff;
+  --surface-strong: #1b2740;
+
+  --border-subtle: #e8e2d7;
+  --border-strong: #d8d0c1;
+  --focus-ring: 0 0 0 3px rgba(79, 127, 92, 0.18);
+
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --motion-fast: 140ms;
+  --motion-base: 220ms;
+  --motion-slow: 340ms;
+
+  --shadow-sm: 0 2px 8px rgba(36, 42, 32, 0.05);
+  --shadow-md: 0 10px 26px rgba(36, 42, 32, 0.08);
+  --shadow-lg: 0 16px 32px rgba(36, 42, 32, 0.12);
+
+  --sidebar-width: 240px;
+  --header-height: 78px;
+  --content-max-width: 1100px;
+  --content-max-width-wide: 1180px;
+  --mobile-nav-height: 78px;
+
+  --z-header: 50;
+  --z-sidebar: 100;
+  --z-mobile-toggle: 110;
+  --z-overlay: 130;
+  --z-modal: 150;
+}
+
+:root[data-density="compact"] {
+  --space-md: 12px;
+  --space-lg: 18px;
+  --space-xl: 26px;
+}
+
+:root[data-radius="rounded"] {
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+:root[data-motion="reduced"] {
+  --motion-fast: 0ms;
+  --motion-base: 0ms;
+  --motion-slow: 0ms;
+}
+
+:root[data-card="flat"] {
+  --shadow-sm: 0 0 0 rgba(0, 0, 0, 0);
+  --shadow-md: 0 0 0 rgba(0, 0, 0, 0);
+}

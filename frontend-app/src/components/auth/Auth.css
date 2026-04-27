@@ -1,17 +1,35 @@
 .auth-btn {
-    width: 100%;
-    justify-content: center;
-    margin-top: var(--space-md);
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-md);
+}
+
+/* ── Dev quick-login panel (non-production only) ── */
+.dev-login-panel {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background: #fffbeb;
+  border: 1px dashed #f59e0b;
+  border-radius: var(--radius-md);
+}
+
+.dev-login-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
 }
 
 .auth-p {
-    color: var(--neutral-600);
-    font-size: var(--font-size-sm);
+  color: var(--neutral-600);
+  font-size: var(--font-size-sm);
 }
 
 .auth-text-block {
-    margin-top: var(--space-lg);
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--neutral-200);
-    text-align: center;
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--neutral-200);
+  text-align: center;
 }

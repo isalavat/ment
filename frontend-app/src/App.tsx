@@ -1,9 +1,21 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import "./App.css";
+import "./styles/tokens.css";
+import "./styles/layout.css";
+import "./styles/utilities.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import { Sidebar } from "./components/layout/Sidebar";
 import { Header } from "./components/layout/Header";
+import { MobileBottomNav } from "./components/layout/MobileBottomNav";
+import { LanguageSwitcher } from "./components/language/LanguageSwitcher";
 import { Login } from "./components/auth/Login";
 import { Dashboard } from "./components/dashboard/Dashboard";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
@@ -19,11 +31,13 @@ import { AdminUsers } from "./components/admin/AdminUsers";
 import { AdminCreateUser } from "./components/admin/AdminCreateUser";
 import { AdminUserDetail } from "./components/admin/AdminUserDetail";
 import { AdminMentors } from "./components/admin/AdminMentors";
-import "./App.css";
 import { Register } from "./components/auth/Register";
+import { HomePage } from "./components/home/HomePage";
+import { UIProvider } from "./contexts/UIContext";
 
 function AppContent() {
   const { user } = useAuth();
+  const location = useLocation();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const toggleMobileSidebar = () => {
@@ -34,8 +48,18 @@ function AppContent() {
     setIsMobileSidebarOpen(false);
   };
 
+  const appLayoutClassName = user
+    ? "app-layout app-layout-shell"
+    : "app-layout app-layout-auth";
+  const mainContentClassName = user
+    ? "main-content main-content-shell"
+    : "main-content main-content-auth";
+  const showAuthLanguageSwitcher =
+    !user &&
+    (location.pathname === "/login" || location.pathname === "/register");
+
   return (
-    <div className="app-layout">
+    <div className={appLayoutClassName}>
       {user && (
         <>
           <Sidebar isOpen={isMobileSidebarOpen} onClose={closeMobileSidebar} />
@@ -47,10 +71,18 @@ function AppContent() {
           )}
         </>
       )}
-      <div className="main-content">
+      <div className={mainContentClassName}>
         {user && <Header onMenuToggle={toggleMobileSidebar} />}
+        {showAuthLanguageSwitcher && (
+          <div className="auth-language-switcher">
+            <LanguageSwitcher />
+          </div>
+        )}
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route
+            path="/"
+            element={user ? <Navigate to="/dashboard" replace /> : <HomePage />}
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route
@@ -162,6 +194,7 @@ function AppContent() {
             }
           />
         </Routes>
+        {user && <MobileBottomNav />}
       </div>
     </div>
   );
@@ -171,9 +204,11 @@ function App() {
   return (
     <BrowserRouter>
       <LanguageProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
+        <UIProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </UIProvider>
       </LanguageProvider>
     </BrowserRouter>
   );

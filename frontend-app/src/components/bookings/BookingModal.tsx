@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { CalendarRange, Clock3, Sparkles, Ticket, X } from "lucide-react";
 import { bookingService } from "../../services/bookingService";
 import { TimeSlot } from "../../types/booking";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -56,13 +57,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     setSelectedDate(formattedDate);
   }, []);
 
-  useEffect(() => {
-    if (selectedDate) {
-      fetchTimeSlots();
-    }
-  }, [selectedDate, mentorId]);
-
-  const fetchTimeSlots = async () => {
+  const fetchTimeSlots = useCallback(async () => {
+    if (!selectedDate) return;
     setLoading(true);
     setError("");
     try {
@@ -75,22 +71,28 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       const slots = await bookingService.getAvailableTimeSlots(
         mentorId,
         startDate.toISOString(),
-        endDate.toISOString()
+        endDate.toISOString(),
       );
       setTimeSlots(slots);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to load time slots");
+      setError(err.response?.data?.error || t.bookings.errors.loadSlotsFailed);
       console.error("Error loading time slots:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [mentorId, selectedDate, t.bookings.errors.loadSlotsFailed]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      void fetchTimeSlots();
+    }
+  }, [selectedDate, fetchTimeSlots]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedSlot) {
-      setError("Please select a time slot");
+      setError(t.bookings.errors.selectTimeSlot);
       return;
     }
 
@@ -114,7 +116,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to create booking");
+      setError(err.response?.data?.error || t.bookings.errors.createFailed);
       console.error("Error creating booking:", err);
     } finally {
       setSubmitting(false);
@@ -157,25 +159,34 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">Book a Session</h2>
+          <div>
+            <h2 className="modal-title">{t.mentors.detail.bookSession}</h2>
+            <p className="modal-subtitle">{t.bookings.chooseDatePickSlot}</p>
+          </div>
           <button className="modal-close" onClick={onClose}>
-            ×
+            <X size={18} />
           </button>
         </div>
 
         <div className="modal-body">
           {/* Mentor Info */}
           <div className="booking-mentor-info">
-            <h3>{mentorName}</h3>
-            <p>{mentorTitle}</p>
+            <div className="booking-mentor-info-copy">
+              <span className="booking-modal-kicker">
+                <Sparkles size={15} />
+                {t.bookings.sessionWithKicker}
+              </span>
+              <h3>{mentorName}</h3>
+              <p>{mentorTitle}</p>
+            </div>
             <p className="booking-rate">
-              ${hourlyRate} <span>/ hour</span>
+              ${hourlyRate} <span>{t.mentors.detail.perHour}</span>
             </p>
           </div>
 
           {/* Date Selection */}
           <div className="form-group">
-            <label className="form-label">Select Date</label>
+            <label className="form-label">{t.bookings.selectDate}</label>
             <input
               type="date"
               className="form-input"
@@ -189,21 +200,21 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           {/* Time Slots */}
           <div className="form-group">
             <label className="form-label">
-              Available Time Slots
+              {t.bookings.availableTimeSlots}
               {timeSlots.length > 0 && (
                 <span className="slots-count">
-                  {" "}
-                  ({timeSlots.length} available)
+                  {` (${timeSlots.length} ${t.bookings.slotsAvailable})`}
                 </span>
               )}
             </label>
 
             {loading ? (
-              <div className="booking-loading">Loading available slots...</div>
+              <div className="booking-loading">
+                {t.bookings.loadingAvailableSlots}
+              </div>
             ) : timeSlots.length === 0 ? (
               <div className="booking-empty">
-                No available time slots for this date. Please select another
-                date.
+                {t.bookings.noTimeSlotsForDate}
               </div>
             ) : (
               <div className="time-slots-grid">
@@ -220,7 +231,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                     </div>
                     <div className="time-slot-duration">
-                      {getSlotDuration(slot)} min
+                      {getSlotDuration(slot)} {t.bookings.minutes}
                     </div>
                     <div className="time-slot-price">
                       ${calculateAmount(slot)}
@@ -233,10 +244,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
           {/* Notes */}
           <div className="form-group">
-            <label className="form-label">Notes (Optional)</label>
+            <label className="form-label">{t.bookings.notesOptional}</label>
             <textarea
               className="form-textarea"
-              placeholder="What would you like to discuss in this session?"
+              placeholder={t.bookings.notesPlaceholder}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
@@ -246,26 +257,34 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           {/* Summary */}
           {selectedSlot && (
             <div className="booking-summary">
-              <h4>Booking Summary</h4>
+              <h4>{t.bookings.bookingSummary}</h4>
               <div className="summary-row">
-                <span>Date:</span>
+                <span>
+                  <CalendarRange size={15} /> {t.dashboard.date}
+                </span>
                 <span>
                   {new Date(selectedSlot.startTime).toLocaleDateString()}
                 </span>
               </div>
               <div className="summary-row">
-                <span>Time:</span>
+                <span>
+                  <Clock3 size={15} /> {t.bookings.time}
+                </span>
                 <span>
                   {formatTime(selectedSlot.startTime)} -{" "}
                   {formatTime(selectedSlot.endTime)}
                 </span>
               </div>
               <div className="summary-row">
-                <span>Duration:</span>
-                <span>{getSlotDuration(selectedSlot)} minutes</span>
+                <span>
+                  <Ticket size={15} /> {t.bookings.duration}
+                </span>
+                <span>
+                  {getSlotDuration(selectedSlot)} {t.bookings.minutes}
+                </span>
               </div>
               <div className="summary-row summary-total">
-                <span>Total Amount:</span>
+                <span>{t.bookings.totalAmountLabel}</span>
                 <span>
                   ${calculateAmount(selectedSlot)} {currency}
                 </span>
@@ -283,7 +302,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             onClick={onClose}
             disabled={submitting}
           >
-            Cancel
+            {t.common.cancel}
           </button>
           <button
             type="button"
@@ -291,27 +310,29 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             onClick={handleSubmit}
             disabled={!selectedSlot || submitting}
           >
-            {submitting ? "Booking..." : "Confirm Booking"}
+            {submitting
+              ? t.bookings.bookingInProgress
+              : t.bookings.confirmBooking}
           </button>
         </div>
 
         {/* Confirmation Dialog */}
         <ConfirmDialog
           isOpen={showConfirm}
-          title="Confirm Booking"
+          title={t.bookings.confirmBooking}
           message={
             selectedSlot
-              ? `Confirm booking for ${formatTime(
-                  selectedSlot.startTime
+              ? `${t.bookings.confirmBookingPrompt} ${formatTime(
+                  selectedSlot.startTime,
                 )} - ${formatTime(selectedSlot.endTime)} on ${new Date(
-                  selectedSlot.startTime
-                ).toLocaleDateString()}? Total: $${calculateAmount(
-                  selectedSlot
+                  selectedSlot.startTime,
+                ).toLocaleDateString()} ${t.bookings.totalLabel} $${calculateAmount(
+                  selectedSlot,
                 )} ${currency}`
               : ""
           }
           type="success"
-          confirmText="Book Now"
+          confirmText={t.bookings.bookNow}
           onConfirm={confirmBooking}
           onCancel={() => setShowConfirm(false)}
         />

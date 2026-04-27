@@ -4,6 +4,7 @@ import { profileService } from "../../services/profileService";
 import { authService } from "../../services/authService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { PageShell } from "../common/PageShell";
 import "./ProfileForm.css";
 import "../admin/AdminUsers.css";
 
@@ -65,12 +66,13 @@ export const MenteeProfileForm: React.FC = () => {
   };
 
   if (loading && !formData.bio) {
-    return <div className="loading-container">Loading...</div>;
+    return <div className="loading-container">{t.common.loading}</div>;
   }
 
   return (
-    <div className="content-area">
-      <div className="page-header">
+    <PageShell
+      title={t.profile.mentee.titleEdit}
+      actions={
         <div>
           <button
             className="btn btn-outline btn-sm"
@@ -78,10 +80,9 @@ export const MenteeProfileForm: React.FC = () => {
           >
             ← {t.profile.common.back}
           </button>
-          <h1 className="page-title mt-sm">{t.profile.mentee.titleEdit}</h1>
         </div>
-      </div>
-
+      }
+    >
       {error && <div className="alert alert-danger mb-md">{error}</div>}
 
       <div className="card">
@@ -89,23 +90,21 @@ export const MenteeProfileForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="admin-form">
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Name</label>
+                <label className="form-label">{t.common.name}</label>
                 <input
                   type="text"
-                  className="form-input"
                   value={`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
                   readOnly
-                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                  className="form-input profile-readonly-input"
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Email</label>
+                <label className="form-label">{t.common.email}</label>
                 <input
                   type="text"
-                  className="form-input"
                   value={user?.email ?? ""}
                   readOnly
-                  style={{ background: "var(--neutral-100)", cursor: "default" }}
+                  className="form-input profile-readonly-input"
                 />
               </div>
             </div>
@@ -123,14 +122,7 @@ export const MenteeProfileForm: React.FC = () => {
                 className="form-textarea"
                 placeholder={t.profile.mentee.bioPlaceholder}
               />
-              <small
-                style={{
-                  color: "var(--neutral-500)",
-                  fontSize: "var(--font-size-sm)",
-                  display: "block",
-                  marginTop: "var(--space-xs)",
-                }}
-              >
+              <small className="profile-helper-text">
                 {t.profile.mentee.bioHelper}
               </small>
             </div>
@@ -148,14 +140,7 @@ export const MenteeProfileForm: React.FC = () => {
                 className="form-textarea"
                 placeholder={t.profile.mentee.goalsPlaceholder}
               />
-              <small
-                style={{
-                  color: "var(--neutral-500)",
-                  fontSize: "var(--font-size-sm)",
-                  display: "block",
-                  marginTop: "var(--space-xs)",
-                }}
-              >
+              <small className="profile-helper-text">
                 {t.profile.mentee.goalsHelper}
               </small>
             </div>
@@ -182,6 +167,6 @@ export const MenteeProfileForm: React.FC = () => {
           </form>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };

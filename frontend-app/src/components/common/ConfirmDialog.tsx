@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./ConfirmDialog.css";
 
 interface ConfirmDialogProps {
@@ -16,12 +17,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isOpen,
   title,
   message,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
   type = "warning",
 }) => {
+  const { t } = useLanguage();
+  const resolvedConfirmText = confirmText ?? t.common.confirm;
+  const resolvedCancelText = cancelText ?? t.common.cancel;
+
   if (!isOpen) return null;
 
   return (
@@ -35,7 +40,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
         <div className="confirm-dialog-footer">
           <button className="btn btn-outline" onClick={onCancel}>
-            {cancelText}
+            {resolvedCancelText}
           </button>
           <button
             className={`btn ${
@@ -46,7 +51,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               onCancel();
             }}
           >
-            {confirmText}
+            {resolvedConfirmText}
           </button>
         </div>
       </div>

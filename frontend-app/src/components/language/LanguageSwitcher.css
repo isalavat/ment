@@ -4,21 +4,29 @@
 }
 
 .language-select {
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--neutral-300);
-  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
   font-size: var(--font-size-sm);
-  background: white;
+  background: var(--surface-base);
+  color: var(--neutral-700);
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
 }
 
 .language-select:hover {
-  border-color: var(--primary-blue);
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
 }
 
 .language-select:focus {
   outline: none;
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 1px var(--primary-blue);
+  box-shadow: var(--focus-ring);
+}
+
+.language-select option {
+  color: var(--neutral-900);
 }

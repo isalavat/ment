@@ -1,4 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  CalendarRange,
+  Clock3,
+  Link2,
+  Mail,
+  NotebookPen,
+  Receipt,
+  Sparkles,
+  Video,
+} from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -6,6 +16,7 @@ import { bookingService } from "../../services/bookingService";
 import { Booking } from "../../types/booking";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { AlertDialog } from "../common/AlertDialog";
+import { PageShell } from "../common/PageShell";
 import "./Bookings.css";
 
 export const BookingDetail: React.FC = () => {
@@ -46,11 +57,7 @@ export const BookingDetail: React.FC = () => {
 
   const isMentor = user?.role === "MENTOR" || !!user?.mentorProfileId;
 
-  useEffect(() => {
-    fetchBooking();
-  }, [id]);
-
-  const fetchBooking = async () => {
+  const fetchBooking = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -59,20 +66,24 @@ export const BookingDetail: React.FC = () => {
       setBooking(data);
       setError("");
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to load booking");
+      setError(err.response?.data?.error || t.bookings.errors.loadDetailFailed);
       console.error("Error fetching booking:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, t.bookings.errors.loadDetailFailed]);
+
+  useEffect(() => {
+    void fetchBooking();
+  }, [fetchBooking]);
 
   const handleConfirmBooking = () => {
     if (!booking || !user?.mentorProfileId) return;
 
     setConfirmDialog({
       isOpen: true,
-      title: "Confirm Booking",
-      message: "Are you sure you want to confirm this booking session?",
+      title: t.bookings.confirmBooking,
+      message: t.bookings.confirmBookingMessage,
       type: "success",
       onConfirm: async () => {
         try {
@@ -83,15 +94,16 @@ export const BookingDetail: React.FC = () => {
           fetchBooking();
           setAlertDialog({
             isOpen: true,
-            title: "Success",
-            message: "Booking confirmed successfully!",
+            title: t.common.success,
+            message: t.bookings.bookingConfirmed,
             type: "success",
           });
         } catch (err: any) {
           setAlertDialog({
             isOpen: true,
-            title: "Error",
-            message: err.response?.data?.error || "Failed to confirm booking",
+            title: t.common.error,
+            message:
+              err.response?.data?.error || t.bookings.errors.confirmFailed,
             type: "danger",
           });
           console.error("Error confirming booking:", err);
@@ -105,9 +117,8 @@ export const BookingDetail: React.FC = () => {
 
     setConfirmDialog({
       isOpen: true,
-      title: "Cancel Booking",
-      message:
-        "Are you sure you want to cancel this booking? This action cannot be undone.",
+      title: t.bookings.cancelBooking,
+      message: t.bookings.cancelBookingMessage,
       type: "danger",
       onConfirm: async () => {
         try {
@@ -122,15 +133,16 @@ export const BookingDetail: React.FC = () => {
           fetchBooking();
           setAlertDialog({
             isOpen: true,
-            title: "Cancelled",
-            message: "Booking cancelled successfully",
+            title: t.bookings.cancelled,
+            message: t.bookings.bookingCancelled,
             type: "info",
           });
         } catch (err: any) {
           setAlertDialog({
             isOpen: true,
-            title: "Error",
-            message: err.response?.data?.error || "Failed to cancel booking",
+            title: t.common.error,
+            message:
+              err.response?.data?.error || t.bookings.errors.cancelFailed,
             type: "danger",
           });
           console.error("Error cancelling booking:", err);
@@ -153,15 +165,16 @@ export const BookingDetail: React.FC = () => {
       fetchBooking();
       setAlertDialog({
         isOpen: true,
-        title: "Success",
-        message: "Meeting link updated successfully!",
+        title: t.common.success,
+        message: t.bookings.meetingLinkUpdated,
         type: "success",
       });
     } catch (err: any) {
       setAlertDialog({
         isOpen: true,
-        title: "Error",
-        message: err.response?.data?.error || "Failed to update meeting link",
+        title: t.common.error,
+        message:
+          err.response?.data?.error || t.bookings.errors.updateLinkFailed,
         type: "danger",
       });
       console.error("Error updating meeting link:", err);
@@ -173,9 +186,8 @@ export const BookingDetail: React.FC = () => {
 
     setConfirmDialog({
       isOpen: true,
-      title: "Complete Session",
-      message:
-        "Mark this session as completed? This confirms that the session has finished.",
+      title: t.bookings.completeSession,
+      message: t.bookings.completeSessionMessage,
       type: "success",
       onConfirm: async () => {
         try {
@@ -183,15 +195,16 @@ export const BookingDetail: React.FC = () => {
           fetchBooking();
           setAlertDialog({
             isOpen: true,
-            title: "Success",
-            message: "Session marked as completed!",
+            title: t.common.success,
+            message: t.bookings.sessionCompleted,
             type: "success",
           });
         } catch (err: any) {
           setAlertDialog({
             isOpen: true,
-            title: "Error",
-            message: err.response?.data?.error || "Failed to complete booking",
+            title: t.common.error,
+            message:
+              err.response?.data?.error || t.bookings.errors.completeFailed,
             type: "danger",
           });
           console.error("Error completing booking:", err);
@@ -242,15 +255,19 @@ export const BookingDetail: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "CONFIRMED":
-        return "Confirmed";
+        return t.dashboard.confirmed;
       case "PENDING":
-        return "Pending";
+        return t.dashboard.pending;
       case "COMPLETED":
-        return "Completed";
+        return t.dashboard.completed;
       case "CANCELLED_BY_USER":
-        return isMentor ? "Cancelled by User" : "Cancelled by You";
+        return isMentor
+          ? t.bookings.status.cancelledByUser
+          : t.bookings.status.cancelledByYou;
       case "CANCELLED_BY_MENTOR":
-        return isMentor ? "Cancelled by You" : "Cancelled by Mentor";
+        return isMentor
+          ? t.bookings.status.cancelledByYou
+          : t.bookings.status.cancelledByMentor;
       default:
         return status;
     }
@@ -277,83 +294,56 @@ export const BookingDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="content-area">
-        <div
-          style={{
-            textAlign: "center",
-            padding: "var(--space-xl)",
-            color: "var(--neutral-600)",
-          }}
-        >
-          Loading booking details...
+      <PageShell title={t.nav.bookings} subtitle={t.bookings.bookingDetails}>
+        <div className="bookings-loading">
+          {t.bookings.loadingBookingDetails}
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   if (error || !booking) {
     return (
-      <div className="content-area">
-        <div
-          style={{
-            padding: "var(--space-md)",
-            background: "var(--danger-50)",
-            color: "var(--danger-700)",
-            borderRadius: "var(--radius-md)",
-            marginBottom: "var(--space-md)",
-          }}
-        >
-          {error || "Booking not found"}
+      <PageShell title={t.nav.bookings} subtitle={t.bookings.bookingDetails}>
+        <div className="bookings-error">
+          {error || t.bookings.bookingNotFound}
         </div>
         <button
           className="btn btn-outline"
           onClick={() => navigate("/bookings")}
         >
-          ← Back to Bookings
+          ← {t.bookings.backToBookings}
         </button>
-      </div>
+      </PageShell>
     );
   }
 
-  const otherPerson = isMentor ? booking.mentee : booking.mentor;
   const otherPersonName = isMentor
     ? `${booking.mentee?.firstName || ""} ${booking.mentee?.lastName || ""}`
     : `${booking.mentor?.user?.firstName || ""} ${booking.mentor?.user?.lastName || ""}`;
 
   return (
-    <div className="content-area">
+    <PageShell
+      title={t.nav.bookings}
+      subtitle={t.bookings.bookingDetails}
+      eyebrow={t.bookings.sessionDetail}
+      className="booking-detail-page"
+    >
       {/* Back Button */}
-      <div style={{ marginBottom: "var(--space-md)" }}>
+      <div className="booking-detail-back-row">
         <button
           className="btn btn-outline"
           onClick={() => navigate("/bookings")}
         >
-          ← Back to Bookings
+          ← {t.bookings.backToBookings}
         </button>
       </div>
 
       {/* Header Card */}
-      <div className="card">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "start",
-            flexWrap: "wrap",
-            gap: "var(--space-md)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "var(--space-md)",
-              alignItems: "center",
-            }}
-          >
-            <div
-              className="mentor-avatar"
-              style={{ width: "80px", height: "80px", fontSize: "24px" }}
-            >
+      <div className="card booking-detail-hero-card">
+        <div className="booking-detail-header">
+          <div className="booking-detail-main">
+            <div className="mentor-avatar booking-detail-avatar">
               {getInitials(
                 isMentor
                   ? booking.mentee?.firstName
@@ -364,88 +354,69 @@ export const BookingDetail: React.FC = () => {
               )}
             </div>
             <div>
-              <h1
-                style={{
-                  fontSize: "var(--font-size-xxl)",
-                  marginBottom: "var(--space-xs)",
-                }}
-              >
-                {isMentor ? "Session with " : "Mentorship Session"}
+              <h1 className="booking-detail-title">
+                {isMentor
+                  ? `${t.bookings.sessionWith} `
+                  : t.bookings.mentorshipSession}
                 {isMentor ? otherPersonName : ""}
               </h1>
-              <p
-                style={{
-                  fontSize: "var(--font-size-lg)",
-                  color: "var(--neutral-600)",
-                }}
-              >
-                {isMentor ? booking.mentee?.email : `with ${otherPersonName}`}
+              <p className="booking-detail-subtitle">
+                {isMentor
+                  ? booking.mentee?.email
+                  : `${t.bookings.with} ${otherPersonName}`}
               </p>
               {!isMentor && booking.mentor?.title && (
-                <p
-                  style={{
-                    fontSize: "var(--font-size-md)",
-                    color: "var(--neutral-500)",
-                  }}
-                >
+                <p className="booking-detail-mentor-title">
                   {booking.mentor.title}
                 </p>
               )}
+              <div className="booking-detail-hero-meta">
+                <span className="booking-detail-hero-chip">
+                  <Sparkles size={14} />
+                  {booking.timeSlot && formatDate(booking.timeSlot.startTime)}
+                </span>
+                <span className="booking-detail-hero-chip booking-detail-hero-chip-muted">
+                  <Mail size={14} />
+                  {isMentor
+                    ? booking.mentee?.email
+                    : booking.mentor?.user?.email}
+                </span>
+              </div>
             </div>
           </div>
           <span
-            className={`badge ${getStatusBadgeClass(booking.status)}`}
-            style={{
-              fontSize: "var(--font-size-lg)",
-              padding: "var(--space-sm) var(--space-md)",
-            }}
+            className={`badge booking-detail-status ${getStatusBadgeClass(booking.status)}`}
           >
             {getStatusText(booking.status)}
           </span>
         </div>
       </div>
 
-      <div className="grid grid-3">
-        <div style={{ gridColumn: "span 2" }}>
+      <div className="booking-detail-grid">
+        <div className="booking-detail-main-column">
           {/* Session Details Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Session Details</h2>
+              <h2 className="card-title">{t.bookings.sessionDetails}</h2>
             </div>
             <div className="card-body">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "var(--space-lg)",
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      marginBottom: "var(--space-xs)",
-                      color: "var(--neutral-700)",
-                    }}
-                  >
-                    📅 Date
+              <div className="booking-detail-section-list">
+                <div className="booking-detail-info-card">
+                  <div className="booking-detail-info-label">
+                    <CalendarRange size={16} />
+                    {t.dashboard.date}
                   </div>
-                  <div style={{ fontSize: "var(--font-size-lg)" }}>
+                  <div className="booking-detail-info-value">
                     {booking.timeSlot && formatDate(booking.timeSlot.startTime)}
                   </div>
                 </div>
 
-                <div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      marginBottom: "var(--space-xs)",
-                      color: "var(--neutral-700)",
-                    }}
-                  >
-                    🕐 Time
+                <div className="booking-detail-info-card">
+                  <div className="booking-detail-info-label">
+                    <Clock3 size={16} />
+                    {t.bookings.time}
                   </div>
-                  <div style={{ fontSize: "var(--font-size-lg)" }}>
+                  <div className="booking-detail-info-value">
                     {booking.timeSlot &&
                       `${formatTime(booking.timeSlot.startTime)} - ${formatTime(
                         booking.timeSlot.endTime,
@@ -453,61 +424,33 @@ export const BookingDetail: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      marginBottom: "var(--space-xs)",
-                      color: "var(--neutral-700)",
-                    }}
-                  >
-                    ⏱️ Duration
+                <div className="booking-detail-info-card">
+                  <div className="booking-detail-info-label">
+                    <Video size={16} />
+                    {t.bookings.duration}
                   </div>
-                  <div style={{ fontSize: "var(--font-size-lg)" }}>
-                    {booking.duration} minutes
+                  <div className="booking-detail-info-value">
+                    {booking.duration} {t.bookings.minutes}
                   </div>
                 </div>
 
-                <div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      marginBottom: "var(--space-xs)",
-                      color: "var(--neutral-700)",
-                    }}
-                  >
-                    💰 Total Amount
+                <div className="booking-detail-info-card booking-detail-info-card-accent">
+                  <div className="booking-detail-info-label">
+                    <Receipt size={16} />
+                    {t.bookings.totalAmount}
                   </div>
-                  <div
-                    style={{
-                      fontSize: "var(--font-size-xl)",
-                      fontWeight: 600,
-                      color: "var(--primary-blue)",
-                    }}
-                  >
+                  <div className="booking-detail-info-value booking-detail-amount-value">
                     ${booking.totalAmount} {booking.currency}
                   </div>
                 </div>
 
                 {booking.notes && (
-                  <div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        marginBottom: "var(--space-xs)",
-                        color: "var(--neutral-700)",
-                      }}
-                    >
-                      📝 Notes
+                  <div className="booking-detail-notes-card">
+                    <div className="booking-detail-info-label">
+                      <NotebookPen size={16} />
+                      {t.bookings.notes}
                     </div>
-                    <div
-                      style={{
-                        padding: "var(--space-md)",
-                        background: "var(--neutral-50)",
-                        borderRadius: "var(--radius-sm)",
-                        lineHeight: 1.6,
-                      }}
-                    >
+                    <div className="booking-detail-notes-copy">
                       {booking.notes}
                     </div>
                   </div>
@@ -519,43 +462,42 @@ export const BookingDetail: React.FC = () => {
           {/* Meeting Link Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Meeting Link</h2>
+              <h2 className="card-title">{t.bookings.meetingLink}</h2>
             </div>
             <div className="card-body">
               {booking.meetingLink ? (
-                <div>
-                  <div
-                    style={{
-                      padding: "var(--space-md)",
-                      background: "var(--neutral-50)",
-                      borderRadius: "var(--radius-sm)",
-                      marginBottom: "var(--space-md)",
-                      wordBreak: "break-all",
-                    }}
-                  >
+                <div className="booking-detail-link-panel">
+                  <div className="booking-detail-link-box">
+                    <span className="booking-detail-link-icon">
+                      <Link2 size={16} />
+                    </span>
                     {booking.meetingLink}
                   </div>
-                  {canJoinMeeting() && (
-                    <button
-                      className="btn btn-success"
-                      onClick={() => window.open(booking.meetingLink, "_blank")}
-                      style={{ marginRight: "var(--space-sm)" }}
-                    >
-                      Join Meeting
-                    </button>
-                  )}
-                  {isMentor &&
-                    (booking.status === "PENDING" ||
-                      booking.status === "CONFIRMED") && (
+                  <div className="booking-detail-link-actions">
+                    {canJoinMeeting() && (
                       <button
-                        className="btn btn-outline"
+                        className="btn btn-success"
                         onClick={() =>
-                          setShowMeetingLinkForm(!showMeetingLinkForm)
+                          window.open(booking.meetingLink, "_blank")
                         }
                       >
-                        Update Link
+                        <Video size={16} />
+                        {t.bookings.joinMeeting}
                       </button>
                     )}
+                    {isMentor &&
+                      (booking.status === "PENDING" ||
+                        booking.status === "CONFIRMED") && (
+                        <button
+                          className="btn btn-outline"
+                          onClick={() =>
+                            setShowMeetingLinkForm(!showMeetingLinkForm)
+                          }
+                        >
+                          {t.bookings.updateLink}
+                        </button>
+                      )}
+                  </div>
                 </div>
               ) : (
                 <div>
@@ -564,52 +506,45 @@ export const BookingDetail: React.FC = () => {
                     booking.status === "CONFIRMED") ? (
                     showMeetingLinkForm ? (
                       <form onSubmit={handleUpdateMeetingLink}>
-                        <div style={{ marginBottom: "var(--space-md)" }}>
+                        <div className="booking-detail-form-row">
                           <input
                             type="url"
-                            className="input"
+                            className="form-input"
                             placeholder="https://zoom.us/j/..."
                             value={meetingLink}
                             onChange={(e) => setMeetingLink(e.target.value)}
                             required
                           />
                         </div>
-                        <button
-                          type="submit"
-                          className="btn btn-primary"
-                          style={{ marginRight: "var(--space-sm)" }}
-                        >
-                          Save Link
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-outline"
-                          onClick={() => setShowMeetingLinkForm(false)}
-                        >
-                          Cancel
-                        </button>
+                        <div className="booking-detail-form-actions">
+                          <button type="submit" className="btn btn-primary">
+                            {t.bookings.saveMeetingLink}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-outline"
+                            onClick={() => setShowMeetingLinkForm(false)}
+                          >
+                            {t.common.cancel}
+                          </button>
+                        </div>
                       </form>
                     ) : (
                       <div>
-                        <p
-                          style={{
-                            color: "var(--neutral-600)",
-                            marginBottom: "var(--space-md)",
-                          }}
-                        >
-                          No meeting link set yet
+                        <p className="booking-detail-empty-copy">
+                          {t.bookings.noMeetingLink}
                         </p>
                         <button
                           className="btn btn-primary"
                           onClick={() => setShowMeetingLinkForm(true)}
                         >
-                          Add Meeting Link
+                          {t.bookings.addMeetingLink}
                         </button>
                       </div>
                     )
                   ) : (
-                    <p style={{ color: "var(--neutral-600)" }}>
-                      Meeting link not available yet
+                    <p className="text-subtle">
+                      {t.bookings.meetingLinkNotAvailable}
                     </p>
                   )}
                 </div>
@@ -619,27 +554,20 @@ export const BookingDetail: React.FC = () => {
         </div>
 
         {/* Sidebar */}
-        <div>
+        <div className="booking-detail-sidebar">
           {/* Actions Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Actions</h2>
+              <h2 className="card-title">{t.bookings.actions}</h2>
             </div>
             <div className="card-body">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "var(--space-sm)",
-                }}
-              >
+              <div className="booking-detail-action-list">
                 {isMentor && booking.status === "PENDING" && (
                   <button
                     className="btn btn-success"
                     onClick={handleConfirmBooking}
-                    style={{ width: "100%" }}
                   >
-                    Confirm Booking
+                    {t.bookings.confirmBooking}
                   </button>
                 )}
 
@@ -647,9 +575,9 @@ export const BookingDetail: React.FC = () => {
                   <button
                     className="btn btn-success"
                     onClick={() => window.open(booking.meetingLink, "_blank")}
-                    style={{ width: "100%" }}
                   >
-                    Join Meeting
+                    <Video size={16} />
+                    {t.bookings.joinMeeting}
                   </button>
                 )}
 
@@ -657,9 +585,8 @@ export const BookingDetail: React.FC = () => {
                   <button
                     className="btn btn-primary"
                     onClick={handleCompleteBooking}
-                    style={{ width: "100%" }}
                   >
-                    Complete Session
+                    {t.bookings.completeSession}
                   </button>
                 )}
 
@@ -667,20 +594,16 @@ export const BookingDetail: React.FC = () => {
                   <button
                     className="btn btn-danger"
                     onClick={handleCancelBooking}
-                    style={{ width: "100%" }}
                   >
-                    Cancel Booking
+                    {t.bookings.cancelBooking}
                   </button>
                 )}
 
                 {!isMentor &&
                   booking.status === "COMPLETED" &&
                   !booking.review && (
-                    <button
-                      className="btn btn-primary"
-                      style={{ width: "100%" }}
-                    >
-                      Leave Review
+                    <button className="btn btn-primary">
+                      {t.bookings.leaveReview}
                     </button>
                   )}
               </div>
@@ -690,33 +613,22 @@ export const BookingDetail: React.FC = () => {
           {/* Booking Info Card */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">Booking Information</h2>
+              <h2 className="card-title">{t.bookings.bookingInformation}</h2>
             </div>
             <div className="card-body">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "var(--space-md)",
-                  fontSize: "var(--font-size-sm)",
-                }}
-              >
-                <div>
-                  <div
-                    style={{ color: "var(--neutral-500)", marginBottom: "4px" }}
-                  >
-                    Booking ID
+              <div className="booking-detail-meta-list">
+                <div className="booking-detail-meta-item">
+                  <div className="booking-detail-meta-label">
+                    {t.bookings.bookingId}
                   </div>
-                  <div style={{ fontWeight: 600 }}>#{booking.id}</div>
+                  <div className="booking-detail-meta-value">#{booking.id}</div>
                 </div>
 
-                <div>
-                  <div
-                    style={{ color: "var(--neutral-500)", marginBottom: "4px" }}
-                  >
-                    Created
+                <div className="booking-detail-meta-item">
+                  <div className="booking-detail-meta-label">
+                    {t.bookings.created}
                   </div>
-                  <div style={{ fontWeight: 600 }}>
+                  <div className="booking-detail-meta-value">
                     {new Date(booking.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -726,16 +638,11 @@ export const BookingDetail: React.FC = () => {
                 </div>
 
                 {booking.confirmedAt && (
-                  <div>
-                    <div
-                      style={{
-                        color: "var(--neutral-500)",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Confirmed
+                  <div className="booking-detail-meta-item">
+                    <div className="booking-detail-meta-label">
+                      {t.dashboard.confirmed}
                     </div>
-                    <div style={{ fontWeight: 600 }}>
+                    <div className="booking-detail-meta-value">
                       {new Date(booking.confirmedAt).toLocaleDateString(
                         "en-US",
                         {
@@ -751,16 +658,11 @@ export const BookingDetail: React.FC = () => {
                 {(booking.status === "CANCELLED_BY_USER" ||
                   booking.status === "CANCELLED_BY_MENTOR") &&
                   booking.cancelledAt && (
-                    <div>
-                      <div
-                        style={{
-                          color: "var(--neutral-500)",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        Cancelled
+                    <div className="booking-detail-meta-item">
+                      <div className="booking-detail-meta-label">
+                        {t.bookings.cancelled}
                       </div>
-                      <div style={{ fontWeight: 600 }}>
+                      <div className="booking-detail-meta-value">
                         {new Date(booking.cancelledAt).toLocaleDateString(
                           "en-US",
                           {
@@ -774,16 +676,11 @@ export const BookingDetail: React.FC = () => {
                   )}
 
                 {booking.status === "COMPLETED" && booking.completedAt && (
-                  <div>
-                    <div
-                      style={{
-                        color: "var(--neutral-500)",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Completed
+                  <div className="booking-detail-meta-item">
+                    <div className="booking-detail-meta-label">
+                      {t.dashboard.completed}
                     </div>
-                    <div style={{ fontWeight: 600 }}>
+                    <div className="booking-detail-meta-value">
                       {new Date(booking.completedAt).toLocaleDateString(
                         "en-US",
                         {
@@ -818,6 +715,6 @@ export const BookingDetail: React.FC = () => {
         type={alertDialog.type}
         onClose={() => setAlertDialog({ ...alertDialog, isOpen: false })}
       />
-    </div>
+    </PageShell>
   );
 };
