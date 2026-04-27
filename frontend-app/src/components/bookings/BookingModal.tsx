@@ -35,6 +35,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [autoDateResolved, setAutoDateResolved] = useState(false);
 
   // Dialog states
   const [showConfirm, setShowConfirm] = useState(false);
@@ -54,6 +55,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0];
     setSelectedDate(formattedDate);
+    setAutoDateResolved(false);
   }, []);
 
   useEffect(() => {
@@ -75,15 +77,53 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       const slots = await bookingService.getAvailableTimeSlots(
         mentorId,
         startDate.toISOString(),
-        endDate.toISOString()
+        endDate.toISOString(),
       );
       setTimeSlots(slots);
+
+      if (slots.length === 0 && !autoDateResolved) {
+        const firstAvailableDate = await findFirstAvailableDate();
+        if (firstAvailableDate && firstAvailableDate !== selectedDate) {
+          setAutoDateResolved(true);
+          setSelectedDate(firstAvailableDate);
+          return;
+        }
+        setAutoDateResolved(true);
+      }
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to load time slots");
       console.error("Error loading time slots:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatLocalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getDate()}`.padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const findFirstAvailableDate = async (): Promise<string | null> => {
+    const rangeStart = new Date();
+    rangeStart.setHours(0, 0, 0, 0);
+
+    const rangeEnd = new Date(rangeStart);
+    rangeEnd.setDate(rangeEnd.getDate() + 30);
+    rangeEnd.setHours(23, 59, 59, 999);
+
+    const futureSlots = await bookingService.getAvailableTimeSlots(
+      mentorId,
+      rangeStart.toISOString(),
+      rangeEnd.toISOString(),
+    );
+
+    if (futureSlots.length === 0) {
+      return null;
+    }
+
+    return formatLocalDate(new Date(futureSlots[0].startTime));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -302,11 +342,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           message={
             selectedSlot
               ? `Confirm booking for ${formatTime(
-                  selectedSlot.startTime
+                  selectedSlot.startTime,
                 )} - ${formatTime(selectedSlot.endTime)} on ${new Date(
-                  selectedSlot.startTime
+                  selectedSlot.startTime,
                 ).toLocaleDateString()}? Total: $${calculateAmount(
-                  selectedSlot
+                  selectedSlot,
                 )} ${currency}`
               : ""
           }
