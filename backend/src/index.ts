@@ -1,10 +1,6 @@
 import "dotenv/config";
 import cors from "cors";
-import express, {
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 import { prisma } from "../prisma/client";
 import { validateEnvironment } from "./config/env";
 import { requireAuth } from "./middleware/auth";
@@ -21,12 +17,12 @@ const app = express();
 
 // Enable CORS for your React frontend
 app.use(
-  cors({
-    origin: ["http://localhost:3001", "http://localhost:3000"], // Add your frontend URL
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
+	cors({
+		origin: ["http://localhost:3001", "http://localhost:3000"], // Add your frontend URL
+		credentials: true,
+		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	}),
 );
 
 app.use(express.json());
@@ -38,32 +34,28 @@ app.use("/availability", availabilityRouter);
 app.use("/time-slots", timeSlotsRouter);
 
 app.get("/health", requireAuth, (_: Request, res: Response) => {
-  res.json({ status: "ok" });
+	res.json({ status: "ok" });
 });
 
-app.post(
-  "/hello",
-  requireAuth,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const text: string = req.body?.text ?? "Hello, World!!";
-      const msg = await prisma.message.create({ data: { text } });
-      res.status(201).json(msg);
-    } catch (err) {
-      next(err);
-    }
-  },
-);
+app.post("/hello", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const text: string = req.body?.text ?? "Hello, World!!";
+		const msg = await prisma.message.create({ data: { text } });
+		res.status(201).json(msg);
+	} catch (err) {
+		next(err);
+	}
+});
 
 app.get("/hello", async (_: Request, res: Response, next: NextFunction) => {
-  try {
-    const latest = await prisma.message.findFirst({
-      orderBy: { createdAt: "desc" },
-    });
-    res.json({ latest });
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const latest = await prisma.message.findFirst({
+			orderBy: { createdAt: "desc" },
+		});
+		res.json({ latest });
+	} catch (err) {
+		next(err);
+	}
 });
 
 app.use(ErrorHandler);
@@ -71,12 +63,12 @@ app.use(ErrorHandler);
 const PORT = process.env.PORT ?? 3000;
 
 async function startServer() {
-  validateEnvironment();
-  await ensureDemoUsersExist();
+	validateEnvironment();
+	await ensureDemoUsersExist();
 
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+	app.listen(PORT, () => {
+		console.log(`Server running on http://localhost:${PORT}`);
+	});
 }
 
 void startServer();
