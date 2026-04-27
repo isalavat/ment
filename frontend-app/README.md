@@ -44,3 +44,13 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Local Environment Notes
+
+Create `frontend-app/.env` from `frontend-app/.env.example`.
+
+For quick test login to work, ensure:
+- `REACT_APP_TEST_USERS_PASSWORD` in frontend matches
+- `TEST_USERS_PASSWORD` in `backend/.env`
+
+Backend API base URL is currently hardcoded to `http://localhost:3000` in `src/services/api.ts`.

@@ -15,3 +15,9 @@
     border-top: 1px solid var(--neutral-200);
     text-align: center;
 }
+
+.auth-helper-text {
+    margin-top: var(--space-xs);
+    color: var(--neutral-600);
+    font-size: var(--font-size-xs);
+}

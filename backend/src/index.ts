@@ -1,6 +1,8 @@
+import "dotenv/config";
 import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { prisma } from "../prisma/client";
+import { validateEnvironment } from "./config/env";
 import { requireAuth } from "./middleware/auth";
 import { ErrorHandler } from "./middleware/errorHandler";
 import adminRouter from "./routes/admin";
@@ -9,6 +11,7 @@ import availabilityRouter from "./routes/availability";
 import bookingRouter from "./routes/bookings";
 import profileRouter from "./routes/profiles";
 import timeSlotsRouter from "./routes/timeSlots";
+import { ensureDemoUsersExist } from "./services/demoUserBootstrap";
 
 const app = express();
 
@@ -58,6 +61,14 @@ app.get("/hello", async (_: Request, res: Response, next: NextFunction) => {
 app.use(ErrorHandler);
 
 const PORT = process.env.PORT ?? 3000;
-app.listen(PORT, () => {
-	console.log(`Server running on http://localhost:${PORT}`);
-});
+
+async function startServer() {
+	validateEnvironment();
+	await ensureDemoUsersExist();
+
+	app.listen(PORT, () => {
+		console.log(`Server running on http://localhost:${PORT}`);
+	});
+}
+
+void startServer();

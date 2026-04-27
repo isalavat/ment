@@ -6,6 +6,11 @@
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"strict": true,
-		"skipLibCheck": true
-	}
+		"skipLibCheck": true,
+		"rootDir": "./",
+		"outDir": "dist",
+		"noEmitOnError": true
+	},
+	"include": ["src/**/*.ts", "prisma/**/*.ts"],
+	"exclude": ["dist", "node_modules"]
 }
