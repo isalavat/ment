@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Plus } from "lucide-react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import {
   adminService,
   User,
@@ -9,11 +11,13 @@ import {
   MentorProfileFull,
 } from "../../services/adminService";
 import { profileService } from "../../services/profileService";
+import { PageShell } from "../common/PageShell";
 import "./AdminUsers.css";
 
 export const AdminUserDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,20 +54,14 @@ export const AdminUserDetail: React.FC = () => {
   const [mentorCategories, setMentorCategories] = useState<any[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
-  const [mentorVerification, setMentorVerification] = useState<MentorProfileFull | null>(null);
-  const [verificationActionLoading, setVerificationActionLoading] = useState(false);
+  const [mentorVerification, setMentorVerification] =
+    useState<MentorProfileFull | null>(null);
+  const [verificationActionLoading, setVerificationActionLoading] =
+    useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
 
-  useEffect(() => {
-    if (id) {
-      loadUser();
-      loadSkills();
-      loadCategories();
-    }
-  }, [id]);
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -108,29 +106,37 @@ export const AdminUserDetail: React.FC = () => {
         setMentorVerification(null);
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to load user");
+      setError(err.response?.data?.error || t.admin.detail.failedToLoad);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, t.admin.detail.failedToLoad]);
 
-  const loadSkills = async () => {
+  const loadSkills = useCallback(async () => {
     try {
       const skills = await adminService.getSkills();
       setAvailableSkills(skills);
     } catch (err) {
       console.error("Failed to load skills", err);
     }
-  };
+  }, []);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const response = await profileService.getCategories();
       setAvailableCategories(response.categories);
     } catch (err) {
       console.error("Failed to load categories", err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (id) {
+      void loadUser();
+      void loadSkills();
+      void loadCategories();
+    }
+  }, [id, loadUser, loadSkills, loadCategories]);
 
   const handleUserChange = (
     e: React.ChangeEvent<
@@ -176,10 +182,10 @@ export const AdminUserDetail: React.FC = () => {
         }
       }
 
-      setSuccess("User updated successfully");
-      loadUser();
+      setSuccess(t.admin.detail.updatedSuccess);
+      void loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to update user");
+      setError(err.response?.data?.error || t.admin.detail.failedToUpdate);
     } finally {
       setSaving(false);
     }
@@ -187,7 +193,7 @@ export const AdminUserDetail: React.FC = () => {
 
   const handleAddSkill = async () => {
     if (!newSkillName && !selectedSkillId) {
-      alert("Please select or enter a skill");
+      alert(t.profile.common.selectSkill);
       return;
     }
     try {
@@ -200,10 +206,10 @@ export const AdminUserDetail: React.FC = () => {
       setMentorSkills(updated.skills);
       setNewSkillName("");
       setSelectedSkillId("");
-      setSuccess("Skill added");
-      loadSkills();
+      setSuccess(t.admin.detail.skillAdded);
+      void loadSkills();
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to add skill");
+      setError(err.response?.data?.error || t.admin.detail.failedToAddSkill);
     }
   };
 
@@ -212,9 +218,9 @@ export const AdminUserDetail: React.FC = () => {
       setError("");
       await adminService.removeSkillFromMentor(id!, skillId);
       setMentorSkills((prev) => prev.filter((ms) => ms.skill.id !== skillId));
-      setSuccess("Skill removed");
+      setSuccess(t.admin.detail.skillRemoved);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to remove skill");
+      setError(err.response?.data?.error || t.admin.detail.failedToRemoveSkill);
     }
   };
 
@@ -228,10 +234,10 @@ export const AdminUserDetail: React.FC = () => {
       );
       if (updated.categories) setMentorCategories(updated.categories);
       setSelectedCategoryId("");
-      setSuccess("Category added");
+      setSuccess(t.admin.detail.categoryAdded);
       await loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to add category");
+      setError(err.response?.data?.error || t.admin.detail.failedToAddCategory);
     }
   };
 
@@ -242,23 +248,30 @@ export const AdminUserDetail: React.FC = () => {
       setMentorCategories((prev) =>
         prev.filter((mc) => mc.category.id !== categoryId),
       );
-      setSuccess("Category removed");
+      setSuccess(t.admin.detail.categoryRemoved);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to remove category");
+      setError(
+        err.response?.data?.error || t.admin.detail.failedToRemoveCategory,
+      );
     }
   };
 
   const handleVerify = async () => {
     if (!mentorVerification) return;
-    if (!window.confirm(`Verify "${user?.firstName} ${user?.lastName}"? They will appear in search results once they set their availability.`)) return;
+    if (
+      !window.confirm(
+        `${t.admin.detail.verifyPromptPrefix} "${user?.firstName} ${user?.lastName}"? ${t.admin.detail.verifyPromptSuffix}`,
+      )
+    )
+      return;
     try {
       setVerificationActionLoading(true);
       setError("");
       await adminService.verifyMentor(mentorVerification.id, "verify");
-      setSuccess("Mentor verified successfully");
+      setSuccess(t.admin.detail.mentorVerified);
       await loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to verify mentor");
+      setError(err.response?.data?.error || t.admin.detail.failedToVerify);
     } finally {
       setVerificationActionLoading(false);
     }
@@ -269,67 +282,84 @@ export const AdminUserDetail: React.FC = () => {
     try {
       setVerificationActionLoading(true);
       setError("");
-      await adminService.verifyMentor(mentorVerification.id, "reject", rejectReason || undefined);
+      await adminService.verifyMentor(
+        mentorVerification.id,
+        "reject",
+        rejectReason || undefined,
+      );
       setShowRejectModal(false);
       setRejectReason("");
-      setSuccess("Mentor rejected");
+      setSuccess(t.admin.detail.mentorRejected);
       await loadUser();
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to reject mentor");
+      setError(err.response?.data?.error || t.admin.detail.failedToReject);
     } finally {
       setVerificationActionLoading(false);
     }
   };
 
+  const getVerificationLabel = (
+    status: MentorProfileFull["verificationStatus"],
+  ) => {
+    switch (status) {
+      case "VERIFIED":
+        return t.admin.mentors.verified;
+      case "REJECTED":
+        return t.admin.mentors.rejected;
+      case "PENDING":
+      default:
+        return t.admin.mentors.pending;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="content-area">
+      <PageShell
+        title={t.admin.detail.loadingTitle}
+        subtitle={t.admin.detail.loadingSubtitle}
+      >
         <div className="card">
-          <div
-            className="card-body"
-            style={{ textAlign: "center", padding: "var(--space-xxl)" }}
-          >
-            Loading user...
-          </div>
+          <div className="card-body admin-center-state">{t.common.loading}</div>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   if (!user) {
     return (
-      <div className="content-area">
+      <PageShell
+        title={t.admin.detail.loadingTitle}
+        subtitle={t.admin.detail.notFoundSubtitle}
+      >
         <div className="card">
           <div className="card-body">
-            <p>User not found</p>
+            <p>{t.admin.detail.notFound}</p>
             <button
               className="btn btn-outline mt-md"
               onClick={() => navigate("/admin/users")}
             >
-              Back to Users
+              {t.admin.detail.backToUsers}
             </button>
           </div>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="content-area">
-      <div className="page-header">
+    <PageShell
+      title={`${t.admin.detail.titlePrefix} ${user.firstName} ${user.lastName}`}
+      actions={
         <div>
           <button
             className="btn btn-outline btn-sm"
             onClick={() => navigate("/admin/users")}
           >
-            ← Back
+            <ArrowLeft size={16} aria-hidden="true" /> {t.common.back}
           </button>
-          <h1 className="page-title mt-sm">
-            Edit User: {user.firstName} {user.lastName}
-          </h1>
         </div>
-      </div>
-
+      }
+    >
       {error && <div className="alert alert-danger mb-md">{error}</div>}
       {success && <div className="alert alert-success mb-md">{success}</div>}
 
@@ -340,7 +370,7 @@ export const AdminUserDetail: React.FC = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="firstName" className="form-label">
-                  First Name *
+                  {t.admin.detail.firstName} *
                 </label>
                 <input
                   type="text"
@@ -354,7 +384,7 @@ export const AdminUserDetail: React.FC = () => {
               </div>
               <div className="form-group">
                 <label htmlFor="lastName" className="form-label">
-                  Last Name *
+                  {t.admin.detail.lastName} *
                 </label>
                 <input
                   type="text"
@@ -370,7 +400,7 @@ export const AdminUserDetail: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="email" className="form-label">
-                Email *
+                {t.admin.detail.email} *
               </label>
               <input
                 type="email"
@@ -385,9 +415,9 @@ export const AdminUserDetail: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="password" className="form-label">
-                New Password{" "}
-                <span style={{ color: "var(--neutral-500)", fontWeight: 400 }}>
-                  (leave blank to keep current)
+                {t.admin.detail.newPassword}{" "}
+                <span className="admin-inline-note">
+                  ({t.admin.detail.leaveBlankToKeepCurrent})
                 </span>
               </label>
               <input
@@ -396,13 +426,13 @@ export const AdminUserDetail: React.FC = () => {
                 name="password"
                 className="form-input"
                 onChange={handleUserChange}
-                placeholder="Enter new password"
+                placeholder={t.admin.detail.passwordPlaceholder}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="role" className="form-label">
-                Role *
+                {t.admin.detail.role} *
               </label>
               <select
                 id="role"
@@ -412,15 +442,15 @@ export const AdminUserDetail: React.FC = () => {
                 onChange={handleUserChange}
                 required
               >
-                <option value="USER">User</option>
-                <option value="MENTOR">Mentor</option>
-                <option value="ADMIN">Admin</option>
+                <option value="USER">{t.common.roles.learner}</option>
+                <option value="MENTOR">{t.common.roles.mentor}</option>
+                <option value="ADMIN">{t.common.roles.admin}</option>
               </select>
             </div>
 
             <div className="form-group">
               <label htmlFor="avatarUrl" className="form-label">
-                Avatar URL (optional)
+                {t.admin.detail.avatarUrlOptional}
               </label>
               <input
                 type="text"
@@ -429,13 +459,13 @@ export const AdminUserDetail: React.FC = () => {
                 className="form-input"
                 value={userData.avatarUrl || ""}
                 onChange={handleUserChange}
-                placeholder="https://example.com/avatar.jpg"
+                placeholder={t.admin.create.avatarPlaceholder}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="userBio" className="form-label">
-                Bio (optional)
+                {t.admin.detail.bioOptional}
               </label>
               <textarea
                 id="userBio"
@@ -444,13 +474,13 @@ export const AdminUserDetail: React.FC = () => {
                 rows={2}
                 value={(userData as any).bio || ""}
                 onChange={handleUserChange}
-                placeholder="Short bio or description..."
+                placeholder={t.admin.detail.userBioPlaceholder}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="goals" className="form-label">
-                Goals (optional)
+                {t.admin.detail.goalsOptional}
               </label>
               <textarea
                 id="goals"
@@ -459,7 +489,7 @@ export const AdminUserDetail: React.FC = () => {
                 rows={2}
                 value={(userData as any).goals || ""}
                 onChange={handleUserChange}
-                placeholder="User's goals or objectives..."
+                placeholder={t.admin.detail.goalsPlaceholder}
               />
             </div>
 
@@ -467,12 +497,12 @@ export const AdminUserDetail: React.FC = () => {
             {userData.role === "MENTOR" && (
               <>
                 <hr className="my-md" />
-                <h3 className="mb-md">Mentor Profile</h3>
+                <h3 className="mb-md">{t.admin.detail.mentorProfile}</h3>
 
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="title" className="form-label">
-                      Professional Title *
+                      {t.admin.detail.professionalTitle} *
                     </label>
                     <input
                       type="text"
@@ -482,12 +512,12 @@ export const AdminUserDetail: React.FC = () => {
                       value={mentorProfile.title}
                       onChange={handleMentorChange}
                       required
-                      placeholder="e.g., Senior Software Engineer"
+                      placeholder={t.admin.detail.titlePlaceholder}
                     />
                   </div>
                   <div className="form-group">
                     <label htmlFor="yearsExperience" className="form-label">
-                      Years of Experience *
+                      {t.admin.detail.yearsExperience} *
                     </label>
                     <input
                       type="number"
@@ -505,7 +535,7 @@ export const AdminUserDetail: React.FC = () => {
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="hourlyRate" className="form-label">
-                      Hourly Rate *
+                      {t.admin.detail.hourlyRate} *
                     </label>
                     <input
                       type="number"
@@ -521,7 +551,7 @@ export const AdminUserDetail: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label htmlFor="currency" className="form-label">
-                      Currency
+                      {t.admin.detail.currency}
                     </label>
                     <input
                       type="text"
@@ -537,7 +567,7 @@ export const AdminUserDetail: React.FC = () => {
 
                 <div className="form-group">
                   <label htmlFor="mentorBio" className="form-label">
-                    Mentor Bio *
+                    {t.admin.detail.mentorBio} *
                   </label>
                   <textarea
                     id="mentorBio"
@@ -547,24 +577,22 @@ export const AdminUserDetail: React.FC = () => {
                     value={mentorProfile.bio}
                     onChange={handleMentorChange}
                     required
-                    placeholder="Tell about your experience and expertise..."
+                    placeholder={t.admin.detail.mentorBioPlaceholder}
                   />
                 </div>
 
                 {/* Skills & Categories — only available after mentor profile is saved */}
                 {!user.mentorProfile ? (
-                  <div
-                    className="alert alert-info"
-                    style={{ marginTop: "var(--space-md)" }}
-                  >
-                    Save changes first to enable skills and categories
-                    management.
+                  <div className="alert alert-info admin-alert-top">
+                    {t.admin.detail.saveFirstForRelations}
                   </div>
                 ) : (
                   <>
                     {/* Skills */}
                     <div className="form-group">
-                      <label className="form-label">Skills</label>
+                      <label className="form-label">
+                        {t.admin.shared.skills}
+                      </label>
                       <div className="skills-list mb-md">
                         {mentorSkills.length > 0 ? (
                           mentorSkills.map((ms: any) => (
@@ -574,29 +602,21 @@ export const AdminUserDetail: React.FC = () => {
                                 type="button"
                                 className="skill-remove"
                                 onClick={() => handleRemoveSkill(ms.skill.id)}
-                                title="Remove skill"
+                                title={t.admin.shared.removeSkill}
                               >
                                 ×
                               </button>
                             </div>
                           ))
                         ) : (
-                          <p
-                            style={{
-                              color: "var(--neutral-500)",
-                              fontSize: "var(--font-size-sm)",
-                            }}
-                          >
-                            No skills added yet
+                          <p className="admin-muted-text">
+                            {t.admin.detail.noSkillsAddedYet}
                           </p>
                         )}
                       </div>
                       <div className="skill-add-form">
                         <div className="form-row">
-                          <div
-                            className="form-group"
-                            style={{ marginBottom: 0 }}
-                          >
+                          <div className="form-group admin-form-group-no-margin">
                             <select
                               className="form-select"
                               value={selectedSkillId}
@@ -604,7 +624,9 @@ export const AdminUserDetail: React.FC = () => {
                                 setSelectedSkillId(e.target.value)
                               }
                             >
-                              <option value="">Select existing skill...</option>
+                              <option value="">
+                                {t.admin.detail.selectExistingSkill}
+                              </option>
                               {availableSkills
                                 .filter(
                                   (s) =>
@@ -619,25 +641,16 @@ export const AdminUserDetail: React.FC = () => {
                                 ))}
                             </select>
                           </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              padding: "0 var(--space-md)",
-                            }}
-                          >
-                            <span style={{ color: "var(--neutral-500)" }}>
-                              or
+                          <div className="admin-inline-separator">
+                            <span className="admin-muted-text">
+                              {t.admin.shared.or}
                             </span>
                           </div>
-                          <div
-                            className="form-group"
-                            style={{ marginBottom: 0 }}
-                          >
+                          <div className="form-group admin-form-group-no-margin">
                             <input
                               type="text"
                               className="form-input"
-                              placeholder="Enter new skill name..."
+                              placeholder={t.admin.detail.enterNewSkillName}
                               value={newSkillName}
                               onChange={(e) => setNewSkillName(e.target.value)}
                               onKeyDown={(e) => {
@@ -653,7 +666,8 @@ export const AdminUserDetail: React.FC = () => {
                             className="btn btn-outline"
                             onClick={handleAddSkill}
                           >
-                            + Add Skill
+                            <Plus size={16} aria-hidden="true" />{" "}
+                            {t.admin.detail.addSkill}
                           </button>
                         </div>
                       </div>
@@ -661,7 +675,9 @@ export const AdminUserDetail: React.FC = () => {
 
                     {/* Categories */}
                     <div className="form-group">
-                      <label className="form-label">Categories</label>
+                      <label className="form-label">
+                        {t.admin.shared.categories}
+                      </label>
                       <div className="skills-list mb-md">
                         {mentorCategories.length > 0 ? (
                           mentorCategories.map((mc: any) => (
@@ -673,29 +689,21 @@ export const AdminUserDetail: React.FC = () => {
                                 onClick={() =>
                                   handleRemoveCategory(mc.category.id)
                                 }
-                                title="Remove category"
+                                title={t.admin.shared.removeCategory}
                               >
                                 ×
                               </button>
                             </div>
                           ))
                         ) : (
-                          <p
-                            style={{
-                              color: "var(--neutral-500)",
-                              fontSize: "var(--font-size-sm)",
-                            }}
-                          >
-                            No categories assigned yet
+                          <p className="admin-muted-text">
+                            {t.admin.detail.noCategoriesAssignedYet}
                           </p>
                         )}
                       </div>
                       <div className="skill-add-form">
                         <div className="form-row">
-                          <div
-                            className="form-group"
-                            style={{ marginBottom: 0, flex: 1 }}
-                          >
+                          <div className="form-group admin-form-group-flex">
                             <select
                               className="form-select"
                               value={selectedCategoryId}
@@ -703,7 +711,9 @@ export const AdminUserDetail: React.FC = () => {
                                 setSelectedCategoryId(e.target.value)
                               }
                             >
-                              <option value="">Select category...</option>
+                              <option value="">
+                                {t.admin.detail.selectCategory}
+                              </option>
                               {availableCategories
                                 .filter(
                                   (cat) =>
@@ -724,7 +734,8 @@ export const AdminUserDetail: React.FC = () => {
                             onClick={handleAddCategory}
                             disabled={!selectedCategoryId}
                           >
-                            + Add Category
+                            <Plus size={16} aria-hidden="true" />{" "}
+                            {t.admin.detail.addCategory}
                           </button>
                         </div>
                       </div>
@@ -734,52 +745,58 @@ export const AdminUserDetail: React.FC = () => {
                     {mentorVerification && (
                       <>
                         <hr className="my-md" />
-                        <h4 className="mb-md">Verification Status</h4>
-                        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)", flexWrap: "wrap" }}>
+                        <h4 className="mb-md">
+                          {t.admin.detail.verificationStatus}
+                        </h4>
+                        <div className="admin-verification-row">
                           <span
                             className={`badge ${
-                              mentorVerification.verificationStatus === "VERIFIED"
+                              mentorVerification.verificationStatus ===
+                              "VERIFIED"
                                 ? "badge-success"
-                                : mentorVerification.verificationStatus === "REJECTED"
-                                ? "badge-danger"
-                                : "badge-warning"
+                                : mentorVerification.verificationStatus ===
+                                    "REJECTED"
+                                  ? "badge-danger"
+                                  : "badge-warning"
                             }`}
                           >
-                            {mentorVerification.verificationStatus}
+                            {getVerificationLabel(
+                              mentorVerification.verificationStatus,
+                            )}
                           </span>
-                          {mentorVerification.verificationStatus !== "VERIFIED" && (
+                          {mentorVerification.verificationStatus !==
+                            "VERIFIED" && (
                             <button
                               type="button"
-                              className="btn btn-outline btn-sm"
                               onClick={handleVerify}
                               disabled={verificationActionLoading}
-                              style={{ color: "var(--color-success, #22c55e)" }}
+                              className="btn btn-outline btn-sm admin-verify-btn"
                             >
-                              Verify
+                              {t.admin.detail.verify}
                             </button>
                           )}
-                          {mentorVerification.verificationStatus !== "REJECTED" && (
+                          {mentorVerification.verificationStatus !==
+                            "REJECTED" && (
                             <button
                               type="button"
                               className="btn btn-danger btn-sm"
-                              onClick={() => { setRejectReason(""); setShowRejectModal(true); }}
+                              onClick={() => {
+                                setRejectReason("");
+                                setShowRejectModal(true);
+                              }}
                               disabled={verificationActionLoading}
                             >
-                              Reject
+                              {t.admin.detail.reject}
                             </button>
                           )}
                         </div>
-                        {mentorVerification.verificationStatus === "REJECTED" && mentorVerification.rejectionReason && (
-                          <div
-                            style={{
-                              marginTop: "var(--space-sm)",
-                              fontSize: "var(--font-size-sm)",
-                              color: "var(--neutral-500)",
-                            }}
-                          >
-                            Reason: {mentorVerification.rejectionReason}
-                          </div>
-                        )}
+                        {mentorVerification.verificationStatus === "REJECTED" &&
+                          mentorVerification.rejectionReason && (
+                            <div className="admin-rejection-reason">
+                              {t.admin.detail.reason}:{" "}
+                              {mentorVerification.rejectionReason}
+                            </div>
+                          )}
                       </>
                     )}
                   </>
@@ -794,14 +811,14 @@ export const AdminUserDetail: React.FC = () => {
                 onClick={() => navigate("/admin/users")}
                 disabled={saving}
               >
-                Cancel
+                {t.admin.detail.cancel}
               </button>
               <button
                 type="submit"
                 className="btn btn-primary"
                 disabled={saving}
               >
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? t.admin.detail.saving : t.admin.detail.saveChanges}
               </button>
             </div>
           </form>
@@ -810,40 +827,60 @@ export const AdminUserDetail: React.FC = () => {
 
       {/* Reject Modal */}
       {showRejectModal && (
-        <div className="view-modal-overlay" onClick={() => setShowRejectModal(false)}>
+        <div
+          className="view-modal-overlay"
+          onClick={() => setShowRejectModal(false)}
+        >
           <div className="view-modal" onClick={(e) => e.stopPropagation()}>
             <div className="view-modal-header">
-              <h2>Reject {user?.firstName} {user?.lastName}</h2>
-              <button className="view-modal-close" onClick={() => setShowRejectModal(false)}>×</button>
+              <h2>
+                {t.admin.detail.rejectTitlePrefix} {user?.firstName}{" "}
+                {user?.lastName}
+              </h2>
+              <button
+                className="view-modal-close"
+                onClick={() => setShowRejectModal(false)}
+              >
+                ×
+              </button>
             </div>
             <div className="view-modal-body">
               <div className="form-group">
                 <label className="form-label">
-                  Rejection Reason{" "}
-                  <span style={{ color: "var(--neutral-500)", fontWeight: 400 }}>(optional — shown to the mentor)</span>
+                  {t.admin.detail.rejectionReason}{" "}
+                  <span className="admin-inline-note">
+                    ({t.admin.detail.rejectionReasonHelp})
+                  </span>
                 </label>
                 <textarea
                   className="form-textarea"
                   rows={3}
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="e.g. Please add at least one category and skill before resubmitting."
+                  placeholder={t.admin.detail.rejectionPlaceholder}
                 />
               </div>
             </div>
             <div className="view-modal-footer">
-              <button className="btn btn-outline" onClick={() => setShowRejectModal(false)}>Cancel</button>
+              <button
+                className="btn btn-outline"
+                onClick={() => setShowRejectModal(false)}
+              >
+                {t.common.cancel}
+              </button>
               <button
                 className="btn btn-danger"
                 onClick={handleRejectConfirm}
                 disabled={verificationActionLoading}
               >
-                {verificationActionLoading ? "Rejecting..." : "Confirm Rejection"}
+                {verificationActionLoading
+                  ? t.admin.detail.rejecting
+                  : t.admin.detail.confirmRejection}
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };

@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { BadgeCheck, CircleX, Pencil } from "lucide-react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import { adminService, MentorProfileFull } from "../../services/adminService";
 import type { VerificationStatus } from "../../types/profile";
+import { PageShell } from "../common/PageShell";
 import "./AdminUsers.css";
-
-const STATUS_LABELS: Record<VerificationStatus, string> = {
-  PENDING: "Pending",
-  VERIFIED: "Verified",
-  REJECTED: "Rejected",
-};
 
 const STATUS_BADGE: Record<VerificationStatus, string> = {
   PENDING: "badge-warning",
@@ -18,6 +15,7 @@ const STATUS_BADGE: Record<VerificationStatus, string> = {
 
 export const AdminMentors: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [mentors, setMentors] = useState<MentorProfileFull[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,11 +33,11 @@ export const AdminMentors: React.FC = () => {
       const data = await adminService.getMentorProfiles(filter || undefined);
       setMentors(data);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to load mentors");
+      setError(err.response?.data?.error || t.admin.mentors.loadFailed);
     } finally {
       setLoading(false);
     }
-  }, [filter]);
+  }, [filter, t.admin.mentors.loadFailed]);
 
   useEffect(() => {
     loadMentors();
@@ -48,7 +46,7 @@ export const AdminMentors: React.FC = () => {
   const handleVerify = async (mentor: MentorProfileFull) => {
     if (
       !window.confirm(
-        `Verify "${mentor.user.firstName} ${mentor.user.lastName}"? They will appear in search results once they set their availability.`,
+        `${t.admin.mentors.verifyPromptPrefix} "${mentor.user.firstName} ${mentor.user.lastName}"? ${t.admin.mentors.verifyPromptSuffix}`,
       )
     ) {
       return;
@@ -58,7 +56,7 @@ export const AdminMentors: React.FC = () => {
       await adminService.verifyMentor(mentor.id, "verify");
       await loadMentors();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to verify mentor");
+      alert(err.response?.data?.error || t.admin.mentors.verifyFailed);
     } finally {
       setActionLoading(null);
     }
@@ -81,18 +79,23 @@ export const AdminMentors: React.FC = () => {
       setRejectTarget(null);
       await loadMentors();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to reject mentor");
+      alert(err.response?.data?.error || t.admin.mentors.rejectFailed);
     } finally {
       setActionLoading(null);
     }
   };
 
-  return (
-    <div className="content-area">
-      <div className="page-header">
-        <h1 className="page-title">Mentor Verification</h1>
-      </div>
+  const statusLabels: Record<VerificationStatus, string> = {
+    PENDING: t.admin.mentors.pending,
+    VERIFIED: t.admin.mentors.verified,
+    REJECTED: t.admin.mentors.rejected,
+  };
 
+  const formatCount = (count: number, singular: string, plural: string) =>
+    `${count} ${count === 1 ? singular : plural}`;
+
+  return (
+    <PageShell title={t.admin.mentors.title}>
       {/* Filter */}
       <div className="card mb-lg">
         <div className="card-body">
@@ -105,10 +108,10 @@ export const AdminMentors: React.FC = () => {
                   setFilter(e.target.value as VerificationStatus | "")
                 }
               >
-                <option value="">All Statuses</option>
-                <option value="PENDING">Pending Review</option>
-                <option value="VERIFIED">Verified</option>
-                <option value="REJECTED">Rejected</option>
+                <option value="">{t.admin.shared.allStatuses}</option>
+                <option value="PENDING">{t.admin.mentors.pendingReview}</option>
+                <option value="VERIFIED">{t.admin.mentors.verified}</option>
+                <option value="REJECTED">{t.admin.mentors.rejected}</option>
               </select>
             </div>
           </div>
@@ -119,64 +122,64 @@ export const AdminMentors: React.FC = () => {
 
       {loading ? (
         <div className="card">
-          <div
-            className="card-body"
-            style={{ textAlign: "center", padding: "var(--space-xxl)" }}
-          >
-            Loading mentors...
+          <div className="card-body admin-center-state">
+            {t.admin.mentors.loadingMentors}
           </div>
         </div>
       ) : mentors.length === 0 ? (
         <div className="card">
-          <div
-            className="card-body"
-            style={{
-              textAlign: "center",
-              padding: "var(--space-xxl)",
-              color: "var(--neutral-500)",
-            }}
-          >
-            No mentors with status "{filter || "any"}"
+          <div className="card-body admin-center-muted">
+            {t.admin.mentors.emptyPrefix} "
+            {filter ? statusLabels[filter] : t.admin.mentors.anyStatus}"
           </div>
         </div>
       ) : (
         <div className="card">
           <div className="table-container">
-            <table className="table">
+            <table className="table admin-table admin-table-mentors">
               <thead>
                 <tr>
-                  <th>Actions</th>
-                  <th>Mentor</th>
-                  <th>Title</th>
-                  <th>Rate</th>
-                  <th>Skills</th>
-                  <th>Categories</th>
-                  <th>Status</th>
+                  <th className="admin-column-actions">
+                    {t.admin.shared.actions}
+                  </th>
+                  <th className="admin-column-mentor">
+                    {t.admin.mentors.mentor}
+                  </th>
+                  <th className="admin-column-title">{t.admin.shared.title}</th>
+                  <th className="admin-column-rate">{t.admin.mentors.rate}</th>
+                  <th className="admin-column-skills">
+                    {t.admin.shared.skills}
+                  </th>
+                  <th className="admin-column-categories">
+                    {t.admin.shared.categories}
+                  </th>
+                  <th className="admin-column-status">
+                    {t.admin.shared.status}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {mentors.map((mentor) => (
                   <tr key={mentor.id}>
-                    <td>
+                    <td className="admin-column-actions">
                       <div className="action-buttons">
                         <button
                           className="btn-icon"
                           onClick={() =>
                             navigate(`/admin/users/${mentor.user.id}`)
                           }
-                          title="Edit profile"
+                          title={t.admin.mentors.editProfile}
                         >
-                          ✏️
+                          <Pencil size={16} aria-hidden="true" />
                         </button>
                         {mentor.verificationStatus !== "VERIFIED" && (
                           <button
-                            className="btn-icon"
                             onClick={() => handleVerify(mentor)}
                             disabled={actionLoading === mentor.id}
-                            title="Verify"
-                            style={{ color: "var(--color-success, #22c55e)" }}
+                            title={t.admin.mentors.verify}
+                            className="btn-icon admin-verify-btn"
                           >
-                            ✓
+                            <BadgeCheck size={16} aria-hidden="true" />
                           </button>
                         )}
                         {mentor.verificationStatus !== "REJECTED" && (
@@ -184,68 +187,64 @@ export const AdminMentors: React.FC = () => {
                             className="btn-icon btn-danger"
                             onClick={() => handleRejectOpen(mentor)}
                             disabled={actionLoading === mentor.id}
-                            title="Reject"
+                            title={t.admin.mentors.reject}
                           >
-                            ✕
+                            <CircleX size={16} aria-hidden="true" />
                           </button>
                         )}
                       </div>
                     </td>
-                    <td>
+                    <td className="admin-column-mentor">
                       <div className="user-cell">
-                        <span>
-                          {mentor.user.firstName} {mentor.user.lastName}
-                        </span>
-                        <span
-                          style={{
-                            display: "block",
-                            fontSize: "var(--font-size-sm)",
-                            color: "var(--neutral-500)",
-                          }}
-                        >
-                          {mentor.user.email}
-                        </span>
+                        <div className="admin-user-copy">
+                          <span className="admin-user-name">
+                            {mentor.user.firstName} {mentor.user.lastName}
+                          </span>
+                          <span className="admin-user-email">
+                            {mentor.user.email}
+                          </span>
+                        </div>
                       </div>
                     </td>
-                    <td>{mentor.title}</td>
-                    <td>
+                    <td className="admin-column-title">{mentor.title}</td>
+                    <td className="admin-column-rate">
                       {mentor.hourlyRate} {mentor.currency}
                     </td>
-                    <td>
+                    <td className="admin-column-skills">
                       {mentor.skills.length > 0 ? (
                         <span className="badge badge-primary">
-                          {mentor.skills.length} skill
-                          {mentor.skills.length > 1 ? "s" : ""}
+                          {formatCount(
+                            mentor.skills.length,
+                            t.admin.mentors.skill,
+                            t.admin.mentors.skills,
+                          )}
                         </span>
                       ) : (
-                        <span style={{ color: "var(--neutral-400)" }}>—</span>
+                        <span className="admin-muted-symbol">—</span>
                       )}
                     </td>
-                    <td>
+                    <td className="admin-column-categories">
                       {mentor.categories.length > 0 ? (
                         <span className="badge badge-primary">
-                          {mentor.categories.length} categor
-                          {mentor.categories.length > 1 ? "ies" : "y"}
+                          {formatCount(
+                            mentor.categories.length,
+                            t.admin.mentors.category,
+                            t.admin.mentors.categories,
+                          )}
                         </span>
                       ) : (
-                        <span style={{ color: "var(--neutral-400)" }}>—</span>
+                        <span className="admin-muted-symbol">—</span>
                       )}
                     </td>
-                    <td>
+                    <td className="admin-column-status">
                       <span
                         className={`badge ${STATUS_BADGE[mentor.verificationStatus]}`}
                       >
-                        {STATUS_LABELS[mentor.verificationStatus]}
+                        {statusLabels[mentor.verificationStatus]}
                       </span>
                       {mentor.verificationStatus === "REJECTED" &&
                         mentor.rejectionReason && (
-                          <div
-                            style={{
-                              fontSize: "var(--font-size-sm)",
-                              color: "var(--neutral-500)",
-                              marginTop: "var(--space-xs)",
-                            }}
-                          >
+                          <div className="admin-rejection-reason">
                             {mentor.rejectionReason}
                           </div>
                         )}
@@ -267,8 +266,8 @@ export const AdminMentors: React.FC = () => {
           <div className="view-modal" onClick={(e) => e.stopPropagation()}>
             <div className="view-modal-header">
               <h2>
-                Reject {rejectTarget.user.firstName}{" "}
-                {rejectTarget.user.lastName}
+                {t.admin.mentors.rejectTitlePrefix}{" "}
+                {rejectTarget.user.firstName} {rejectTarget.user.lastName}
               </h2>
               <button
                 className="view-modal-close"
@@ -280,11 +279,9 @@ export const AdminMentors: React.FC = () => {
             <div className="view-modal-body">
               <div className="form-group">
                 <label className="form-label">
-                  Rejection Reason{" "}
-                  <span
-                    style={{ color: "var(--neutral-500)", fontWeight: 400 }}
-                  >
-                    (optional — shown to the mentor)
+                  {t.admin.mentors.rejectionReason}{" "}
+                  <span className="admin-inline-note">
+                    ({t.admin.mentors.rejectionReasonHelp})
                   </span>
                 </label>
                 <textarea
@@ -292,7 +289,7 @@ export const AdminMentors: React.FC = () => {
                   rows={3}
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="e.g. Please add at least one category and skill before resubmitting."
+                  placeholder={t.admin.mentors.rejectionPlaceholder}
                 />
               </div>
             </div>
@@ -301,7 +298,7 @@ export const AdminMentors: React.FC = () => {
                 className="btn btn-outline"
                 onClick={() => setRejectTarget(null)}
               >
-                Cancel
+                {t.common.cancel}
               </button>
               <button
                 className="btn btn-danger"
@@ -309,13 +306,13 @@ export const AdminMentors: React.FC = () => {
                 disabled={actionLoading === rejectTarget.id}
               >
                 {actionLoading === rejectTarget.id
-                  ? "Rejecting..."
-                  : "Confirm Rejection"}
+                  ? t.admin.mentors.rejecting
+                  : t.admin.mentors.confirmRejection}
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };

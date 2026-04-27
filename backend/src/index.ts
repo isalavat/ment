@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { prisma } from "../prisma/client";
+import { bootstrapDevUsers } from "./devBootstrap";
 import { requireAuth } from "./middleware/auth";
 import { ErrorHandler } from "./middleware/errorHandler";
 import adminRouter from "./routes/admin";
@@ -15,7 +16,7 @@ const app = express();
 // Enable CORS for your React frontend
 app.use(
 	cors({
-		origin: ["http://localhost:3001", "http://localhost:3000"], // Add your frontend URL
+		origin: ["http://localhost:3001", "http://localhost:3000", "http://localhost:3002"], // Dev frontend ports
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 		allowedHeaders: ["Content-Type", "Authorization"],
@@ -58,6 +59,11 @@ app.get("/hello", async (_: Request, res: Response, next: NextFunction) => {
 app.use(ErrorHandler);
 
 const PORT = process.env.PORT ?? 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
 	console.log(`Server running on http://localhost:${PORT}`);
+	try {
+		await bootstrapDevUsers();
+	} catch (err) {
+		console.error("[devBootstrap] Failed to bootstrap dev users:", err);
+	}
 });

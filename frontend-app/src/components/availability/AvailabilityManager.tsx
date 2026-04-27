@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  CalendarRange,
+  Clock3,
+  Plus,
+  Repeat,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useLanguage } from "../../i18n/LanguageContext";
 import {
   availabilityService,
   Availability,
   WeeklyScheduleSlot,
 } from "../../services/availabilityService";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { PageShell } from "../common/PageShell";
 import "./AvailabilityManager.css";
 
-const DAYS_OF_WEEK = [
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-];
+const DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6] as const;
 
 export const AvailabilityManager: React.FC = () => {
   const { user, login } = useAuth();
@@ -49,13 +50,7 @@ export const AvailabilityManager: React.FC = () => {
     0: { enabled: false, startTime: "09:00", endTime: "17:00" },
   });
 
-  useEffect(() => {
-    if (user?.mentorProfileId) {
-      fetchAvailabilities();
-    }
-  }, [user]);
-
-  const fetchAvailabilities = async () => {
+  const fetchAvailabilities = useCallback(async () => {
     if (!user?.mentorProfileId) return;
 
     setLoading(true);
@@ -71,12 +66,18 @@ export const AvailabilityManager: React.FC = () => {
         login(updatedUser);
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to load availabilities");
+      setError(err.response?.data?.error || t.availability.manager.errors.loadFailed);
       console.error("Error loading availabilities:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, login, t.availability.manager.errors.loadFailed]);
+
+  useEffect(() => {
+    if (user?.mentorProfileId) {
+      void fetchAvailabilities();
+    }
+  }, [user?.mentorProfileId, fetchAvailabilities]);
 
   const handleAddAvailability = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,9 +101,9 @@ export const AvailabilityManager: React.FC = () => {
         isRecurring: true,
         specificDate: "",
       });
-      fetchAvailabilities();
+      void fetchAvailabilities();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to create availability");
+      alert(err.response?.data?.error || t.availability.manager.errors.createFailed);
       console.error("Error creating availability:", err);
     }
   };
@@ -123,7 +124,7 @@ export const AvailabilityManager: React.FC = () => {
     }
 
     if (schedule.length === 0) {
-      alert("Please select at least one day");
+      alert(t.availability.manager.selectAtLeastOneDay);
       return;
     }
 
@@ -132,127 +133,209 @@ export const AvailabilityManager: React.FC = () => {
         user.mentorProfileId,
         schedule,
       );
-      alert(result.message);
+      alert(result.message || t.availability.manager.weeklyScheduleCreated);
       setShowWeeklyForm(false);
-      fetchAvailabilities();
+      void fetchAvailabilities();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to create weekly schedule");
+      alert(
+        err.response?.data?.error || t.availability.manager.errors.createWeeklyFailed,
+      );
       console.error("Error creating weekly schedule:", err);
     }
   };
 
   const handleDeleteAvailability = async (id: string) => {
     if (!user?.mentorProfileId) return;
-    if (!window.confirm("Delete this availability?")) return;
+    if (!window.confirm(t.availability.manager.deleteConfirm)) return;
 
     try {
       await availabilityService.deleteAvailability(id, user.mentorProfileId);
-      fetchAvailabilities();
+      void fetchAvailabilities();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete availability");
+      alert(err.response?.data?.error || t.availability.manager.errors.deleteFailed);
       console.error("Error deleting availability:", err);
     }
   };
 
   const getDayLabel = (dayOfWeek: number) => {
-    return DAYS_OF_WEEK.find((d) => d.value === dayOfWeek)?.label || "";
+    switch (dayOfWeek) {
+      case 0:
+        return t.availability.days.sunday;
+      case 1:
+        return t.availability.days.monday;
+      case 2:
+        return t.availability.days.tuesday;
+      case 3:
+        return t.availability.days.wednesday;
+      case 4:
+        return t.availability.days.thursday;
+      case 5:
+        return t.availability.days.friday;
+      case 6:
+        return t.availability.days.saturday;
+      default:
+        return "";
+    }
   };
+
+  const recurringCount = availabilities.filter(
+    (availability) => availability.isRecurring,
+  ).length;
+  const specificCount = availabilities.length - recurringCount;
 
   if (!user?.mentorProfileId) {
     return (
-      <div className="content-area">
-        <div className="error-message">
-          You need to create a mentor profile first.
-        </div>
-      </div>
+      <PageShell
+        title={t.availability.manager.title}
+        subtitle={t.availability.manager.mentorSetupRequired}
+      >
+        <div className="error-message">{t.availability.manager.needMentorProfileFirst}</div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="content-area">
-      <div className="page-header">
-        <h1 className="page-title">Availability Management</h1>
-        <p className="page-subtitle">
-          Set your weekly schedule and specific dates
-        </p>
-      </div>
+    <PageShell
+      title={t.availability.manager.title}
+      subtitle={t.availability.manager.subtitle}
+      eyebrow={t.nav.sections.mentorTools}
+      className="availability-page"
+    >
+      <section className="availability-overview-card card">
+        <div className="availability-overview-copy">
+          <span className="availability-overview-kicker">
+            <Sparkles size={16} />
+            {t.availability.manager.overviewKicker}
+          </span>
+          <h2 className="availability-overview-title">
+            {t.availability.manager.overviewTitle}
+          </h2>
+          <p className="availability-overview-text">
+            {t.availability.manager.overviewText}
+          </p>
+        </div>
+        <div className="availability-overview-metrics">
+          <div className="availability-overview-metric">
+            <span className="availability-overview-metric-icon">
+              <Repeat size={18} />
+            </span>
+            <span className="availability-overview-metric-label">
+              {t.availability.manager.recurring}
+            </span>
+            <strong className="availability-overview-metric-value">
+              {recurringCount}
+            </strong>
+          </div>
+          <div className="availability-overview-metric">
+            <span className="availability-overview-metric-icon">
+              <CalendarRange size={18} />
+            </span>
+            <span className="availability-overview-metric-label">
+              {t.availability.manager.specificDates}
+            </span>
+            <strong className="availability-overview-metric-value">
+              {specificCount}
+            </strong>
+          </div>
+          <div className="availability-overview-metric">
+            <span className="availability-overview-metric-icon">
+              <Clock3 size={18} />
+            </span>
+            <span className="availability-overview-metric-label">
+              {t.availability.manager.totalWindows}
+            </span>
+            <strong className="availability-overview-metric-value">
+              {availabilities.length}
+            </strong>
+          </div>
+        </div>
+      </section>
 
       <div className="availability-actions">
         <button
           className="btn btn-primary"
           onClick={() => setShowWeeklyForm(true)}
         >
-          Set Weekly Schedule
+          <Repeat size={16} />
+          {t.availability.manager.setWeeklySchedule}
         </button>
         <button
           className="btn btn-outline"
           onClick={() => setShowAddForm(true)}
         >
-          Add Single Slot
+          <Plus size={16} />
+          {t.availability.manager.addSingleSlot}
         </button>
       </div>
 
       {error && <div className="error-message">{error}</div>}
 
-      {/* Weekly Schedule Form Modal */}
       {showWeeklyForm && (
         <div className="modal-overlay" onClick={() => setShowWeeklyForm(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content availability-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2 className="modal-title">Set Weekly Schedule</h2>
+              <div>
+                <h2 className="modal-title">{t.availability.manager.setWeeklySchedule}</h2>
+                <p className="availability-modal-subtitle">
+                  {t.availability.manager.weeklyModalSubtitle}
+                </p>
+              </div>
               <button
                 className="modal-close"
                 onClick={() => setShowWeeklyForm(false)}
               >
-                ×
+                x
               </button>
             </div>
             <form onSubmit={handleCreateWeeklySchedule}>
               <div className="modal-body">
                 {DAYS_OF_WEEK.map((day) => (
-                  <div key={day.value} className="weekly-day-row">
+                  <div key={day} className="weekly-day-row">
                     <label className="day-checkbox">
                       <input
                         type="checkbox"
-                        checked={weeklySchedule[day.value].enabled}
+                        checked={weeklySchedule[day].enabled}
                         onChange={(e) =>
                           setWeeklySchedule({
                             ...weeklySchedule,
-                            [day.value]: {
-                              ...weeklySchedule[day.value],
+                            [day]: {
+                              ...weeklySchedule[day],
                               enabled: e.target.checked,
                             },
                           })
                         }
                       />
-                      <span className="day-label">{day.label}</span>
+                      <span className="day-label">{getDayLabel(day)}</span>
                     </label>
-                    {weeklySchedule[day.value].enabled && (
+                    {weeklySchedule[day].enabled && (
                       <div className="time-inputs">
                         <input
                           type="time"
                           className="form-input"
-                          value={weeklySchedule[day.value].startTime}
+                          value={weeklySchedule[day].startTime}
                           onChange={(e) =>
                             setWeeklySchedule({
                               ...weeklySchedule,
-                              [day.value]: {
-                                ...weeklySchedule[day.value],
+                              [day]: {
+                                ...weeklySchedule[day],
                                 startTime: e.target.value,
                               },
                             })
                           }
                         />
-                        <span>to</span>
+                        <span>{t.availability.manager.to}</span>
                         <input
                           type="time"
                           className="form-input"
-                          value={weeklySchedule[day.value].endTime}
+                          value={weeklySchedule[day].endTime}
                           onChange={(e) =>
                             setWeeklySchedule({
                               ...weeklySchedule,
-                              [day.value]: {
-                                ...weeklySchedule[day.value],
+                              [day]: {
+                                ...weeklySchedule[day],
                                 endTime: e.target.value,
                               },
                             })
@@ -269,10 +352,10 @@ export const AvailabilityManager: React.FC = () => {
                   className="btn btn-outline"
                   onClick={() => setShowWeeklyForm(false)}
                 >
-                  Cancel
+                  {t.common.cancel}
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Create Schedule
+                  {t.availability.manager.createSchedule}
                 </button>
               </div>
             </form>
@@ -280,23 +363,30 @@ export const AvailabilityManager: React.FC = () => {
         </div>
       )}
 
-      {/* Add Single Availability Modal */}
       {showAddForm && (
         <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content availability-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2 className="modal-title">Add Availability</h2>
+              <div>
+                <h2 className="modal-title">{t.availability.manager.addAvailability}</h2>
+                <p className="availability-modal-subtitle">
+                  {t.availability.manager.addModalSubtitle}
+                </p>
+              </div>
               <button
                 className="modal-close"
                 onClick={() => setShowAddForm(false)}
               >
-                ×
+                x
               </button>
             </div>
             <form onSubmit={handleAddAvailability}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label className="form-label">Type</label>
+                  <label className="form-label">{t.availability.manager.type}</label>
                   <select
                     className="form-select"
                     value={formData.isRecurring ? "recurring" : "specific"}
@@ -307,14 +397,14 @@ export const AvailabilityManager: React.FC = () => {
                       })
                     }
                   >
-                    <option value="recurring">Recurring Weekly</option>
-                    <option value="specific">Specific Date</option>
+                    <option value="recurring">{t.availability.manager.recurringWeekly}</option>
+                    <option value="specific">{t.availability.manager.specificDate}</option>
                   </select>
                 </div>
 
                 {formData.isRecurring ? (
                   <div className="form-group">
-                    <label className="form-label">Day of Week</label>
+                    <label className="form-label">{t.availability.manager.dayOfWeek}</label>
                     <select
                       className="form-select"
                       value={formData.dayOfWeek}
@@ -326,15 +416,15 @@ export const AvailabilityManager: React.FC = () => {
                       }
                     >
                       {DAYS_OF_WEEK.map((day) => (
-                        <option key={day.value} value={day.value}>
-                          {day.label}
+                        <option key={day} value={day}>
+                          {getDayLabel(day)}
                         </option>
                       ))}
                     </select>
                   </div>
                 ) : (
                   <div className="form-group">
-                    <label className="form-label">Date</label>
+                    <label className="form-label">{t.availability.manager.date}</label>
                     <input
                       type="date"
                       className="form-input"
@@ -352,7 +442,7 @@ export const AvailabilityManager: React.FC = () => {
                 )}
 
                 <div className="form-group">
-                  <label className="form-label">Start Time</label>
+                  <label className="form-label">{t.availability.manager.startTime}</label>
                   <input
                     type="time"
                     className="form-input"
@@ -365,7 +455,7 @@ export const AvailabilityManager: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">End Time</label>
+                  <label className="form-label">{t.availability.manager.endTime}</label>
                   <input
                     type="time"
                     className="form-input"
@@ -383,10 +473,10 @@ export const AvailabilityManager: React.FC = () => {
                   className="btn btn-outline"
                   onClick={() => setShowAddForm(false)}
                 >
-                  Cancel
+                  {t.common.cancel}
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Add Availability
+                  {t.availability.manager.addAvailability}
                 </button>
               </div>
             </form>
@@ -394,32 +484,37 @@ export const AvailabilityManager: React.FC = () => {
         </div>
       )}
 
-      {/* Availability List */}
       {loading ? (
-        <div className="loading-message">Loading availabilities...</div>
+        <div className="loading-message">{t.availability.manager.loading}</div>
       ) : availabilities.length === 0 ? (
         <div className="empty-message">
-          <p>
-            No availabilities set yet. Create your schedule to start receiving
-            bookings.
-          </p>
+          <p>{t.availability.manager.emptyState}</p>
         </div>
       ) : (
         <div className="availability-list">
-          <h3>Current Availabilities</h3>
+          <div className="availability-list-header">
+            <h3>{t.availability.manager.currentAvailabilities}</h3>
+            <span className="availability-list-count">
+              {availabilities.length} {t.availability.manager.items}
+            </span>
+          </div>
           {availabilities.map((avail) => (
             <div key={avail.id} className="availability-card">
               <div className="availability-info">
                 {avail.isRecurring ? (
                   <>
-                    <span className="availability-type">Recurring</span>
-                    <span className="availability-day">
-                      {getDayLabel(avail.dayOfWeek)}
+                    <span className="availability-type availability-type-recurring">
+                      <Repeat size={14} />
+                      {t.availability.manager.recurring}
                     </span>
+                    <span className="availability-day">{getDayLabel(avail.dayOfWeek)}</span>
                   </>
                 ) : (
                   <>
-                    <span className="availability-type">Specific Date</span>
+                    <span className="availability-type availability-type-specific">
+                      <CalendarRange size={14} />
+                      {t.availability.manager.specificDate}
+                    </span>
                     <span className="availability-day">
                       {avail.specificDate
                         ? new Date(avail.specificDate).toLocaleDateString()
@@ -435,12 +530,13 @@ export const AvailabilityManager: React.FC = () => {
                 className="btn btn-sm btn-outline btn-danger"
                 onClick={() => handleDeleteAvailability(avail.id)}
               >
-                Delete
+                <Trash2 size={14} />
+                {t.common.delete}
               </button>
             </div>
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };

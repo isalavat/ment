@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
+import {
+  CalendarRange,
+  Heart,
+  Mail,
+  MessageCircle,
+  Sparkles,
+  Star,
+} from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { mentorService, MentorProfile } from "../../services/mentorService";
 import { BookingModal } from "../bookings/BookingModal";
 import { AlertDialog } from "../common/AlertDialog";
+import { PageShell } from "../common/PageShell";
 import "./Mentors.css";
 
 export const MentorDetail: React.FC = () => {
@@ -55,10 +64,6 @@ export const MentorDetail: React.FC = () => {
   };
 
   const handleBookSession = () => {
-    console.log("Book Session clicked", {
-      user,
-    });
-
     if (!user) {
       setAlertDialog({
         isOpen: true,
@@ -85,32 +90,16 @@ export const MentorDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="content-area">
-        <div
-          style={{
-            textAlign: "center",
-            padding: "var(--space-xl)",
-            color: "var(--neutral-600)",
-          }}
-        >
-          {t.mentors.detail.loading}
-        </div>
-      </div>
+      <PageShell title={t.mentors.title} subtitle={t.mentors.subtitle}>
+        <div className="mentor-state-box">{t.mentors.detail.loading}</div>
+      </PageShell>
     );
   }
 
   if (error || !mentor) {
     return (
-      <div className="content-area">
-        <div
-          style={{
-            padding: "var(--space-md)",
-            background: "var(--danger-50)",
-            color: "var(--danger-700)",
-            borderRadius: "var(--radius-md)",
-            marginBottom: "var(--space-md)",
-          }}
-        >
+      <PageShell title={t.mentors.title} subtitle={t.mentors.subtitle}>
+        <div className="mentor-error-box">
           {error || t.mentors.detail.notFound}
         </div>
         <button
@@ -119,167 +108,109 @@ export const MentorDetail: React.FC = () => {
         >
           ← {t.mentors.detail.backToMentors}
         </button>
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="content-area">
-      <div style={{ marginBottom: "var(--space-md)" }}>
-        <a
+    <PageShell
+      title={`${mentor.user?.firstName} ${mentor.user?.lastName}`}
+      subtitle={mentor.title || t.mentors.detail.defaultTitle}
+      eyebrow="Mentor profile"
+      className="mentor-detail-page"
+    >
+      <div className="mentor-detail-back-row">
+        <button
+          type="button"
+          className="mentor-detail-back-link"
           onClick={() => navigate("/mentors")}
-          style={{
-            color: "var(--neutral-600)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "var(--space-xs)",
-            cursor: "pointer",
-            textDecoration: "none",
-          }}
         >
           ← {t.mentors.detail.backToMentors}
-        </a>
+        </button>
       </div>
 
       {/* Profile Header Card */}
-      <div className="card">
-        <div
-          style={{ display: "flex", gap: "var(--space-xl)", flexWrap: "wrap" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "var(--space-lg)",
-              alignItems: "start",
-            }}
-          >
+      <div className="card mentor-detail-hero-card">
+        <div className="mentor-detail-hero-layout">
+          <div className="mentor-detail-hero-main">
             <div className="mentor-avatar-xl">{getInitials(mentor)}</div>
 
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "start",
-                  justifyContent: "space-between",
-                  gap: "var(--space-md)",
-                  flexWrap: "wrap",
-                }}
-              >
+            <div className="mentor-detail-hero-info">
+              <div className="mentor-detail-heading-row">
                 <div>
-                  <h1
-                    style={{
-                      fontSize: "var(--font-size-xxl)",
-                      marginBottom: "var(--space-xs)",
-                    }}
-                  >
+                  <h1 className="mentor-detail-name">
                     {mentor.user?.firstName} {mentor.user?.lastName}
                   </h1>
-                  <p
-                    style={{
-                      fontSize: "var(--font-size-lg)",
-                      color: "var(--neutral-600)",
-                      marginBottom: "var(--space-sm)",
-                    }}
-                  >
+                  <p className="mentor-detail-title-text">
                     {mentor.title || t.mentors.detail.defaultTitle}
                   </p>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "var(--space-md)",
-                      marginBottom: "var(--space-md)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "var(--space-xs)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          color: "var(--warning-yellow)",
-                          fontSize: "20px",
-                        }}
-                      >
-                        ⭐
+                  <div className="mentor-detail-meta-row">
+                    <div className="mentor-detail-rating">
+                      <span className="mentor-detail-rating-star">
+                        <Star size={16} fill="currentColor" />
                       </span>
-                      <span
-                        style={{
-                          fontSize: "var(--font-size-lg)",
-                          fontWeight: 600,
-                        }}
-                      >
+                      <span className="mentor-detail-rating-value">
                         {mentor.avgRating?.toFixed(1) || "0.0"}
                       </span>
-                      <span style={{ color: "var(--neutral-500)" }}>
+                      <span className="mentor-detail-rating-reviews">
                         ({mentor.totalReviews || 0} {t.mentors.reviews})
                       </span>
                     </div>
                     {mentor.yearsExperience && (
-                      <>
-                        <span style={{ color: "var(--neutral-400)" }}>|</span>
-                        <div>
-                          <span style={{ fontWeight: 600 }}>
+                      <div className="mentor-detail-experience">
+                        <span className="mentor-detail-experience-divider">
+                          |
+                        </span>
+                        <div className="mentor-detail-experience-text">
+                          <span className="mentor-detail-experience-value">
                             {mentor.yearsExperience}
                           </span>{" "}
                           {t.mentors.detail.yearsExperience}
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "var(--space-sm)",
-                      flexWrap: "wrap",
-                    }}
-                  >
+                  <div className="mentor-detail-actions">
                     <button
-                      className="btn btn-primary btn-lg"
+                      className="btn btn-primary btn-lg mentor-detail-action-btn"
                       onClick={handleBookSession}
                     >
-                      📅 {t.mentors.detail.bookSession}
+                      <CalendarRange size={16} />
+                      {t.mentors.detail.bookSession}
                     </button>
-                    <button className="btn btn-outline btn-lg">
-                      ❤️ {t.mentors.detail.addToFavorites}
+                    <button className="btn btn-outline btn-lg mentor-detail-action-btn">
+                      <Heart size={16} />
+                      {t.mentors.detail.addToFavorites}
                     </button>
-                    <button className="btn btn-outline btn-lg">
-                      💬 {t.mentors.detail.message}
+                    <button className="btn btn-outline btn-lg mentor-detail-action-btn">
+                      <MessageCircle size={16} />
+                      {t.mentors.detail.message}
                     </button>
                   </div>
                 </div>
 
-                <div style={{ textAlign: "right" }}>
-                  <div
-                    style={{
-                      fontSize: "var(--font-size-xxl)",
-                      fontWeight: 600,
-                      color: "var(--primary-blue)",
-                    }}
-                  >
+                <div className="mentor-detail-price-block">
+                  <div className="mentor-detail-price-value">
                     ${mentor.hourlyRate || 0}
-                    <span
-                      style={{
-                        fontSize: "var(--font-size-base)",
-                        fontWeight: 400,
-                        color: "var(--neutral-600)",
-                      }}
-                    >
+                    <span className="mentor-detail-price-unit">
                       {t.mentors.detail.perHour}
                     </span>
                   </div>
-                  <div
-                    style={{
-                      fontSize: "var(--font-size-sm)",
-                      color: "var(--neutral-500)",
-                    }}
-                  >
+                  <div className="mentor-detail-price-currency">
                     {mentor.currency || "USD"}
                   </div>
+                </div>
+              </div>
+
+              <div className="mentor-detail-highlight-row">
+                <div className="mentor-detail-highlight-chip">
+                  <Sparkles size={15} />
+                  Verified-ready profile
+                </div>
+                <div className="mentor-detail-highlight-chip mentor-detail-highlight-chip-muted">
+                  <Mail size={15} />
+                  {mentor.user?.email}
                 </div>
               </div>
             </div>
@@ -287,15 +218,15 @@ export const MentorDetail: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-3">
-        <div style={{ gridColumn: "span 2" }}>
+      <div className="mentor-detail-grid">
+        <div className="mentor-detail-main-column">
           {/* About Card */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title">{t.mentors.detail.about}</h2>
             </div>
             <div className="card-body">
-              <p style={{ lineHeight: 1.8 }}>
+              <p className="mentor-detail-copy">
                 {mentor.bio || t.mentors.detail.noBio}
               </p>
             </div>
@@ -310,21 +241,11 @@ export const MentorDetail: React.FC = () => {
                 </h2>
               </div>
               <div className="card-body">
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "var(--space-sm)",
-                  }}
-                >
+                <div className="mentor-detail-chip-list">
                   {mentor.skills.map((skillRel) => (
                     <span
                       key={skillRel.skill.id}
-                      className="badge badge-primary"
-                      style={{
-                        padding: "var(--space-sm) var(--space-md)",
-                        fontSize: "var(--font-size-sm)",
-                      }}
+                      className="mentor-detail-skill-chip"
                     >
                       {skillRel.skill.name}
                     </span>
@@ -342,13 +263,7 @@ export const MentorDetail: React.FC = () => {
               </h2>
             </div>
             <div className="card-body">
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "var(--neutral-500)",
-                  padding: "var(--space-xl)",
-                }}
-              >
+              <div className="mentor-detail-empty-state">
                 {t.mentors.detail.noReviews}
               </div>
             </div>
@@ -356,88 +271,46 @@ export const MentorDetail: React.FC = () => {
         </div>
 
         {/* Sidebar */}
-        <div>
+        <div className="mentor-detail-sidebar">
           {/* Stats Card */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title">{t.mentors.detail.stats}</h2>
             </div>
             <div className="card-body">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "var(--space-md)",
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      color: "var(--neutral-500)",
-                      fontSize: "var(--font-size-sm)",
-                      marginBottom: "4px",
-                    }}
-                  >
+              <div className="mentor-detail-stat-list">
+                <div className="mentor-detail-stat-item">
+                  <div className="mentor-detail-stat-label">
                     {t.mentors.detail.responseTime}
                   </div>
-                  <div
-                    style={{ fontWeight: 600, fontSize: "var(--font-size-md)" }}
-                  >
+                  <div className="mentor-detail-stat-value">
                     {t.mentors.detail.responseTimeValue}
                   </div>
                 </div>
 
-                <div>
-                  <div
-                    style={{
-                      color: "var(--neutral-500)",
-                      fontSize: "var(--font-size-sm)",
-                      marginBottom: "4px",
-                    }}
-                  >
+                <div className="mentor-detail-stat-item">
+                  <div className="mentor-detail-stat-label">
                     {t.mentors.detail.totalSessions}
                   </div>
-                  <div
-                    style={{ fontWeight: 600, fontSize: "var(--font-size-md)" }}
-                  >
+                  <div className="mentor-detail-stat-value">
                     {mentor.totalReviews || 0}+
                   </div>
                 </div>
 
-                <div>
-                  <div
-                    style={{
-                      color: "var(--neutral-500)",
-                      fontSize: "var(--font-size-sm)",
-                      marginBottom: "4px",
-                    }}
-                  >
+                <div className="mentor-detail-stat-item">
+                  <div className="mentor-detail-stat-label">
                     {t.mentors.detail.hourlyRate}
                   </div>
-                  <div
-                    style={{ fontWeight: 600, fontSize: "var(--font-size-md)" }}
-                  >
+                  <div className="mentor-detail-stat-value">
                     ${mentor.hourlyRate || 0}/{mentor.currency || "USD"}
                   </div>
                 </div>
 
-                <div>
-                  <div
-                    style={{
-                      color: "var(--neutral-500)",
-                      fontSize: "var(--font-size-sm)",
-                      marginBottom: "4px",
-                    }}
-                  >
+                <div className="mentor-detail-stat-item">
+                  <div className="mentor-detail-stat-label">
                     {t.mentors.detail.contact}
                   </div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      fontSize: "var(--font-size-md)",
-                      wordBreak: "break-all",
-                    }}
-                  >
+                  <div className="mentor-detail-stat-value mentor-detail-stat-value-break">
                     {mentor.user?.email}
                   </div>
                 </div>
@@ -452,22 +325,11 @@ export const MentorDetail: React.FC = () => {
                 <h2 className="card-title">{t.mentors.detail.categories}</h2>
               </div>
               <div className="card-body">
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "var(--space-xs)",
-                  }}
-                >
+                <div className="mentor-detail-category-list">
                   {mentor.categories.map((catRel) => (
                     <div
                       key={catRel.category.id}
-                      style={{
-                        padding: "var(--space-sm)",
-                        background: "var(--neutral-50)",
-                        borderRadius: "var(--radius-sm)",
-                        fontWeight: 500,
-                      }}
+                      className="mentor-detail-category-item"
                     >
                       {catRel.category.name}
                     </div>
@@ -506,6 +368,6 @@ export const MentorDetail: React.FC = () => {
           }
         }}
       />
-    </div>
+    </PageShell>
   );
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./ConfirmDialog.css";
 
 interface AlertDialogProps {
@@ -14,10 +15,13 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
   isOpen,
   title,
   message,
-  confirmText = "OK",
+  confirmText,
   onClose,
   type = "info",
 }) => {
+  const { t } = useLanguage();
+  const resolvedConfirmText = confirmText ?? t.common.ok;
+
   if (!isOpen) return null;
 
   return (
@@ -35,7 +39,7 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
             onClick={onClose}
             style={{ width: "100px" }}
           >
-            {confirmText}
+            {resolvedConfirmText}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { CalendarRange, Clock3, Sparkles, Ticket, Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -6,6 +7,7 @@ import { bookingService } from "../../services/bookingService";
 import { Booking } from "../../types/booking";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { AlertDialog } from "../common/AlertDialog";
+import { PageShell } from "../common/PageShell";
 import "./Bookings.css";
 
 type BookingStatusFilter =
@@ -52,11 +54,7 @@ export const Bookings: React.FC = () => {
   // Determine if user is viewing as mentor or mentee
   const isMentor = user?.role === "MENTOR" || !!user?.mentorProfileId;
 
-  useEffect(() => {
-    fetchBookings();
-  }, [activeTab]);
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -79,7 +77,7 @@ export const Bookings: React.FC = () => {
       } else if (user?.id) {
         data = await bookingService.getBookingsForMentee(user.id, status);
       } else {
-        setError("Profile not found");
+        setError(t.bookings.errors.profileNotFound);
         setLoading(false);
         return;
       }
@@ -98,20 +96,31 @@ export const Bookings: React.FC = () => {
 
       setBookings(filteredData);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to fetch bookings");
+      setError(err.response?.data?.error || t.bookings.errors.fetchFailed);
       console.error("Error fetching bookings:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    activeTab,
+    isMentor,
+    t.bookings.errors.fetchFailed,
+    t.bookings.errors.profileNotFound,
+    user?.mentorProfileId,
+    user?.id,
+  ]);
+
+  useEffect(() => {
+    void fetchBookings();
+  }, [fetchBookings]);
 
   const handleConfirmBooking = (bookingId: string) => {
     if (!user?.mentorProfileId) return;
 
     setConfirmDialog({
       isOpen: true,
-      title: "Confirm Booking",
-      message: "Are you sure you want to confirm this booking session?",
+      title: t.bookings.confirmBooking,
+      message: t.bookings.confirmBookingMessage,
       type: "success",
       onConfirm: async () => {
         try {
@@ -119,15 +128,16 @@ export const Bookings: React.FC = () => {
           fetchBookings();
           setAlertDialog({
             isOpen: true,
-            title: "Success",
-            message: "Booking confirmed successfully!",
+            title: t.common.success,
+            message: t.bookings.bookingConfirmed,
             type: "success",
           });
         } catch (err: any) {
           setAlertDialog({
             isOpen: true,
-            title: "Error",
-            message: err.response?.data?.error || "Failed to confirm booking",
+            title: t.common.error,
+            message:
+              err.response?.data?.error || t.bookings.errors.confirmFailed,
             type: "danger",
           });
           console.error("Error confirming booking:", err);
@@ -139,9 +149,8 @@ export const Bookings: React.FC = () => {
   const handleCancelBooking = (bookingId: string) => {
     setConfirmDialog({
       isOpen: true,
-      title: "Cancel Booking",
-      message:
-        "Are you sure you want to cancel this booking? This action cannot be undone.",
+      title: t.bookings.cancelBooking,
+      message: t.bookings.cancelBookingMessage,
       type: "danger",
       onConfirm: async () => {
         try {
@@ -156,15 +165,16 @@ export const Bookings: React.FC = () => {
           fetchBookings();
           setAlertDialog({
             isOpen: true,
-            title: "Cancelled",
-            message: "Booking cancelled successfully",
+            title: t.bookings.cancelled,
+            message: t.bookings.bookingCancelled,
             type: "info",
           });
         } catch (err: any) {
           setAlertDialog({
             isOpen: true,
-            title: "Error",
-            message: err.response?.data?.error || "Failed to cancel booking",
+            title: t.common.error,
+            message:
+              err.response?.data?.error || t.bookings.errors.cancelFailed,
             type: "danger",
           });
           console.error("Error cancelling booking:", err);
@@ -214,15 +224,19 @@ export const Bookings: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "CONFIRMED":
-        return "Confirmed";
+        return t.dashboard.confirmed;
       case "PENDING":
-        return "Pending";
+        return t.dashboard.pending;
       case "COMPLETED":
-        return "Completed";
+        return t.dashboard.completed;
       case "CANCELLED_BY_USER":
-        return isMentor ? "Cancelled by User" : "Cancelled by You";
+        return isMentor
+          ? t.bookings.status.cancelledByUser
+          : t.bookings.status.cancelledByYou;
       case "CANCELLED_BY_MENTOR":
-        return isMentor ? "Cancelled by You" : "Cancelled by Mentor";
+        return isMentor
+          ? t.bookings.status.cancelledByYou
+          : t.bookings.status.cancelledByMentor;
       default:
         return status;
     }
@@ -245,16 +259,67 @@ export const Bookings: React.FC = () => {
     return booking.status === "PENDING" || booking.status === "CONFIRMED";
   };
 
+  const summaryItems = [
+    {
+      label: t.bookings.labels.totalBookings,
+      value: bookings.length,
+      icon: <Ticket size={18} />,
+    },
+    {
+      label: t.bookings.labels.upcoming,
+      value: bookings.filter((booking) => booking.status === "CONFIRMED")
+        .length,
+      icon: <CalendarRange size={18} />,
+    },
+    {
+      label: t.bookings.labels.pending,
+      value: bookings.filter((booking) => booking.status === "PENDING").length,
+      icon: <Clock3 size={18} />,
+    },
+  ];
+
   return (
-    <div className="content-area">
-      <div className="page-header">
-        <h1 className="page-title">{t.nav.bookings}</h1>
-        <p className="page-subtitle">
-          {isMentor
-            ? "Manage your mentee sessions"
-            : "Manage your mentorship sessions"}
-        </p>
-      </div>
+    <PageShell
+      title={t.nav.bookings}
+      eyebrow={
+        isMentor
+          ? t.bookings.labels.mentorSessions
+          : t.bookings.labels.sessionManagement
+      }
+      subtitle={
+        isMentor
+          ? t.bookings.labels.manageMenteeSessions
+          : t.bookings.labels.manageMentorshipSessions
+      }
+      className="bookings-page"
+    >
+      <section className="booking-overview-card card">
+        <div className="booking-overview-copy">
+          <span className="booking-overview-kicker">
+            <Sparkles size={16} />
+            {t.bookings.labels.sessionTimeline}
+          </span>
+          <h2 className="booking-overview-title">
+            {t.bookings.labels.keepBookingsInOnePlace}
+          </h2>
+          <p className="booking-overview-text">
+            {t.bookings.labels.overviewText}
+          </p>
+        </div>
+        <div className="booking-overview-metrics">
+          {summaryItems.map((item) => (
+            <div key={item.label} className="booking-overview-metric">
+              <span className="booking-overview-metric-icon">{item.icon}</span>
+              <span className="booking-overview-metric-label">
+                {item.label}
+              </span>
+              <strong className="booking-overview-metric-value">
+                {item.value}
+              </strong>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Tabs */}
       <div className="booking-tabs">
@@ -262,60 +327,65 @@ export const Bookings: React.FC = () => {
           className={`tab-button ${activeTab === "ALL" ? "active" : ""}`}
           onClick={() => setActiveTab("ALL")}
         >
-          All
+          {t.bookings.labels.all}
         </button>
         <button
           className={`tab-button ${activeTab === "PENDING" ? "active" : ""}`}
           onClick={() => setActiveTab("PENDING")}
         >
-          Pending
+          {t.dashboard.pending}
         </button>
         <button
           className={`tab-button ${activeTab === "CONFIRMED" ? "active" : ""}`}
           onClick={() => setActiveTab("CONFIRMED")}
         >
-          Upcoming
+          {t.bookings.labels.upcoming}
         </button>
         <button
           className={`tab-button ${activeTab === "COMPLETED" ? "active" : ""}`}
           onClick={() => setActiveTab("COMPLETED")}
         >
-          Completed
+          {t.dashboard.completed}
         </button>
         <button
           className={`tab-button ${activeTab === "CANCELLED" ? "active" : ""}`}
           onClick={() => setActiveTab("CANCELLED")}
         >
-          Cancelled
+          {t.bookings.cancelled}
         </button>
       </div>
 
       {/* Bookings List */}
       {loading ? (
-        <div className="bookings-loading">Loading bookings...</div>
+        <div className="bookings-loading">{t.bookings.loadingBookings}</div>
       ) : error ? (
         <div className="bookings-error">{error}</div>
       ) : bookings.length === 0 ? (
         <div className="bookings-empty">
-          <p>No bookings found</p>
+          <p>{t.bookings.noBookingsFound}</p>
           <button
             className="btn btn-primary"
             onClick={() => navigate("/mentors")}
           >
-            Find Mentors
+            {t.nav.mentors}
           </button>
         </div>
       ) : (
         <div className="bookings-list">
           {bookings.map((booking) => {
-            console.log("Booking card:", {
-              id: booking.id,
-              status: booking.status,
-              isMentor,
-              showConfirm: isMentor && booking.status === "PENDING",
-            });
             return (
               <div key={booking.id} className="booking-card">
+                <div className="booking-card-top">
+                  <span
+                    className={`badge ${getStatusBadgeClass(booking.status)}`}
+                  >
+                    {getStatusText(booking.status)}
+                  </span>
+                  <span className="booking-card-price">
+                    ${booking.totalAmount} {booking.currency}
+                  </span>
+                </div>
+
                 <div className="booking-main">
                   <div className="booking-mentor-section">
                     <div className="mentor-avatar">
@@ -336,13 +406,6 @@ export const Bookings: React.FC = () => {
                             ? `${booking.mentee?.firstName} ${booking.mentee?.lastName}`
                             : `${booking.mentor?.user?.firstName} ${booking.mentor?.user?.lastName}`}
                         </h3>
-                        <span
-                          className={`badge ${getStatusBadgeClass(
-                            booking.status,
-                          )}`}
-                        >
-                          {getStatusText(booking.status)}
-                        </span>
                       </div>
                       <p className="mentor-title">
                         {isMentor
@@ -354,22 +417,24 @@ export const Bookings: React.FC = () => {
                       )}
                       <div className="booking-details">
                         <div className="detail-item">
-                          📅{" "}
+                          <CalendarRange size={15} />
                           {booking.timeSlot &&
                             formatDate(booking.timeSlot.startTime)}
                         </div>
                         <div className="detail-item">
-                          🕐{" "}
+                          <Clock3 size={15} />
                           {booking.timeSlot &&
                             `${formatTime(
                               booking.timeSlot.startTime,
                             )} - ${formatTime(booking.timeSlot.endTime)}`}
                         </div>
                         <div className="detail-item">
-                          ⏱️ {booking.duration} min
+                          <Video size={15} /> {booking.duration} min
                         </div>
-                        <div className="detail-item">
-                          💰 ${booking.totalAmount} {booking.currency}
+                        <div className="detail-item booking-detail-item-muted">
+                          {booking.meetingLink
+                            ? t.bookings.meetingLinkReady
+                            : t.bookings.meetingLinkPending}
                         </div>
                       </div>
                     </div>
@@ -382,7 +447,7 @@ export const Bookings: React.FC = () => {
                         className="btn btn-success"
                         onClick={() => handleConfirmBooking(booking.id)}
                       >
-                        Confirm
+                        {t.common.confirm}
                       </button>
                     )}
 
@@ -393,7 +458,8 @@ export const Bookings: React.FC = () => {
                           window.open(booking.meetingLink, "_blank")
                         }
                       >
-                        Join Meeting
+                        <Video size={16} />
+                        {t.bookings.joinMeeting}
                       </button>
                     )}
 
@@ -402,7 +468,7 @@ export const Bookings: React.FC = () => {
                       booking.status === "COMPLETED" &&
                       !booking.review && (
                         <button className="btn btn-primary">
-                          Leave Review
+                          {t.bookings.leaveReview}
                         </button>
                       )}
 
@@ -411,7 +477,7 @@ export const Bookings: React.FC = () => {
                         className="btn btn-outline btn-danger"
                         onClick={() => handleCancelBooking(booking.id)}
                       >
-                        Cancel
+                        {t.common.cancel}
                       </button>
                     )}
 
@@ -419,7 +485,7 @@ export const Bookings: React.FC = () => {
                       className="btn btn-outline"
                       onClick={() => navigate(`/bookings/${booking.id}`)}
                     >
-                      View Details
+                      {t.bookings.viewDetails}
                     </button>
                   </div>
                 </div>
@@ -446,6 +512,6 @@ export const Bookings: React.FC = () => {
         type={alertDialog.type}
         onClose={() => setAlertDialog({ ...alertDialog, isOpen: false })}
       />
-    </div>
+    </PageShell>
   );
 };

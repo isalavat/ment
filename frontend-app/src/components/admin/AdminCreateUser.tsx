@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { useLanguage } from "../../i18n/LanguageContext";
 import {
   adminService,
   CreateUserData,
@@ -7,6 +9,7 @@ import {
   Skill,
 } from "../../services/adminService";
 import { profileService } from "../../services/profileService";
+import { PageShell } from "../common/PageShell";
 import "./AdminUsers.css";
 
 interface Category {
@@ -17,6 +20,7 @@ interface Category {
 
 export const AdminCreateUser: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -156,7 +160,9 @@ export const AdminCreateUser: React.FC = () => {
       navigate("/admin/users");
     } catch (err: any) {
       setError(
-        err.response?.data?.error || err.message || "Failed to create user",
+        err.response?.data?.error ||
+          err.message ||
+          t.admin.create.failedToCreate,
       );
     } finally {
       setLoading(false);
@@ -164,19 +170,20 @@ export const AdminCreateUser: React.FC = () => {
   };
 
   return (
-    <div className="content-area">
-      <div className="page-header">
+    <PageShell
+      title={t.admin.create.title}
+      actions={
         <div>
           <button
             className="btn btn-outline btn-sm"
             onClick={() => navigate("/admin/users")}
           >
-            ← Back
+            <ArrowLeft size={16} aria-hidden="true" />{" "}
+            {t.admin.create.backToUsers}
           </button>
-          <h1 className="page-title mt-sm">Create New User</h1>
         </div>
-      </div>
-
+      }
+    >
       {error && <div className="alert alert-danger mb-md">{error}</div>}
 
       <div className="card">
@@ -186,7 +193,7 @@ export const AdminCreateUser: React.FC = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="firstName" className="form-label">
-                  First Name *
+                  {t.admin.create.firstName} *
                 </label>
                 <input
                   type="text"
@@ -200,7 +207,7 @@ export const AdminCreateUser: React.FC = () => {
               </div>
               <div className="form-group">
                 <label htmlFor="lastName" className="form-label">
-                  Last Name *
+                  {t.admin.create.lastName} *
                 </label>
                 <input
                   type="text"
@@ -216,7 +223,7 @@ export const AdminCreateUser: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="email" className="form-label">
-                Email *
+                {t.admin.create.email} *
               </label>
               <input
                 type="email"
@@ -231,7 +238,7 @@ export const AdminCreateUser: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="password" className="form-label">
-                Password *
+                {t.admin.create.password} *
               </label>
               <input
                 type="password"
@@ -247,7 +254,7 @@ export const AdminCreateUser: React.FC = () => {
 
             <div className="form-group">
               <label htmlFor="role" className="form-label">
-                Role *
+                {t.admin.create.role} *
               </label>
               <select
                 id="role"
@@ -257,15 +264,15 @@ export const AdminCreateUser: React.FC = () => {
                 onChange={handleUserChange}
                 required
               >
-                <option value="USER">User</option>
-                <option value="MENTOR">Mentor</option>
-                <option value="ADMIN">Admin</option>
+                <option value="USER">{t.common.roles.learner}</option>
+                <option value="MENTOR">{t.common.roles.mentor}</option>
+                <option value="ADMIN">{t.common.roles.admin}</option>
               </select>
             </div>
 
             <div className="form-group">
               <label htmlFor="avatarUrl" className="form-label">
-                Avatar URL (optional)
+                {t.admin.create.avatarUrlOptional}
               </label>
               <input
                 type="text"
@@ -274,13 +281,13 @@ export const AdminCreateUser: React.FC = () => {
                 className="form-input"
                 value={userData.avatarUrl}
                 onChange={handleUserChange}
-                placeholder="https://example.com/avatar.jpg"
+                placeholder={t.admin.create.avatarPlaceholder}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="bio" className="form-label">
-                Bio (optional)
+                {t.admin.create.bioOptional}
               </label>
               <textarea
                 id="bio"
@@ -289,13 +296,13 @@ export const AdminCreateUser: React.FC = () => {
                 rows={2}
                 value={userData.bio}
                 onChange={handleUserChange}
-                placeholder="Short bio or description..."
+                placeholder={t.admin.create.bioPlaceholder}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="goals" className="form-label">
-                Goals (optional)
+                {t.admin.create.goalsOptional}
               </label>
               <textarea
                 id="goals"
@@ -304,7 +311,7 @@ export const AdminCreateUser: React.FC = () => {
                 rows={2}
                 value={userData.goals}
                 onChange={handleUserChange}
-                placeholder="User's goals or objectives..."
+                placeholder={t.admin.create.goalsPlaceholder}
               />
             </div>
 
@@ -312,11 +319,11 @@ export const AdminCreateUser: React.FC = () => {
             {userData.role === "MENTOR" && (
               <>
                 <hr className="my-md" />
-                <h3 className="mb-md">Mentor Profile</h3>
+                <h3 className="mb-md">{t.admin.create.mentorProfile}</h3>
 
                 <div className="form-group">
                   <label htmlFor="title" className="form-label">
-                    Professional Title *
+                    {t.admin.create.professionalTitle} *
                   </label>
                   <input
                     type="text"
@@ -326,13 +333,13 @@ export const AdminCreateUser: React.FC = () => {
                     value={mentorData.title}
                     onChange={handleMentorChange}
                     required
-                    placeholder="e.g., Senior Software Engineer"
+                    placeholder={t.admin.create.titlePlaceholder}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="mentorBio" className="form-label">
-                    Mentor Bio *
+                    {t.admin.create.mentorBio} *
                   </label>
                   <textarea
                     id="mentorBio"
@@ -342,14 +349,14 @@ export const AdminCreateUser: React.FC = () => {
                     value={mentorData.bio}
                     onChange={handleMentorChange}
                     required
-                    placeholder="Experience, expertise, what mentees can expect..."
+                    placeholder={t.admin.create.mentorBioPlaceholder}
                   />
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="yearsExperience" className="form-label">
-                      Years of Experience *
+                      {t.admin.create.yearsExperience} *
                     </label>
                     <input
                       type="number"
@@ -364,7 +371,7 @@ export const AdminCreateUser: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label htmlFor="hourlyRate" className="form-label">
-                      Hourly Rate *
+                      {t.admin.create.hourlyRate} *
                     </label>
                     <input
                       type="number"
@@ -380,7 +387,7 @@ export const AdminCreateUser: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label htmlFor="currency" className="form-label">
-                      Currency
+                      {t.admin.create.currency}
                     </label>
                     <input
                       type="text"
@@ -396,7 +403,9 @@ export const AdminCreateUser: React.FC = () => {
 
                 {/* Categories */}
                 <div className="form-group">
-                  <label className="form-label">Categories</label>
+                  <label className="form-label">
+                    {t.admin.create.categories}
+                  </label>
                   <div className="skills-list mb-md">
                     {selectedCategories.length > 0 ? (
                       selectedCategories.map((cat) => (
@@ -406,29 +415,21 @@ export const AdminCreateUser: React.FC = () => {
                             type="button"
                             className="skill-remove"
                             onClick={() => handleRemoveCategory(cat.id)}
-                            title="Remove category"
+                            title={t.admin.shared.removeCategory}
                           >
                             ×
                           </button>
                         </div>
                       ))
                     ) : (
-                      <p
-                        style={{
-                          color: "var(--neutral-500)",
-                          fontSize: "var(--font-size-sm)",
-                        }}
-                      >
-                        No categories selected
+                      <p className="admin-muted-text">
+                        {t.admin.create.noCategoriesSelected}
                       </p>
                     )}
                   </div>
                   <div className="skill-add-form">
                     <div className="form-row">
-                      <div
-                        className="form-group"
-                        style={{ marginBottom: 0, flex: 1 }}
-                      >
+                      <div className="form-group admin-form-group-flex">
                         <select
                           className="form-select"
                           value=""
@@ -437,7 +438,9 @@ export const AdminCreateUser: React.FC = () => {
                               handleAddCategory(e.target.value);
                           }}
                         >
-                          <option value="">Select a category...</option>
+                          <option value="">
+                            {t.admin.create.selectCategory}
+                          </option>
                           {availableCategories
                             .filter(
                               (cat) =>
@@ -458,7 +461,7 @@ export const AdminCreateUser: React.FC = () => {
 
                 {/* Skills */}
                 <div className="form-group">
-                  <label className="form-label">Skills</label>
+                  <label className="form-label">{t.admin.create.skills}</label>
                   <div className="skills-list mb-md">
                     {selectedSkills.length > 0 ? (
                       selectedSkills.map((skill) => (
@@ -473,32 +476,27 @@ export const AdminCreateUser: React.FC = () => {
                             onClick={() =>
                               handleRemoveSkill(skill.id || skill.name)
                             }
-                            title="Remove skill"
+                            title={t.admin.shared.removeSkill}
                           >
                             ×
                           </button>
                         </div>
                       ))
                     ) : (
-                      <p
-                        style={{
-                          color: "var(--neutral-500)",
-                          fontSize: "var(--font-size-sm)",
-                        }}
-                      >
-                        No skills added
+                      <p className="admin-muted-text">
+                        {t.admin.create.noSkillsAdded}
                       </p>
                     )}
                   </div>
                   <div className="skill-add-form">
                     <div className="form-row">
-                      <div className="form-group" style={{ marginBottom: 0 }}>
+                      <div className="form-group admin-form-group-no-margin">
                         <select
                           className="form-select"
                           value={selectedSkillId}
                           onChange={(e) => setSelectedSkillId(e.target.value)}
                         >
-                          <option value="">Select a skill...</option>
+                          <option value="">{t.admin.create.selectSkill}</option>
                           {availableSkills
                             .filter(
                               (s) =>
@@ -511,20 +509,16 @@ export const AdminCreateUser: React.FC = () => {
                             ))}
                         </select>
                       </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          padding: "0 var(--space-md)",
-                        }}
-                      >
-                        <span style={{ color: "var(--neutral-500)" }}>or</span>
+                      <div className="admin-inline-separator">
+                        <span className="admin-muted-text">
+                          {t.admin.shared.or}
+                        </span>
                       </div>
-                      <div className="form-group" style={{ marginBottom: 0 }}>
+                      <div className="form-group admin-form-group-no-margin">
                         <input
                           type="text"
                           className="form-input"
-                          placeholder="Enter new skill name"
+                          placeholder={t.admin.create.enterNewSkillName}
                           value={newSkillName}
                           onChange={(e) => setNewSkillName(e.target.value)}
                           onKeyDown={(e) => {
@@ -540,7 +534,7 @@ export const AdminCreateUser: React.FC = () => {
                         className="btn btn-outline"
                         onClick={handleAddSkill}
                       >
-                        Add Skill
+                        {t.admin.create.addSkill}
                       </button>
                     </div>
                   </div>
@@ -555,7 +549,7 @@ export const AdminCreateUser: React.FC = () => {
                 onClick={() => navigate("/admin/users")}
                 disabled={loading}
               >
-                Cancel
+                {t.admin.create.cancel}
               </button>
               <button
                 type="submit"
@@ -563,15 +557,15 @@ export const AdminCreateUser: React.FC = () => {
                 disabled={loading}
               >
                 {loading
-                  ? "Creating..."
+                  ? t.admin.create.creating
                   : userData.role === "MENTOR"
-                    ? "Create User & Profile"
-                    : "Create User"}
+                    ? t.admin.create.createUserAndProfile
+                    : t.admin.create.createUser}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };

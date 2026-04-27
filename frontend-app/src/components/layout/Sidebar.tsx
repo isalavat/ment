@@ -1,8 +1,19 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+  BookOpen,
+  CalendarRange,
+  LayoutDashboard,
+  ShieldCheck,
+  UserRound,
+  Users,
+  Wallet,
+  X,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { LanguageSwitcher } from "../language/LanguageSwitcher";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { PlantIcon } from "../common/PlantIcon";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -24,37 +35,77 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
+  const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
+    isActive ? "nav-item nav-item-active" : "nav-item";
+
   return (
     <aside id="sidebar" className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
       <div className="sidebar-header">
-        <LanguageSwitcher />
+        <NavLink
+          to="/dashboard"
+          className="sidebar-brand"
+          onClick={handleLinkClick}
+        >
+          <span className="sidebar-brand-icon">
+            <PlantIcon size={20} className="sidebar-brand-icon-svg" />
+          </span>
+          <span className="sidebar-brand-text">MentorHub</span>
+        </NavLink>
         <button
           className="sidebar-close"
           onClick={onClose}
           aria-label="Close menu"
         >
-          ✕
+          <X size={18} />
         </button>
+      </div>
+      <div className="sidebar-language-wrap">
+        <LanguageSwitcher />
       </div>
       <nav className="sidebar-nav">
         <div className="nav-section">
           <div className="nav-section-title">{t.nav.sections.main}</div>
-          <Link to="/" className="nav-item" onClick={handleLinkClick}>
-            <span className="nav-icon">👨‍🎓</span>
+          <NavLink
+            to="/"
+            end
+            className={navLinkClassName}
+            onClick={handleLinkClick}
+          >
+            <span className="nav-icon">
+              <PlantIcon size={18} />
+            </span>
             <span>{t.nav.home}</span>
-          </Link>
-          <Link to="/dashboard" className="nav-item" onClick={handleLinkClick}>
-            <span className="nav-icon">📊</span>
+          </NavLink>
+          <NavLink
+            to="/dashboard"
+            className={navLinkClassName}
+            onClick={handleLinkClick}
+          >
+            <span className="nav-icon">
+              <LayoutDashboard size={18} />
+            </span>
             <span>{t.nav.dashboard}</span>
-          </Link>
-          <Link to="/mentors" className="nav-item" onClick={handleLinkClick}>
-            <span className="nav-icon">👥</span>
+          </NavLink>
+          <NavLink
+            to="/mentors"
+            className={navLinkClassName}
+            onClick={handleLinkClick}
+          >
+            <span className="nav-icon">
+              <Users size={18} />
+            </span>
             <span>{t.nav.mentors}</span>
-          </Link>
-          <Link to="/bookings" className="nav-item" onClick={handleLinkClick}>
-            <span className="nav-icon">📅</span>
+          </NavLink>
+          <NavLink
+            to="/bookings"
+            className={navLinkClassName}
+            onClick={handleLinkClick}
+          >
+            <span className="nav-icon">
+              <CalendarRange size={18} />
+            </span>
             <span>{t.nav.bookings}</span>
-          </Link>
+          </NavLink>
         </div>
       </nav>
 
@@ -64,22 +115,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <div className="nav-section-title">
               {t.nav.sections.mentorTools}
             </div>
-            <Link
+            <NavLink
               to="/availability"
-              className="nav-item"
+              className={navLinkClassName}
               onClick={handleLinkClick}
             >
-              <span className="nav-icon">🗓️</span>
+              <span className="nav-icon">
+                <CalendarRange size={18} />
+              </span>
               <span>{t.nav.mentorTools.availability}</span>
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/time-slots"
-              className="nav-item"
+              className={navLinkClassName}
               onClick={handleLinkClick}
             >
-              <span className="nav-icon">⏰</span>
+              <span className="nav-icon">
+                <BookOpen size={18} />
+              </span>
               <span>{t.nav.mentorTools.timeSlots}</span>
-            </Link>
+            </NavLink>
           </div>
         </nav>
       )}
@@ -88,22 +143,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <nav className="sidebar-nav">
           <div className="nav-section">
             <div className="nav-section-title">{t.nav.sections.admin}</div>
-            <Link
+            <NavLink
               to="/admin/users"
-              className="nav-item"
+              className={navLinkClassName}
               onClick={handleLinkClick}
             >
-              <span className="nav-icon">⚙️</span>
+              <span className="nav-icon">
+                <ShieldCheck size={18} />
+              </span>
               <span>{t.nav.admin.userManagement}</span>
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/admin/mentors"
-              className="nav-item"
+              className={navLinkClassName}
               onClick={handleLinkClick}
             >
-              <span className="nav-icon">✓</span>
-              <span>Mentor Verification</span>
-            </Link>
+              <span className="nav-icon">
+                <ShieldCheck size={18} />
+              </span>
+              <span>{t.nav.admin.mentorVerification}</span>
+            </NavLink>
           </div>
         </nav>
       )}
@@ -113,25 +172,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <div className="nav-section-title">{t.nav.profile}</div>
 
           {user?.role === "USER" && (
-            <Link
+            <NavLink
               to="/profile/me"
-              className="nav-item"
+              className={navLinkClassName}
               onClick={handleLinkClick}
             >
-              <span className="nav-icon">👤</span>
+              <span className="nav-icon">
+                <UserRound size={18} />
+              </span>
               <span>{t.nav.profile}</span>
-            </Link>
+            </NavLink>
           )}
 
           {user?.role === "MENTOR" && (
-            <Link
+            <NavLink
               to="/profile/mentor"
-              className="nav-item"
+              className={navLinkClassName}
               onClick={handleLinkClick}
             >
-              <span className="nav-icon">👤</span>
+              <span className="nav-icon">
+                <UserRound size={18} />
+              </span>
               <span>{t.nav.profile}</span>
-            </Link>
+            </NavLink>
           )}
         </div>
       </nav>
@@ -139,14 +202,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="nav-section">
           <div className="nav-section-title">{t.nav.sections.account}</div>
 
-          <div
-            className="nav-item"
-            onClick={handleLogout}
-            style={{ cursor: "pointer" }}
-          >
-            <span className="nav-icon">🚪</span>
+          <button className="nav-item nav-item-button" onClick={handleLogout}>
+            <span className="nav-icon">
+              <Wallet size={18} />
+            </span>
             <span>{t.nav.logout}</span>
-          </div>
+          </button>
         </div>
       </nav>
     </aside>

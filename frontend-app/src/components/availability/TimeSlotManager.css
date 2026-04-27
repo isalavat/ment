@@ -1,22 +1,180 @@
+.timeslot-page {
+  gap: var(--space-lg);
+}
+
+.timeslot-overview-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: var(--space-lg);
+  background: linear-gradient(
+    135deg,
+    rgba(79, 127, 92, 0.12),
+    rgba(255, 255, 255, 0.98)
+  );
+}
+
+.timeslot-overview-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: 560px;
+}
+
+.timeslot-overview-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary-blue);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.timeslot-overview-title {
+  font-family: var(--font-family-display);
+  font-size: clamp(1.4rem, 1.15rem + 0.7vw, 2rem);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.04em;
+}
+
+.timeslot-overview-text {
+  color: var(--neutral-600);
+}
+
+.timeslot-overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  min-width: 340px;
+}
+
+.timeslot-overview-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(79, 127, 92, 0.12);
+  border-radius: var(--radius-md);
+}
+
+.timeslot-overview-metric-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-subtle);
+  color: var(--primary-blue);
+}
+
+.timeslot-overview-metric-label {
+  color: var(--neutral-500);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.timeslot-overview-metric-value {
+  font-size: var(--font-size-lg);
+  color: var(--neutral-900);
+  letter-spacing: -0.03em;
+}
+
 .timeslot-filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
   padding: var(--space-lg);
-  background: white;
-  border: 1px solid var(--neutral-200);
+  background: var(--surface-base);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
+}
+
+.timeslot-filters-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.timeslot-filters-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-subtle);
+  color: var(--primary-blue);
+}
+
+.timeslot-filters-title {
+  color: var(--neutral-900);
+  font-weight: 600;
+}
+
+.timeslot-filters-subtitle {
+  color: var(--neutral-500);
+  font-size: var(--font-size-sm);
+}
+
+.timeslot-generate-card {
+  margin-bottom: var(--space-lg);
+}
+
+.timeslot-generate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.timeslot-generate-footer {
+  margin-top: var(--space-md);
+}
+
+.timeslot-generate-hint {
+  color: var(--neutral-600);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-xs);
+}
+
+.timeslot-filter-range {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
 }
 
 .timeslots-list {
   margin-top: var(--space-lg);
 }
 
+.timeslots-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
 .timeslots-list h3 {
   font-size: var(--font-size-lg);
   font-weight: 600;
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
+}
+
+.timeslots-list-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-subtle);
+  color: var(--neutral-600);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
 }
 
 .timeslot-card {
@@ -24,8 +182,12 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-md);
-  background: white;
-  border: 1px solid var(--neutral-200);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(245, 242, 235, 0.84)
+  );
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-sm);
 }
@@ -39,6 +201,9 @@
 }
 
 .timeslot-datetime {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 500;
   color: var(--neutral-900);
 }
@@ -48,27 +213,15 @@
   font-size: var(--font-size-sm);
 }
 
-.badge-success {
-  background: var(--success-100);
-  color: var(--success-700);
-}
-
-.badge-warning {
-  background: var(--warning-100);
-  color: var(--warning-700);
-}
-
-.badge-danger {
-  background: var(--danger-100);
-  color: var(--danger-700);
-}
-
-.badge-neutral {
-  background: var(--neutral-100);
-  color: var(--neutral-600);
-}
-
 @media (max-width: 768px) {
+  .timeslot-overview-card {
+    flex-direction: column;
+  }
+
+  .timeslot-overview-metrics {
+    min-width: 0;
+  }
+
   .timeslot-card {
     flex-direction: column;
     align-items: flex-start;
@@ -77,5 +230,16 @@
 
   .timeslot-info {
     width: 100%;
+  }
+
+  .timeslots-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .timeslot-overview-metrics {
+    grid-template-columns: 1fr;
   }
 }

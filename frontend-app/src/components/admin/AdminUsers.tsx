@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { adminService, User } from "../../services/adminService";
+import {
+  BadgeCheck,
+  CirclePlus,
+  Eye,
+  Pencil,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { adminService, User } from "../../services/adminService";
+import { PageShell } from "../common/PageShell";
 import "./AdminUsers.css";
 
 export const AdminUsers: React.FC = () => {
@@ -30,11 +39,7 @@ export const AdminUsers: React.FC = () => {
   const [viewData, setViewData] = useState<User | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
 
-  useEffect(() => {
-    loadUsers();
-  }, [filters]);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -47,11 +52,15 @@ export const AdminUsers: React.FC = () => {
       setUsers(response.users);
       setPagination(response.pagination);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to load users");
+      setError(err.response?.data?.error || t.admin.users.loadFailed);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, t.admin.users.loadFailed]);
+
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
@@ -60,7 +69,7 @@ export const AdminUsers: React.FC = () => {
   const handleDelete = async (userId: string, fullName: string) => {
     if (
       !window.confirm(
-        `Are you sure you want to delete "${fullName}"? This cannot be undone.`,
+        `${t.admin.users.deletePromptPrefix} "${fullName}"? ${t.admin.users.deletePromptSuffix}`,
       )
     ) {
       return;
@@ -68,9 +77,9 @@ export const AdminUsers: React.FC = () => {
 
     try {
       await adminService.deleteUser(userId);
-      loadUsers();
+      void loadUsers();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete user");
+      alert(err.response?.data?.error || t.admin.users.deleteFailed);
     }
   };
 
@@ -82,7 +91,7 @@ export const AdminUsers: React.FC = () => {
       const data = await adminService.getUser(userId);
       setViewData(data);
     } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to load profile");
+      alert(err.response?.data?.error || t.admin.users.loadProfileFailed);
       setViewTarget(null);
     } finally {
       setViewLoading(false);
@@ -107,18 +116,31 @@ export const AdminUsers: React.FC = () => {
     }
   };
 
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return t.common.roles.admin;
+      case "MENTOR":
+        return t.common.roles.mentor;
+      case "USER":
+        return t.common.roles.learner;
+      default:
+        return role;
+    }
+  };
+
   return (
-    <div className="content-area">
-      <div className="page-header">
-        <h1 className="page-title">User Management</h1>
+    <PageShell
+      title={t.admin.users.title}
+      actions={
         <button
           className="btn btn-primary"
           onClick={() => navigate("/admin/users/create")}
         >
-          + Create User
+          <CirclePlus size={16} aria-hidden="true" /> {t.admin.users.createUser}
         </button>
-      </div>
-
+      }
+    >
       {/* Filters */}
       <div className="card mb-lg">
         <div className="card-body">
@@ -127,7 +149,7 @@ export const AdminUsers: React.FC = () => {
               <input
                 type="text"
                 className="form-input"
-                placeholder="Search by email or name..."
+                placeholder={t.admin.users.searchPlaceholder}
                 value={filters.search}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
               />
@@ -138,10 +160,10 @@ export const AdminUsers: React.FC = () => {
                 value={filters.role}
                 onChange={(e) => handleFilterChange("role", e.target.value)}
               >
-                <option value="">All Roles</option>
-                <option value="USER">User</option>
-                <option value="MENTOR">Mentor</option>
-                <option value="ADMIN">Admin</option>
+                <option value="">{t.admin.shared.allRoles}</option>
+                <option value="USER">{t.common.roles.learner}</option>
+                <option value="MENTOR">{t.common.roles.mentor}</option>
+                <option value="ADMIN">{t.common.roles.admin}</option>
               </select>
             </div>
             <button
@@ -150,7 +172,7 @@ export const AdminUsers: React.FC = () => {
                 setFilters({ role: "", search: "", page: 1, limit: 20 })
               }
             >
-              Clear Filters
+              {t.admin.shared.clearFilters}
             </button>
           </div>
         </div>
@@ -160,39 +182,42 @@ export const AdminUsers: React.FC = () => {
 
       {loading ? (
         <div className="card">
-          <div
-            className="card-body"
-            style={{ textAlign: "center", padding: "var(--space-xxl)" }}
-          >
-            Loading users...
+          <div className="card-body admin-center-state">
+            {t.admin.users.loadingUsers}
           </div>
         </div>
       ) : (
         <>
           <div className="card">
             <div className="table-container">
-              <table className="table">
+              <table className="table admin-table admin-table-users">
                 <thead>
                   <tr>
-                    <th>Actions</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Profile</th>
-                    <th>Created</th>
+                    <th className="admin-column-actions">
+                      {t.admin.shared.actions}
+                    </th>
+                    <th className="admin-column-name">{t.common.name}</th>
+                    <th className="admin-column-email">{t.common.email}</th>
+                    <th className="admin-column-role">{t.admin.shared.role}</th>
+                    <th className="admin-column-profile">
+                      {t.admin.shared.profile}
+                    </th>
+                    <th className="admin-column-created">
+                      {t.admin.shared.created}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((user) => (
                     <tr key={user.id}>
-                      <td>
+                      <td className="admin-column-actions">
                         <div className="action-buttons">
                           <button
                             className="btn-icon"
                             onClick={() => handleView(user.id, user.role)}
-                            title="View profile"
+                            title={t.admin.users.viewProfile}
                           >
-                            👁️
+                            <Eye size={16} aria-hidden="true" />
                           </button>
                           <button
                             className="btn-icon"
@@ -201,9 +226,9 @@ export const AdminUsers: React.FC = () => {
                                 state: { role: user.role },
                               })
                             }
-                            title="Edit"
+                            title={t.admin.users.editUser}
                           >
-                            ✏️
+                            <Pencil size={16} aria-hidden="true" />
                           </button>
                           <button
                             className="btn-icon btn-danger"
@@ -213,13 +238,13 @@ export const AdminUsers: React.FC = () => {
                                 `${user.firstName} ${user.lastName}`,
                               )
                             }
-                            title="Delete"
+                            title={t.admin.users.deleteUser}
                           >
-                            🗑️
+                            <Trash2 size={16} aria-hidden="true" />
                           </button>
                         </div>
                       </td>
-                      <td>
+                      <td className="admin-column-name">
                         <div className="user-cell">
                           {user.avatarUrl && (
                             <img
@@ -228,32 +253,58 @@ export const AdminUsers: React.FC = () => {
                               className="user-avatar-sm"
                             />
                           )}
-                          <span>
-                            {user.firstName} {user.lastName}
-                          </span>
+                          <div className="admin-user-copy">
+                            <span className="admin-user-name">
+                              {user.firstName} {user.lastName}
+                            </span>
+                            <span className="admin-user-email admin-mobile-email">
+                              {user.email}
+                            </span>
+                            <div
+                              className="admin-mobile-meta"
+                              aria-hidden="true"
+                            >
+                              <span className="admin-meta-chip">
+                                {t.admin.shared.role}: {getRoleLabel(user.role)}
+                              </span>
+                              <span className="admin-meta-chip">
+                                {t.admin.shared.profile}:{" "}
+                                {user.mentorProfile
+                                  ? t.admin.users.mentorBadge
+                                  : t.admin.shared.noProfile}
+                              </span>
+                              <span className="admin-meta-chip">
+                                {t.admin.shared.created}:{" "}
+                                {new Date(user.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </td>
-                      <td>{user.email}</td>
-                      <td>
+                      <td className="admin-column-email">{user.email}</td>
+                      <td className="admin-column-role">
                         <span
                           className={`badge ${getRoleBadgeClass(user.role)}`}
                         >
-                          {user.role}
+                          {getRoleLabel(user.role)}
                         </span>
                       </td>
-                      <td>
+                      <td className="admin-column-profile">
                         {user.mentorProfile && (
                           <span className="profile-status success">
-                            ✓ Mentor
+                            <BadgeCheck size={14} aria-hidden="true" />{" "}
+                            {t.admin.users.mentorBadge}
                           </span>
                         )}
                         {!user.mentorProfile && (
                           <span className="profile-status muted">
-                            No profile
+                            {t.admin.shared.noProfile}
                           </span>
                         )}
                       </td>
-                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                      <td className="admin-column-created">
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -271,11 +322,12 @@ export const AdminUsers: React.FC = () => {
                   setFilters((prev) => ({ ...prev, page: prev.page - 1 }))
                 }
               >
-                Previous
+                {t.admin.users.previous}
               </button>
               <span className="pagination-info">
-                Page {pagination.page} of {pagination.totalPages} (
-                {pagination.total} total)
+                {t.admin.users.page} {pagination.page} {t.admin.users.of}{" "}
+                {pagination.totalPages} ({pagination.total}{" "}
+                {t.admin.users.total})
               </span>
               <button
                 className="btn btn-outline btn-sm"
@@ -284,7 +336,7 @@ export const AdminUsers: React.FC = () => {
                   setFilters((prev) => ({ ...prev, page: prev.page + 1 }))
                 }
               >
-                Next
+                {t.admin.users.next}
               </button>
             </div>
           )}
@@ -299,7 +351,7 @@ export const AdminUsers: React.FC = () => {
               <h2>
                 {viewData
                   ? `${viewData.firstName} ${viewData.lastName}`
-                  : "Loading..."}
+                  : t.common.loading}
               </h2>
               <button className="view-modal-close" onClick={closeView}>
                 ×
@@ -308,15 +360,16 @@ export const AdminUsers: React.FC = () => {
 
             <div className="view-modal-body">
               {viewLoading ? (
-                <div
-                  style={{ textAlign: "center", padding: "var(--space-xxl)" }}
-                >
-                  Loading profile...
+                <div className="admin-center-state">
+                  {t.admin.shared.loadingProfile}
                 </div>
               ) : viewData ? (
                 <>
                   {/* User info */}
                   <div className="view-section">
+                    <h3 className="view-section-title">
+                      {t.admin.users.userInfo}
+                    </h3>
                     <div className="view-user-header">
                       {viewData.avatarUrl && (
                         <img
@@ -335,7 +388,7 @@ export const AdminUsers: React.FC = () => {
                             viewData.role,
                           )}`}
                         >
-                          {viewData.role}
+                          {getRoleLabel(viewData.role)}
                         </span>
                       </div>
                     </div>
@@ -345,45 +398,57 @@ export const AdminUsers: React.FC = () => {
                   {viewData.mentorProfile && (
                     <>
                       <div className="view-section">
-                        <h3 className="view-section-title">Mentor Profile</h3>
+                        <h3 className="view-section-title">
+                          {t.admin.shared.mentorProfile}
+                        </h3>
                         <div className="view-grid">
                           <div className="view-field">
-                            <span className="view-label">Title</span>
+                            <span className="view-label">
+                              {t.admin.shared.title}
+                            </span>
                             <span className="view-value">
                               {(viewData.mentorProfile as any).title || "—"}
                             </span>
                           </div>
                           <div className="view-field">
-                            <span className="view-label">Experience</span>
+                            <span className="view-label">
+                              {t.admin.shared.experience}
+                            </span>
                             <span className="view-value">
                               {(viewData.mentorProfile as any)
                                 .yearsExperience ?? "—"}{" "}
-                              yrs
+                              {t.admin.shared.yearsShort}
                             </span>
                           </div>
                           <div className="view-field">
-                            <span className="view-label">Hourly Rate</span>
+                            <span className="view-label">
+                              {t.admin.shared.hourlyRate}
+                            </span>
                             <span className="view-value">
                               {(viewData.mentorProfile as any).hourlyRate}{" "}
                               {(viewData.mentorProfile as any).currency}
                             </span>
                           </div>
                           <div className="view-field">
-                            <span className="view-label">Rating</span>
-                            <span className="view-value">
-                              ⭐{" "}
+                            <span className="view-label">
+                              {t.admin.shared.rating}
+                            </span>
+                            <span className="view-value admin-rating-value">
+                              <Star size={14} aria-hidden="true" />
                               {(viewData.mentorProfile as any).avgRating ??
-                                "N/A"}{" "}
+                                t.admin.shared.notAvailable}{" "}
                               (
                               {(viewData.mentorProfile as any).totalReviews ??
                                 0}{" "}
-                              reviews)
+                              {t.mentors.reviews})
                             </span>
                           </div>
                         </div>
                         {(viewData.mentorProfile as any).bio && (
                           <div className="view-field mt-md">
-                            <span className="view-label">Bio</span>
+                            <span className="view-label">
+                              {t.admin.shared.bio}
+                            </span>
                             <p className="view-bio">
                               {(viewData.mentorProfile as any).bio}
                             </p>
@@ -393,7 +458,9 @@ export const AdminUsers: React.FC = () => {
 
                       {(viewData.mentorProfile as any).skills?.length > 0 && (
                         <div className="view-section">
-                          <h3 className="view-section-title">Skills</h3>
+                          <h3 className="view-section-title">
+                            {t.admin.users.skillsSection}
+                          </h3>
                           <div className="skills-list">
                             {(viewData.mentorProfile as any).skills.map(
                               (ms: any) => (
@@ -412,7 +479,9 @@ export const AdminUsers: React.FC = () => {
                       {(viewData.mentorProfile as any).categories?.length >
                         0 && (
                         <div className="view-section">
-                          <h3 className="view-section-title">Categories</h3>
+                          <h3 className="view-section-title">
+                            {t.admin.users.categoriesSection}
+                          </h3>
                           <div className="skills-list">
                             {(viewData.mentorProfile as any).categories.map(
                               (mc: any) => (
@@ -433,16 +502,22 @@ export const AdminUsers: React.FC = () => {
                   {/* User bio/goals */}
                   {(viewData.bio || viewData.goals) && (
                     <div className="view-section">
-                      <h3 className="view-section-title">Profile</h3>
+                      <h3 className="view-section-title">
+                        {t.admin.users.profileSection}
+                      </h3>
                       {viewData.bio && (
                         <div className="view-field">
-                          <span className="view-label">Bio</span>
+                          <span className="view-label">
+                            {t.admin.shared.bio}
+                          </span>
                           <p className="view-bio">{viewData.bio}</p>
                         </div>
                       )}
                       {viewData.goals && (
                         <div className="view-field mt-md">
-                          <span className="view-label">Learning Goals</span>
+                          <span className="view-label">
+                            {t.admin.shared.learningGoals}
+                          </span>
                           <p className="view-bio">{viewData.goals}</p>
                         </div>
                       )}
@@ -454,7 +529,7 @@ export const AdminUsers: React.FC = () => {
 
             <div className="view-modal-footer">
               <button className="btn btn-outline" onClick={closeView}>
-                Close
+                {t.admin.shared.close}
               </button>
               {viewData && (
                 <button
@@ -466,13 +541,13 @@ export const AdminUsers: React.FC = () => {
                     });
                   }}
                 >
-                  Edit
+                  {t.admin.users.edit}
                 </button>
               )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
