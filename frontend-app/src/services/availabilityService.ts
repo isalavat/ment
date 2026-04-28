@@ -30,7 +30,7 @@ export interface WeeklyScheduleSlot {
 export const availabilityService = {
   // Create single availability
   async createAvailability(
-    data: CreateAvailabilityData
+    data: CreateAvailabilityData,
   ): Promise<Availability> {
     const response = await api.post("/availability", data);
     return response.data;
@@ -39,7 +39,7 @@ export const availabilityService = {
   // Create weekly schedule
   async createWeeklySchedule(
     mentorId: string,
-    schedule: WeeklyScheduleSlot[]
+    schedule: WeeklyScheduleSlot[],
   ): Promise<{ count: number; message: string }> {
     const response = await api.post("/availability/weekly", {
       mentorId,
@@ -57,14 +57,14 @@ export const availabilityService = {
   // Get recurring availabilities
   async getRecurringAvailabilities(
     mentorId: string,
-    dayOfWeek?: number
+    dayOfWeek?: number,
   ): Promise<Availability[]> {
     const params: any = {};
     if (dayOfWeek !== undefined) params.dayOfWeek = dayOfWeek;
 
     const response = await api.get(
       `/availability/mentor/${mentorId}/recurring`,
-      { params }
+      { params },
     );
     return response.data;
   },
@@ -73,7 +73,7 @@ export const availabilityService = {
   async updateAvailability(
     id: string,
     mentorId: string,
-    data: Partial<CreateAvailabilityData>
+    data: Partial<CreateAvailabilityData>,
   ): Promise<Availability> {
     const response = await api.patch(`/availability/${id}`, {
       mentorId,
@@ -85,7 +85,7 @@ export const availabilityService = {
   // Delete availability
   async deleteAvailability(
     id: string,
-    mentorId: string
+    mentorId: string,
   ): Promise<{ success: boolean; message: string }> {
     const response = await api.delete(`/availability/${id}`, {
       data: { mentorId },
@@ -98,7 +98,7 @@ export const availabilityService = {
     mentorId: string,
     startDate: string,
     endDate: string,
-    slotDuration?: number
+    slotDuration?: number,
   ): Promise<{ count: number; message: string }> {
     const response = await api.post("/time-slots/generate", {
       mentorId,
@@ -114,7 +114,7 @@ export const availabilityService = {
     mentorId: string,
     startDate?: string,
     endDate?: string,
-    status?: string
+    status?: string,
   ): Promise<any[]> {
     const params: any = {};
     if (startDate) params.startDate = startDate;
@@ -130,10 +130,26 @@ export const availabilityService = {
   // Delete time slot
   async deleteTimeSlot(
     slotId: string,
-    mentorId: string
+    mentorId: string,
   ): Promise<{ success: boolean; message: string }> {
     const response = await api.delete(`/time-slots/${slotId}`, {
       data: { mentorId },
+    });
+    return response.data;
+  },
+
+  // Bulk delete available time slots in a date range
+  async bulkDeleteTimeSlots(
+    mentorId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<{ count: number; message: string }> {
+    const response = await api.delete("/time-slots/bulk", {
+      data: {
+        mentorId,
+        startDate,
+        endDate,
+      },
     });
     return response.data;
   },
@@ -142,7 +158,7 @@ export const availabilityService = {
   async updateTimeSlotStatus(
     slotId: string,
     mentorId: string,
-    status: string
+    status: string,
   ): Promise<any> {
     const response = await api.patch(`/time-slots/${slotId}/status`, {
       mentorId,

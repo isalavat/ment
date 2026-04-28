@@ -124,6 +124,21 @@
   margin-bottom: var(--space-lg);
 }
 
+.timeslot-bulk-card {
+  margin-bottom: var(--space-lg);
+}
+
+.timeslot-timeline-card {
+  margin-bottom: var(--space-lg);
+}
+
+.timeslot-week-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+
 .timeslot-generate-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -131,13 +146,38 @@
 }
 
 .timeslot-generate-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
   margin-top: var(--space-md);
 }
 
 .timeslot-generate-hint {
+  width: 100%;
   color: var(--neutral-600);
   font-size: var(--font-size-sm);
   margin-top: var(--space-xs);
+}
+
+.timeslot-preview-row {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.timeslot-preview-chip {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(79, 127, 92, 0.22);
+  background: rgba(79, 127, 92, 0.08);
+  color: var(--neutral-700);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
 }
 
 .timeslot-filter-range {

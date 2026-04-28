@@ -25,6 +25,7 @@ import { Mentors } from "./components/mentors/Mentors";
 import { MentorDetail } from "./components/mentors/MentorDetail";
 import { Bookings } from "./components/bookings/Bookings";
 import { BookingDetail } from "./components/bookings/BookingDetail";
+import { BookSessionPage } from "./components/bookings/BookSessionPage";
 import { AvailabilityManager } from "./components/availability/AvailabilityManager";
 import { TimeSlotManager } from "./components/availability/TimeSlotManager";
 import { AdminUsers } from "./components/admin/AdminUsers";
@@ -36,7 +37,7 @@ import { HomePage } from "./components/home/HomePage";
 import { UIProvider } from "./contexts/UIContext";
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, isHydrating } = useAuth();
   const location = useLocation();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -57,6 +58,10 @@ function AppContent() {
   const showAuthLanguageSwitcher =
     !user &&
     (location.pathname === "/login" || location.pathname === "/register");
+
+  if (isHydrating) {
+    return null;
+  }
 
   return (
     <div className={appLayoutClassName}>
@@ -83,8 +88,14 @@ function AppContent() {
             path="/"
             element={user ? <Navigate to="/dashboard" replace /> : <HomePage />}
           />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+          />
+          <Route
+            path="/register"
+            element={user ? <Navigate to="/dashboard" replace /> : <Register />}
+          />
           <Route
             path="/dashboard"
             element={
@@ -106,6 +117,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <MentorDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mentors/:id/book"
+            element={
+              <ProtectedRoute>
+                <BookSessionPage />
               </ProtectedRoute>
             }
           />

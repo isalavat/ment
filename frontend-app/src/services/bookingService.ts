@@ -13,7 +13,7 @@ export const bookingService = {
     menteeId: string,
     status?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
   ): Promise<Booking[]> {
     const params: any = {};
     if (status) params.status = status;
@@ -29,7 +29,7 @@ export const bookingService = {
     mentorId: string,
     status?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
   ): Promise<Booking[]> {
     const params: any = {};
     if (status) params.status = status;
@@ -57,7 +57,7 @@ export const bookingService = {
   // Cancel booking (mentee)
   async cancelBookingByMentee(
     bookingId: string,
-    menteeId: string
+    menteeId: string,
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/cancel-mentee`, {
       menteeId,
@@ -68,7 +68,7 @@ export const bookingService = {
   // Cancel booking (mentor)
   async cancelBookingByMentor(
     bookingId: string,
-    mentorId: string
+    mentorId: string,
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/cancel-mentor`, {
       mentorId,
@@ -86,7 +86,7 @@ export const bookingService = {
   async updateMeetingLink(
     bookingId: string,
     mentorId: string,
-    meetingLink: string
+    meetingLink: string,
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/meeting-link`, {
       mentorId,
@@ -99,13 +99,29 @@ export const bookingService = {
   async getAvailableTimeSlots(
     mentorId: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
   ): Promise<TimeSlot[]> {
     const params: any = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
     const response = await api.get(`/time-slots/mentor/${mentorId}/available`, {
+      params,
+    });
+    return response.data;
+  },
+
+  // Get all mentor slots for calendar rendering (available/booked/unavailable)
+  async getMentorTimeSlots(
+    mentorId: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<TimeSlot[]> {
+    const params: any = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await api.get(`/time-slots/mentor/${mentorId}`, {
       params,
     });
     return response.data;

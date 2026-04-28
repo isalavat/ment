@@ -1,0 +1,164 @@
+.week-timeline {
+  display: grid;
+  gap: 6px;
+}
+
+.week-timeline-header-row {
+  display: grid;
+  gap: 0;
+}
+
+.week-timeline-time-head {
+  width: 46px;
+}
+
+.week-timeline-day-head {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  color: var(--neutral-700);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+}
+
+.week-timeline-day-head span {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-500);
+}
+
+.week-timeline-body {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 0;
+}
+
+.week-timeline-axis {
+  position: relative;
+}
+
+.week-timeline-axis-label {
+  position: absolute;
+  transform: translateY(-50%);
+  font-size: var(--font-size-sm);
+  color: var(--neutral-600);
+}
+
+.week-timeline-days-wrap {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+  overflow: hidden;
+}
+
+.week-timeline-day-col {
+  min-width: 0;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.week-timeline-grid {
+  position: relative;
+}
+
+.week-timeline-hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid rgba(20, 32, 51, 0.14);
+}
+
+.week-timeline-cell-hit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.week-timeline-cell-hit:hover {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.week-timeline-slot {
+  position: absolute;
+  left: 22%;
+  width: 56%;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: default;
+  z-index: 2;
+}
+
+.week-timeline-slot-available {
+  background: rgba(128, 188, 68, 0.92);
+  border-color: rgba(104, 156, 52, 0.95);
+}
+
+.week-timeline-slot-booked {
+  background: rgba(156, 156, 160, 0.92);
+  border-color: rgba(126, 126, 130, 0.92);
+  cursor: not-allowed;
+}
+
+.week-timeline-slot-unavailable {
+  background: rgba(156, 156, 160, 0.9);
+  border-color: rgba(126, 126, 130, 0.88);
+  cursor: not-allowed;
+}
+
+.week-timeline-slot.selected {
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 0 0 4px rgba(32, 42, 66, 0.35);
+}
+
+@media (max-width: 768px) {
+  .week-timeline-body {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .week-timeline-axis-label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 560px) {
+  .week-timeline-header-row {
+    grid-template-columns: 24px repeat(7, minmax(0, 1fr)) !important;
+  }
+
+  .week-timeline-time-head {
+    width: 24px;
+  }
+
+  .week-timeline-body {
+    grid-template-columns: 24px 1fr;
+  }
+
+  .week-timeline-day-head {
+    padding-bottom: 2px;
+  }
+
+  .week-timeline-day-head strong,
+  .week-timeline-day-head span {
+    font-size: 8px;
+    line-height: 1.1;
+  }
+
+  .week-timeline-day-head span {
+    display: none;
+  }
+
+  .week-timeline-axis-label {
+    font-size: 8px;
+  }
+
+  .week-timeline-slot {
+    left: 10%;
+    width: 80%;
+    border-radius: 6px;
+  }
+}

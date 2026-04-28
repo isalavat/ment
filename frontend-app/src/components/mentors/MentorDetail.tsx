@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   CalendarRange,
   Heart,
@@ -11,7 +11,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { mentorService, MentorProfile } from "../../services/mentorService";
-import { BookingModal } from "../bookings/BookingModal";
+import { bookingService } from "../../services/bookingService";
+import { TimeSlot } from "../../types/booking";
 import { AlertDialog } from "../common/AlertDialog";
 import { PageShell } from "../common/PageShell";
 import "./Mentors.css";
@@ -19,12 +20,15 @@ import "./Mentors.css";
 export const MentorDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { user } = useAuth();
   const [mentor, setMentor] = useState<MentorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [previewDate, setPreviewDate] = useState("");
+  const [previewSlots, setPreviewSlots] = useState<TimeSlot[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState("");
   const [alertDialog, setAlertDialog] = useState<{
     isOpen: boolean;
     title: string;
@@ -36,6 +40,11 @@ export const MentorDetail: React.FC = () => {
     title: "",
     message: "",
   });
+
+  useEffect(() => {
+    const today = new Date();
+    setPreviewDate(today.toISOString().split("T")[0]);
+  }, []);
 
   useEffect(() => {
     const fetchMentor = async () => {
@@ -57,6 +66,40 @@ export const MentorDetail: React.FC = () => {
     fetchMentor();
   }, [id]);
 
+  const fetchPreviewSlots = useCallback(async () => {
+    if (!mentor?.id || !previewDate) return;
+
+    setPreviewLoading(true);
+    setPreviewError("");
+    try {
+      const startDate = new Date(previewDate);
+      startDate.setHours(0, 0, 0, 0);
+
+      const endDate = new Date(previewDate);
+      endDate.setHours(23, 59, 59, 999);
+
+      const data = await bookingService.getAvailableTimeSlots(
+        mentor.id,
+        startDate.toISOString(),
+        endDate.toISOString(),
+      );
+      setPreviewSlots(data);
+    } catch (err: any) {
+      setPreviewError(
+        err.response?.data?.error || t.bookings.errors.loadSlotsFailed,
+      );
+      console.error("Error fetching preview slots:", err);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [mentor?.id, previewDate, t.bookings.errors.loadSlotsFailed]);
+
+  useEffect(() => {
+    if (mentor?.id && previewDate) {
+      void fetchPreviewSlots();
+    }
+  }, [mentor?.id, previewDate, fetchPreviewSlots]);
+
   const getInitials = (mentor: MentorProfile) => {
     const firstName = mentor.user?.firstName || "";
     const lastName = mentor.user?.lastName || "";
@@ -64,6 +107,8 @@ export const MentorDetail: React.FC = () => {
   };
 
   const handleBookSession = () => {
+    if (!mentor?.id) return;
+
     if (!user) {
       setAlertDialog({
         isOpen: true,
@@ -75,16 +120,21 @@ export const MentorDetail: React.FC = () => {
       return;
     }
 
-    setShowBookingModal(true);
+    navigate(`/mentors/${mentor.id}/book`, {
+      state: {
+        initialDate: previewDate || undefined,
+      },
+    });
   };
 
-  const handleBookingSuccess = () => {
-    setAlertDialog({
-      isOpen: true,
-      title: "Success!",
-      message: "Booking created successfully! Check your bookings page.",
-      type: "success",
-      onCloseAction: () => navigate("/bookings"),
+  const localeCode =
+    locale === "ru" ? "ru-RU" : locale === "ky" ? "ky-KG" : "en-US";
+
+  const formatSlotTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString(localeCode, {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
@@ -272,6 +322,68 @@ export const MentorDetail: React.FC = () => {
 
         {/* Sidebar */}
         <div className="mentor-detail-sidebar">
+          <div className="card mentor-detail-preview-card">
+            <div className="card-header">
+              <h2 className="card-title">
+                {t.mentors.detail.slotPreviewTitle}
+              </h2>
+            </div>
+            <div className="card-body">
+              <p className="mentor-detail-preview-copy">
+                {t.mentors.detail.slotPreviewSubtitle}
+              </p>
+              <div className="form-group">
+                <label className="form-label">{t.bookings.selectDate}</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={previewDate}
+                  onChange={(e) => setPreviewDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+
+              {previewLoading ? (
+                <div className="mentor-detail-preview-state">
+                  {t.bookings.loadingAvailableSlots}
+                </div>
+              ) : previewError ? (
+                <div className="mentor-detail-preview-error">
+                  {previewError}
+                </div>
+              ) : previewSlots.length === 0 ? (
+                <div className="mentor-detail-preview-state">
+                  {t.mentors.detail.slotPreviewEmpty}
+                </div>
+              ) : (
+                <>
+                  <div className="mentor-detail-preview-list">
+                    {previewSlots.slice(0, 6).map((slot) => (
+                      <div key={slot.id} className="mentor-detail-preview-item">
+                        <span>
+                          {formatSlotTime(slot.startTime)} -{" "}
+                          {formatSlotTime(slot.endTime)}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-outline btn-sm"
+                          onClick={handleBookSession}
+                        >
+                          {t.mentors.detail.bookSession}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  {previewSlots.length > 6 && (
+                    <p className="mentor-detail-preview-more">
+                      +{previewSlots.length - 6} {t.mentors.detail.moreSlots}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
           {/* Stats Card */}
           <div className="card">
             <div className="card-header">
@@ -340,20 +452,6 @@ export const MentorDetail: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Booking Modal */}
-      {showBookingModal && mentor && user?.id && (
-        <BookingModal
-          mentorId={mentor.id}
-          mentorName={`${mentor.user?.firstName} ${mentor.user?.lastName}`}
-          mentorTitle={mentor.title || ""}
-          hourlyRate={mentor.hourlyRate || 0}
-          currency={mentor.currency || "USD"}
-          menteeId={user.id}
-          onClose={() => setShowBookingModal(false)}
-          onSuccess={handleBookingSuccess}
-        />
-      )}
 
       {/* Alert Dialog */}
       <AlertDialog
