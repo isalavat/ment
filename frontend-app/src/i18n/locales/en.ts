@@ -590,6 +590,11 @@ export const en = {
         "After setting availability, generate slots and review them in one move.",
       generateAndReviewSlots: "Generate and Review Slots",
       openTimeSlotManager: "Open Time Slot Manager",
+      advancedOptions: "Advanced options",
+      showAdvanced: "Show",
+      hideAdvanced: "Hide",
+      advancedHint:
+        "Manual tools for exceptional cases. Calendar quick create is recommended.",
       needAvailabilityBeforeGenerating:
         "Add availability first, then generate your bookable slots.",
       weeklyModalSubtitle: "Build your recurring week in one pass.",

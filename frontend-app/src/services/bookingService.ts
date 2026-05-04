@@ -126,4 +126,24 @@ export const bookingService = {
     });
     return response.data;
   },
+
+  // Compute bookable slots from availability rules (no pre-generated slots required)
+  async getComputedBookableSlots(
+    mentorId: string,
+    startDate?: string,
+    endDate?: string,
+    stepMinutes?: number,
+    durationMinutes?: number,
+  ): Promise<TimeSlot[]> {
+    const params: any = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (stepMinutes) params.stepMinutes = stepMinutes;
+    if (durationMinutes) params.durationMinutes = durationMinutes;
+
+    const response = await api.get(`/time-slots/mentor/${mentorId}/bookable`, {
+      params,
+    });
+    return response.data;
+  },
 };

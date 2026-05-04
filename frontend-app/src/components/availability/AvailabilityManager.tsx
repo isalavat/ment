@@ -39,6 +39,7 @@ export const AvailabilityManager: React.FC = () => {
   const [error, setError] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [showWeeklyForm, setShowWeeklyForm] = useState(false);
+  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
   const [generatingSlots, setGeneratingSlots] = useState(false);
   const [quickCreating, setQuickCreating] = useState(false);
   const [calendarAnchorDate, setCalendarAnchorDate] = useState("");
@@ -586,23 +587,6 @@ export const AvailabilityManager: React.FC = () => {
         </div>
       </section>
 
-      <div className="availability-actions">
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowWeeklyForm(true)}
-        >
-          <Repeat size={16} />
-          {t.availability.manager.setWeeklySchedule}
-        </button>
-        <button
-          className="btn btn-outline"
-          onClick={() => setShowAddForm(true)}
-        >
-          <Plus size={16} />
-          {t.availability.manager.addSingleSlot}
-        </button>
-      </div>
-
       <section className="availability-calendar-card card">
         <div className="availability-calendar-header">
           <div>
@@ -786,6 +770,44 @@ export const AvailabilityManager: React.FC = () => {
             </button>
           </div>
         </form>
+      </section>
+
+      <section className="availability-advanced-card card">
+        <button
+          type="button"
+          className="availability-advanced-toggle"
+          onClick={() => setShowAdvancedTools((prev) => !prev)}
+          aria-expanded={showAdvancedTools}
+        >
+          <strong>{t.availability.manager.advancedOptions}</strong>
+          <span>
+            {showAdvancedTools
+              ? t.availability.manager.hideAdvanced
+              : t.availability.manager.showAdvanced}
+          </span>
+        </button>
+
+        {showAdvancedTools && (
+          <div className="availability-actions">
+            <p className="availability-advanced-hint">
+              {t.availability.manager.advancedHint}
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowWeeklyForm(true)}
+            >
+              <Repeat size={16} />
+              {t.availability.manager.setWeeklySchedule}
+            </button>
+            <button
+              className="btn btn-outline"
+              onClick={() => setShowAddForm(true)}
+            >
+              <Plus size={16} />
+              {t.availability.manager.addSingleSlot}
+            </button>
+          </div>
+        )}
       </section>
 
       {error && <div className="error-message">{error}</div>}

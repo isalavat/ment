@@ -40,6 +40,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 }) => {
   const { t } = useLanguage();
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [legacyTimeSlots, setLegacyTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -127,9 +128,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       endDate.setDate(startDate.getDate() + 6);
       endDate.setHours(23, 59, 59, 999);
 
-      const [availabilities, slots] = await Promise.all([
+      const [availabilities, computedSlots, legacySlots] = await Promise.all([
         availabilityService.getAvailabilitiesForMentor(mentorId),
-        bookingService.getMentorTimeSlots(
+        bookingService.getComputedBookableSlots(
+          mentorId,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          15,
+          60,
+        ),
+        bookingService.getAvailableTimeSlots(
           mentorId,
           startDate.toISOString(),
           endDate.toISOString(),
@@ -174,17 +182,88 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         });
       });
 
-      // Overlay generated slots as authoritative status.
-      slots.forEach((slot) => {
+      // Overlay computed bookable slots as authoritative status.
+      computedSlots.forEach((slot) => {
         const start = new Date(slot.startTime);
         cellMap.set(toHourKey(start), slot);
       });
 
       setCalendarSlots(Array.from(cellMap.values()));
-      setTimeSlots(slots.filter((slot) => slot.status === "AVAILABLE"));
+      setLegacyTimeSlots(
+        legacySlots.filter((slot) => slot.status === "AVAILABLE"),
+      );
+      setTimeSlots(computedSlots.filter((slot) => slot.status === "AVAILABLE"));
     } catch (err: any) {
-      setError(err.response?.data?.error || t.bookings.errors.loadSlotsFailed);
-      console.error("Error loading time slots:", err);
+      try {
+        // Fallback while backend booking still depends on generated slot IDs.
+        const startDate = getWeekStart(selectedDate);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999);
+
+        const [availabilities, legacySlots] = await Promise.all([
+          availabilityService.getAvailabilitiesForMentor(mentorId),
+          bookingService.getMentorTimeSlots(
+            mentorId,
+            startDate.toISOString(),
+            endDate.toISOString(),
+          ),
+        ]);
+
+        const weekDates = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date(startDate);
+          d.setDate(startDate.getDate() + i);
+          return d;
+        });
+        const cellMap = new Map<string, TimeSlot>();
+
+        availabilities.forEach((availability: Availability) => {
+          const [startHour] = availability.startTime.split(":").map(Number);
+          const [endHour] = availability.endTime.split(":").map(Number);
+
+          weekDates.forEach((day) => {
+            const dayIso = day.toISOString().split("T")[0];
+            const matchRecurring =
+              availability.isRecurring && availability.dayOfWeek === day.getDay();
+            const matchSpecific =
+              !availability.isRecurring &&
+              availability.specificDate?.split("T")[0] === dayIso;
+
+            if (!matchRecurring && !matchSpecific) return;
+
+            for (let hour = startHour; hour < endHour; hour += 1) {
+              const start = new Date(day);
+              start.setHours(hour, 0, 0, 0);
+              const end = new Date(start);
+              end.setHours(hour + 1, 0, 0, 0);
+              cellMap.set(toHourKey(start), {
+                id: `avail-${availability.id}-${toHourKey(start)}`,
+                mentorId,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
+                status: "AVAILABLE",
+              });
+            }
+          });
+        });
+
+        legacySlots.forEach((slot) => {
+          const start = new Date(slot.startTime);
+          cellMap.set(toHourKey(start), slot);
+        });
+
+        setCalendarSlots(Array.from(cellMap.values()));
+        const availableLegacySlots = legacySlots.filter(
+          (slot) => slot.status === "AVAILABLE",
+        );
+        setTimeSlots(availableLegacySlots);
+        setLegacyTimeSlots(availableLegacySlots);
+      } catch (fallbackErr: any) {
+        setError(
+          fallbackErr.response?.data?.error || t.bookings.errors.loadSlotsFailed,
+        );
+        console.error("Error loading time slots:", fallbackErr);
+      }
     } finally {
       setLoading(false);
     }
@@ -207,8 +286,41 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     setShowConfirm(true);
   };
 
+  const resolveBookableSlotId = useCallback(() => {
+    return (
+      legacyTimeSlots.find((slot) => {
+        const start = new Date(slot.startTime);
+        const end = new Date(slot.endTime);
+
+        const slotStartDate = start.toISOString().split("T")[0];
+        const slotEndDate = end.toISOString().split("T")[0];
+        const slotStartTime = `${String(start.getHours()).padStart(2, "0")}:${String(
+          start.getMinutes(),
+        ).padStart(2, "0")}`;
+        const slotEndTime = `${String(end.getHours()).padStart(2, "0")}:${String(
+          end.getMinutes(),
+        ).padStart(2, "0")}`;
+
+        return (
+          slotStartDate === bookingDraft.startDate &&
+          slotStartTime === bookingDraft.startTime &&
+          slotEndDate === bookingDraft.endDate &&
+          slotEndTime === bookingDraft.endTime
+        );
+      }) || null
+    );
+  }, [
+    legacyTimeSlots,
+    bookingDraft.startDate,
+    bookingDraft.startTime,
+    bookingDraft.endDate,
+    bookingDraft.endTime,
+  ]);
+
   const confirmBooking = async () => {
     if (!selectedSlot) return;
+
+    const slotForBooking = resolveBookableSlotId() || selectedSlot;
 
     setSubmitting(true);
     setError("");
@@ -217,7 +329,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       await bookingService.createBooking({
         menteeId,
         mentorId,
-        timeSlotId: selectedSlot.id,
+        timeSlotId: slotForBooking.id.startsWith("computed-")
+          ? undefined
+          : slotForBooking.id,
+        startTime: selectedSlot.startTime,
+        endTime: selectedSlot.endTime,
         notes: notes || undefined,
       });
 

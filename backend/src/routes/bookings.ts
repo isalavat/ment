@@ -13,21 +13,31 @@ router.use(requireAuth);
  */
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { menteeId, mentorId, timeSlotId, notes } = req.body;
+		const { menteeId, mentorId, timeSlotId, startTime, endTime, notes } = req.body;
 
 		// Verify the mentee profile belongs to the authenticated user
 		// TODO: Add proper authorization check
 
-		if (!mentorId || !timeSlotId) {
+		if (!mentorId || (!timeSlotId && (!startTime || !endTime))) {
 			return res.status(400).json({
-				error: "mentorId and timeSlotId are required",
+				error: "mentorId and either timeSlotId or startTime/endTime are required",
 			});
+		}
+
+		if (startTime && Number.isNaN(new Date(startTime).getTime())) {
+			return res.status(400).json({ error: "Invalid startTime" });
+		}
+
+		if (endTime && Number.isNaN(new Date(endTime).getTime())) {
+			return res.status(400).json({ error: "Invalid endTime" });
 		}
 
 		const booking = await bookingService.createBooking({
 			menteeId,
 			mentorId,
 			timeSlotId,
+			startTime: startTime ? new Date(startTime) : undefined,
+			endTime: endTime ? new Date(endTime) : undefined,
 			notes,
 		});
 

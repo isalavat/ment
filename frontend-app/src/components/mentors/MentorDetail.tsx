@@ -78,11 +78,22 @@ export const MentorDetail: React.FC = () => {
       const endDate = new Date(previewDate);
       endDate.setHours(23, 59, 59, 999);
 
-      const data = await bookingService.getAvailableTimeSlots(
-        mentor.id,
-        startDate.toISOString(),
-        endDate.toISOString(),
-      );
+      let data: TimeSlot[] = [];
+      try {
+        data = await bookingService.getComputedBookableSlots(
+          mentor.id,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          15,
+          60,
+        );
+      } catch {
+        data = await bookingService.getAvailableTimeSlots(
+          mentor.id,
+          startDate.toISOString(),
+          endDate.toISOString(),
+        );
+      }
       setPreviewSlots(data);
     } catch (err: any) {
       setPreviewError(
