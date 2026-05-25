@@ -13,7 +13,7 @@ export const bookingService = {
     menteeId: string,
     status?: string,
     startDate?: string,
-    endDate?: string,
+    endDate?: string
   ): Promise<Booking[]> {
     const params: any = {};
     if (status) params.status = status;
@@ -29,7 +29,7 @@ export const bookingService = {
     mentorId: string,
     status?: string,
     startDate?: string,
-    endDate?: string,
+    endDate?: string
   ): Promise<Booking[]> {
     const params: any = {};
     if (status) params.status = status;
@@ -133,7 +133,7 @@ export const bookingService = {
     startDate?: string,
     endDate?: string,
     stepMinutes?: number,
-    durationMinutes?: number,
+    durationMinutes?: number
   ): Promise<TimeSlot[]> {
     const params: any = {};
     if (startDate) params.startDate = startDate;
