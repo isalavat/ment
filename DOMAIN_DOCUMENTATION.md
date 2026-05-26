@@ -425,11 +425,11 @@ interface MentorFilters {
 
 ### `RefreshTokenRepository` (`domain/token/RefreshTokenRepostory.ts`)
 
-| Method             | Description                |
-| ------------------ | -------------------------- |
-| `save(token)`      | Persist new refresh token  |
+| Method                | Description                |
+| --------------------- | -------------------------- |
+| `save(token)`         | Persist new refresh token  |
 | `findByRawToken(raw)` | Lookup by raw token string |
-| `revoke(token)`    | Set `revokedAt`            |
+| `revoke(token)`       | Set `revokedAt`            |
 
 ### `SkillRepository` (`domain/skill/SkillRepository.ts`)
 
@@ -449,29 +449,29 @@ interface MentorFilters {
 
 ### `BookingRepository` (`domain/booking/BookingRepository.ts`)
 
-| Method                                       | Description                                  |
-| -------------------------------------------- | -------------------------------------------- |
-| `findById(bookingId)`                        | Single booking with mentor/mentee/slot data |
-| `findForMentee(menteeId, filters?)`          | List bookings for a mentee                  |
-| `findForMentor(mentorId, filters?)`          | List bookings for a mentor                  |
-| `findActiveOverlap(mentorId, start, end)`    | Prevent overlapping active sessions         |
-| `create(input)`                              | Persist new booking snapshot                |
-| `updateStatus(id, status, timestampField?)`  | State transition with optional timestamp    |
-| `updateMeetingLink(id, meetingLink)`         | Store/update session meeting URL            |
+| Method                                      | Description                                 |
+| ------------------------------------------- | ------------------------------------------- |
+| `findById(bookingId)`                       | Single booking with mentor/mentee/slot data |
+| `findForMentee(menteeId, filters?)`         | List bookings for a mentee                  |
+| `findForMentor(mentorId, filters?)`         | List bookings for a mentor                  |
+| `findActiveOverlap(mentorId, start, end)`   | Prevent overlapping active sessions         |
+| `create(input)`                             | Persist new booking snapshot                |
+| `updateStatus(id, status, timestampField?)` | State transition with optional timestamp    |
+| `updateMeetingLink(id, meetingLink)`        | Store/update session meeting URL            |
 
 ### `AvailabilityManagementRepository` (`domain/availability/AvailabilityManagementRepository.ts`)
 
-| Method                                 | Description                                     |
-| -------------------------------------- | ----------------------------------------------- |
-| `create(data)`                         | Create one availability window                  |
-| `createWeekly(data)`                   | Bulk-create weekly schedule                     |
-| `findById(id)`                         | Lookup by availability ID                       |
-| `findByIdWithMentor(id)`               | Lookup with mentor-user projection              |
-| `findForMentor(mentorId)`              | All availability records for a mentor           |
-| `findRecurringForMentor(id, day?)`     | Recurring windows with optional weekday filter  |
-| `findSpecificDateForMentor(id, date?)` | One-off date windows with optional day filter   |
-| `update(id, data)`                     | Update availability fields                      |
-| `delete(id)`                           | Delete availability                             |
+| Method                                 | Description                                    |
+| -------------------------------------- | ---------------------------------------------- |
+| `create(data)`                         | Create one availability window                 |
+| `createWeekly(data)`                   | Bulk-create weekly schedule                    |
+| `findById(id)`                         | Lookup by availability ID                      |
+| `findByIdWithMentor(id)`               | Lookup with mentor-user projection             |
+| `findForMentor(mentorId)`              | All availability records for a mentor          |
+| `findRecurringForMentor(id, day?)`     | Recurring windows with optional weekday filter |
+| `findSpecificDateForMentor(id, date?)` | One-off date windows with optional day filter  |
+| `update(id, data)`                     | Update availability fields                     |
+| `delete(id)`                           | Delete availability                            |
 
 ### `AvailabilityRepository` (`domain/availability/AvailabilityRepository.ts`)
 
@@ -481,38 +481,38 @@ interface MentorFilters {
 
 ### `TimeSlotRepository` (`domain/timeSlot/TimeSlotRepository.ts`)
 
-| Method                                 | Description                                      |
-| -------------------------------------- | ------------------------------------------------ |
-| `findById(slotId)`                     | Find concrete slot by ID                         |
-| `findByMentorAndRange(mentorId, s, e)` | Find exact slot for mentor/time range            |
-| `findBlockedOverlap(mentorId, s, e)`   | Detect overlap with blocked slot                 |
-| `create(input)`                        | Create one concrete slot                         |
-| `claimAvailable(slotId)`               | Atomic claim (AVAILABLE -> BOOKED)               |
-| `releaseAvailable(slotId)`             | Release slot back to AVAILABLE when needed       |
+| Method                                 | Description                                |
+| -------------------------------------- | ------------------------------------------ |
+| `findById(slotId)`                     | Find concrete slot by ID                   |
+| `findByMentorAndRange(mentorId, s, e)` | Find exact slot for mentor/time range      |
+| `findBlockedOverlap(mentorId, s, e)`   | Detect overlap with blocked slot           |
+| `create(input)`                        | Create one concrete slot                   |
+| `claimAvailable(slotId)`               | Atomic claim (AVAILABLE -> BOOKED)         |
+| `releaseAvailable(slotId)`             | Release slot back to AVAILABLE when needed |
 
 ### `TimeSlotManagementRepository` (`domain/timeSlot/TimeSlotManagementRepository.ts`)
 
-| Method                                      | Description                                       |
-| ------------------------------------------- | ------------------------------------------------- |
-| `findAvailableForMentor(id, start?, end?)`  | Query only AVAILABLE slots                        |
-| `findAllForMentor(id, start?, end?, status?)` | Query slots with optional status/date filters   |
-| `findById(slotId)`                          | Read single slot with booking projection          |
-| `updateStatus(slotId, status)`              | Manual status override                            |
-| `delete(slotId)`                            | Delete one slot                                   |
-| `deleteAvailableForMentorInRange(id, s, e)` | Bulk-delete AVAILABLE slots in date range         |
+| Method                                        | Description                                   |
+| --------------------------------------------- | --------------------------------------------- |
+| `findAvailableForMentor(id, start?, end?)`    | Query only AVAILABLE slots                    |
+| `findAllForMentor(id, start?, end?, status?)` | Query slots with optional status/date filters |
+| `findById(slotId)`                            | Read single slot with booking projection      |
+| `updateStatus(slotId, status)`                | Manual status override                        |
+| `delete(slotId)`                              | Delete one slot                               |
+| `deleteAvailableForMentorInRange(id, s, e)`   | Bulk-delete AVAILABLE slots in date range     |
 
 ### `TimeSlotGenerationService` (`domain/timeSlot/TimeSlotGenerationService.ts`)
 
-| Method                              | Description                                              |
-| ----------------------------------- | -------------------------------------------------------- |
-| `generateTimeSlots(input)`          | Materialize concrete slots from availability templates   |
-| `getComputedBookableSlots(input)`   | Compute bookable windows from availability and blockers  |
+| Method                            | Description                                             |
+| --------------------------------- | ------------------------------------------------------- |
+| `generateTimeSlots(input)`        | Materialize concrete slots from availability templates  |
+| `getComputedBookableSlots(input)` | Compute bookable windows from availability and blockers |
 
 ### `AvailabilitySlotSyncService` (`domain/availability/AvailabilitySlotSyncService.ts`)
 
-| Method                      | Description                                                       |
-| --------------------------- | ----------------------------------------------------------------- |
-| `reconcileForMentor(id)`    | Rebuild/sync generated slots after availability mutations         |
+| Method                   | Description                                               |
+| ------------------------ | --------------------------------------------------------- |
+| `reconcileForMentor(id)` | Rebuild/sync generated slots after availability mutations |
 
 ---
 
@@ -590,43 +590,43 @@ Scheduling and booking flows are now implemented as first-class use-cases over d
 
 ### Booking
 
-| Use-Case                        | Description                                            |
-| ------------------------------- | ------------------------------------------------------ |
-| `CreateBookingUseCase`          | Create booking from slot ID or explicit time range     |
-| `ConfirmBookingUseCase`         | Mentor confirms pending booking                        |
-| `CancelBookingByMenteeUseCase`  | Mentee cancellation + slot release in transaction      |
-| `CancelBookingByMentorUseCase`  | Mentor cancellation + slot release in transaction      |
-| `CompleteBookingUseCase`        | Mark booking completed                                 |
-| `UpdateMeetingLinkUseCase`      | Set or update meeting link                             |
-| `GetBookingByIdUseCase`         | Read single booking                                    |
-| `GetBookingsForMenteeUseCase`   | Query mentee bookings with filters                     |
-| `GetBookingsForMentorUseCase`   | Query mentor bookings with filters                     |
+| Use-Case                       | Description                                        |
+| ------------------------------ | -------------------------------------------------- |
+| `CreateBookingUseCase`         | Create booking from slot ID or explicit time range |
+| `ConfirmBookingUseCase`        | Mentor confirms pending booking                    |
+| `CancelBookingByMenteeUseCase` | Mentee cancellation + slot release in transaction  |
+| `CancelBookingByMentorUseCase` | Mentor cancellation + slot release in transaction  |
+| `CompleteBookingUseCase`       | Mark booking completed                             |
+| `UpdateMeetingLinkUseCase`     | Set or update meeting link                         |
+| `GetBookingByIdUseCase`        | Read single booking                                |
+| `GetBookingsForMenteeUseCase`  | Query mentee bookings with filters                 |
+| `GetBookingsForMentorUseCase`  | Query mentor bookings with filters                 |
 
 ### Scheduling — Availability
 
-| Use-Case                               | Description                                   |
-| -------------------------------------- | --------------------------------------------- |
-| `CreateAvailabilityUseCase`            | Create one availability window                |
-| `CreateWeeklyScheduleUseCase`          | Bulk-create weekly schedule                   |
-| `GetAvailabilitiesForMentorUseCase`    | List all mentor availabilities                |
-| `GetRecurringAvailabilitiesUseCase`    | List recurring availability windows           |
-| `GetSpecificDateAvailabilitiesUseCase` | List one-off availability windows             |
-| `GetAvailabilityByIdUseCase`           | Read availability details                     |
-| `UpdateAvailabilityUseCase`            | Update availability + trigger slot sync       |
-| `DeleteAvailabilityUseCase`            | Delete availability + trigger slot sync       |
+| Use-Case                               | Description                             |
+| -------------------------------------- | --------------------------------------- |
+| `CreateAvailabilityUseCase`            | Create one availability window          |
+| `CreateWeeklyScheduleUseCase`          | Bulk-create weekly schedule             |
+| `GetAvailabilitiesForMentorUseCase`    | List all mentor availabilities          |
+| `GetRecurringAvailabilitiesUseCase`    | List recurring availability windows     |
+| `GetSpecificDateAvailabilitiesUseCase` | List one-off availability windows       |
+| `GetAvailabilityByIdUseCase`           | Read availability details               |
+| `UpdateAvailabilityUseCase`            | Update availability + trigger slot sync |
+| `DeleteAvailabilityUseCase`            | Delete availability + trigger slot sync |
 
 ### Scheduling — Time Slots
 
-| Use-Case                         | Description                                       |
-| -------------------------------- | ------------------------------------------------- |
-| `GenerateTimeSlotsUseCase`       | Materialize slots for date range                  |
-| `GetAllSlotsForMentorUseCase`    | Query all slots with date/status filters          |
-| `GetAvailableSlotsUseCase`       | Query only available slots                        |
-| `GetComputedBookableSlotsUseCase`| Compute bookable slots (availability-aware)       |
-| `GetTimeSlotByIdUseCase`         | Read single slot                                  |
-| `UpdateTimeSlotStatusUseCase`    | Manual status update                              |
-| `DeleteTimeSlotUseCase`          | Delete single slot                                |
-| `BulkDeleteTimeSlotsUseCase`     | Bulk delete available slots in date range         |
+| Use-Case                          | Description                                 |
+| --------------------------------- | ------------------------------------------- |
+| `GenerateTimeSlotsUseCase`        | Materialize slots for date range            |
+| `GetAllSlotsForMentorUseCase`     | Query all slots with date/status filters    |
+| `GetAvailableSlotsUseCase`        | Query only available slots                  |
+| `GetComputedBookableSlotsUseCase` | Compute bookable slots (availability-aware) |
+| `GetTimeSlotByIdUseCase`          | Read single slot                            |
+| `UpdateTimeSlotStatusUseCase`     | Manual status update                        |
+| `DeleteTimeSlotUseCase`           | Delete single slot                          |
+| `BulkDeleteTimeSlotsUseCase`      | Bulk delete available slots in date range   |
 
 ---
 
