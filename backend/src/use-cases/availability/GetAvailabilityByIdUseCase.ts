@@ -2,14 +2,16 @@ import type { AvailabilityManagementRepository } from "../../domain/availability
 import { NotFoundError } from "../../lib/error";
 
 export class GetAvailabilityByIdUseCase {
-	constructor(private readonly availabilityRepo: AvailabilityManagementRepository) {}
+  constructor(
+    private readonly availabilityRepo: AvailabilityManagementRepository,
+  ) {}
 
-	async execute(id: string) {
-		const availability = await this.availabilityRepo.findByIdWithMentor(id);
-		if (!availability) {
-			throw new NotFoundError("Availability not found");
-		}
+  async execute(id: string) {
+    const availability = await this.availabilityRepo.findByIdWithMentor(id);
+    if (!availability) {
+      throw new NotFoundError("Availability not found");
+    }
 
-		return availability;
-	}
+    return availability;
+  }
 }
