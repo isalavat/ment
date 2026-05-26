@@ -59,7 +59,7 @@ Browser (React SPA)
 ┌─────────────────────────────────────────────┐
 │              Express 5 API                  │
 │                                             │
-│  Routes → Middleware → Controllers          │
+│  Routes → Middleware → Controllers/Handlers │
 │               │                             │
 │          Use-Cases (Application Layer)      │
 │               │                             │
@@ -112,9 +112,12 @@ backend/src/
 │   └── user/                       # Admin: user CRUD
 │
 ├── domain/                         # Pure domain model (zero infra deps)
+│   ├── availability/               # Availability repository/service ports
+│   ├── booking/                    # Booking repository port
 │   ├── category/                   # Category entity + repository interface
 │   ├── mentor/                     # MentorProfile entity + repository interface
 │   ├── skill/                      # Skill entity + repository interface
+│   ├── timeSlot/                   # Time-slot repository/service ports
 │   ├── token/                      # RefreshToken entity + value objects
 │   └── user/                       # User entity + value objects + repository interface
 │
@@ -122,7 +125,7 @@ backend/src/
 │   ├── PrismaClientGetway.ts       # Tx-aware Prisma client resolver
 │   ├── PrismaTransactionalContext.ts # AsyncLocalStorage transaction context
 │   ├── repositories/               # Prisma implementations of domain repos
-│   ├── services/                   # BCrypt + JWT service implementations
+│   ├── services/                   # BCrypt/JWT + scheduling sync/generation implementations
 │   └── transaction/                # PrismaTransaction (runs $transaction)
 │
 ├── lib/
@@ -144,25 +147,25 @@ backend/src/
 │   ├── profiles.ts
 │   └── timeSlots.ts
 │
-├── services/                       # Domain service interfaces + direct Prisma services
+├── services/                       # Domain service interfaces (ports)
 │   ├── PasswordHasher.ts           # Port interface
-│   ├── TokenService.ts             # Port interface
-│   ├── availabilityService.ts      # Direct Prisma (not yet migrated to DDD)
-│   ├── bookingService.ts           # Direct Prisma
-│   └── timeSlotService.ts          # Direct Prisma
+│   └── TokenService.ts             # Port interface
 │
 └── use-cases/                      # Application commands/queries
-    ├── LoginUserUseCase.ts
-    ├── RegisterUserUseCase.ts
-    ├── LogoutUserUseCase.ts
-    ├── RotateSessionUseCase.ts
-    ├── admin/                      # AdminCreateUser, UpdateUser, DeleteUser
-    ├── category/                   # ReadAllCategories
-    ├── errors/                     # Application error types
-    ├── mentor/                     # Full mentor CRUD, verification, skills, categories
-    ├── profile/                    # GetMyProfile
-    ├── skill/                      # CreateSkill, ReadAllSkills
-    └── user/                       # UpdateMyProfile
+  ├── LoginUserUseCase.ts
+  ├── RegisterUserUseCase.ts
+  ├── LogoutUserUseCase.ts
+  ├── RotateSessionUseCase.ts
+  ├── admin/                      # AdminCreateUser, UpdateUser, DeleteUser
+  ├── availability/               # Availability CRUD + weekly/query use-cases
+  ├── booking/                    # Booking lifecycle + query use-cases
+  ├── category/                   # ReadAllCategories
+  ├── errors/                     # Application error types
+  ├── mentor/                     # Full mentor CRUD, verification, skills, categories
+  ├── profile/                    # GetMyProfile
+  ├── skill/                      # CreateSkill, ReadAllSkills
+  ├── time-slot/                  # Time-slot generation/query/management use-cases
+  └── user/                       # UpdateMyProfile
 ```
 
 ---
@@ -206,7 +209,7 @@ The backend follows **Domain-Driven Design (DDD)** combined with **Clean Archite
 | Manual DI            | No IoC container; repositories/services are instantiated per controller call                                           |
 | Ambient transactions | `AsyncLocalStorage` propagates the Prisma `TransactionClient`; repos pick it up automatically via `PrismaClientGetway` |
 
-> **Migration note:** The `Availability`, `Booking`, and `TimeSlot` feature areas use direct-Prisma services (`services/availabilityService.ts`, `bookingService.ts`, `timeSlotService.ts`) rather than the full DDD pattern. These are identified areas for future refactoring.
+> **Current state:** `Availability`, `Booking`, and `TimeSlot` feature areas are now routed through domain ports + use-cases + Prisma adapters, with transaction boundaries handled in use-cases where required.
 
 ---
 
