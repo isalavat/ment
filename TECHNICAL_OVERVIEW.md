@@ -1,6 +1,6 @@
 # Technical Overview — Ment Platform
 
-> Last updated: April 27, 2026
+> Last updated: May 26, 2026
 
 ---
 
@@ -221,7 +221,7 @@ All routes are prefixed and mounted in `src/index.ts`.
 | POST | `/auth/register` | — | Register new user |
 | POST | `/auth/login` | — | Login, returns access + refresh tokens |
 | POST | `/auth/refresh` | — | Rotate session (new token pair) |
-| POST | `/auth/logout` | ✅ | Revoke refresh token |
+| POST | `/auth/logout` | — | Revoke refresh token (expects `refreshToken` in body) |
 
 #### Profiles — `/profiles`
 
@@ -231,12 +231,14 @@ All routes are prefixed and mounted in `src/index.ts`.
 | PUT | `/profiles/me` | ✅ | Update bio/goals |
 | GET | `/profiles/mentors` | — | Public mentor listing (filterable) |
 | GET | `/profiles/mentors/:id` | — | Single public mentor profile |
+| GET | `/profiles/categories` | — | Public category list |
+| GET | `/profiles/skills` | — | Public skill list |
 | POST | `/profiles/mentor` | ✅ | Create own mentor profile |
 | PUT | `/profiles/mentor` | ✅ | Update own mentor profile |
 | POST | `/profiles/mentor/skills` | ✅ | Add skill to own profile |
-| DELETE | `/profiles/mentor/skills/:id` | ✅ | Remove skill from own profile |
+| DELETE | `/profiles/mentor/skills/:skillId` | ✅ | Remove skill from own profile |
 | POST | `/profiles/mentor/categories` | ✅ | Add category to own profile |
-| DELETE | `/profiles/mentor/categories/:id` | ✅ | Remove category from own profile |
+| DELETE | `/profiles/mentor/categories/:categoryId` | ✅ | Remove category from own profile |
 
 #### Admin — `/admin` (all routes require Auth + Admin role)
 
@@ -280,7 +282,11 @@ All routes are prefixed and mounted in `src/index.ts`.
 | GET | `/bookings/mentee/:menteeId` | Bookings for mentee |
 | GET | `/bookings/mentor/:mentorId` | Bookings for mentor |
 | GET | `/bookings/:id` | Single booking |
-| PATCH | `/bookings/:id/status` | Update booking status |
+| PATCH | `/bookings/:id/confirm` | Confirm booking |
+| PATCH | `/bookings/:id/cancel-mentee` | Cancel booking by mentee |
+| PATCH | `/bookings/:id/cancel-mentor` | Cancel booking by mentor |
+| PATCH | `/bookings/:id/complete` | Mark booking completed |
+| PATCH | `/bookings/:id/meeting-link` | Update meeting link |
 
 #### Availability — `/availability` (all require Auth)
 
@@ -291,6 +297,8 @@ All routes are prefixed and mounted in `src/index.ts`.
 | GET | `/availability/mentor/:mentorId` | All availabilities for mentor |
 | GET | `/availability/mentor/:mentorId/recurring` | Recurring only |
 | GET | `/availability/mentor/:mentorId/specific` | One-off dates only |
+| GET | `/availability/:id` | Single availability |
+| PATCH | `/availability/:id` | Update availability |
 | DELETE | `/availability/:id` | Delete availability |
 
 #### Time Slots — `/time-slots` (all require Auth)
@@ -299,9 +307,12 @@ All routes are prefixed and mounted in `src/index.ts`.
 |---|---|---|
 | POST | `/time-slots/generate` | Generate concrete slots from availability |
 | GET | `/time-slots/mentor/:mentorId/available` | Available slots (with date filter) |
+| GET | `/time-slots/mentor/:mentorId/bookable` | Computed bookable slots |
 | GET | `/time-slots/mentor/:mentorId` | All slots for mentor |
 | GET | `/time-slots/:id` | Single slot |
 | PATCH | `/time-slots/:id/status` | Override slot status |
+| DELETE | `/time-slots/:id` | Delete one slot |
+| DELETE | `/time-slots/bulk` | Bulk delete slots in date range |
 
 ---
 
@@ -331,7 +342,7 @@ Client                          API
   │                              │
   │── POST /auth/logout ────────▶│
   │                              │── revoke refresh token in DB
-  │◀── 204 ────────────────────│
+  │◀── 200 { ok: true } ───────│
 ```
 
 **`requireAdmin` guard:** After JWT verification, does a DB lookup to confirm `user.role === 'ADMIN'`. This ensures role cannot be faked via token payload even if a key were compromised.
@@ -393,7 +404,7 @@ The global `ErrorHandler` middleware:
 ```
 Request
   │
-  ├── cors()              — allows localhost:3001 + localhost:3000, credentials: true
+  ├── cors()              — allows localhost:3001 + localhost:3000 + localhost:3002, credentials: true
   ├── express.json()      — body parser
   │
   ├── requireAuth         — verifies Bearer JWT, attaches req.user
@@ -439,13 +450,15 @@ frontend-app/src/
 │   ├── bookings/                   # Bookings, BookingDetail, BookingModal
 │   ├── common/                     # AlertDialog, ConfirmDialog (reusable modals)
 │   ├── dashboard/                  # Dashboard (role-aware hub)
+│   ├── home/                       # Public landing page
 │   ├── language/                   # LanguageSwitcher
 │   ├── layout/                     # Header, Sidebar, ProtectedRoute
 │   ├── mentors/                    # Mentors (marketplace), MentorDetail
 │   └── profile/                    # MenteeProfileForm, MentorProfileForm
 │
 ├── contexts/
-│   └── AuthContext.tsx             # User auth state (user, login, logout, isAuthenticated)
+│   ├── AuthContext.tsx             # User auth state (user, login, logout, isAuthenticated)
+│   └── UIContext.tsx               # Shared UI state helpers
 │
 ├── i18n/
 │   ├── LanguageContext.tsx         # Active locale + t() translation accessor
@@ -478,9 +491,11 @@ Provider nesting in `App.tsx`:
 ```jsx
 <BrowserRouter>
   <LanguageProvider>       // i18n context
-    <AuthProvider>         // auth state
-      <AppContent />       // layout + Routes
-    </AuthProvider>
+    <UIProvider>           // UI state (layout helpers)
+      <AuthProvider>       // auth state
+        <AppContent />     // layout + Routes
+      </AuthProvider>
+    </UIProvider>
   </LanguageProvider>
 </BrowserRouter>
 ```
@@ -491,17 +506,19 @@ Provider nesting in `App.tsx`:
 
 | Path | Component | Protected |
 |---|---|---|
-| `/` | → `/dashboard` redirect | — |
+| `/` | `HomePage` (or redirect to `/dashboard` if logged in) | No |
 | `/login` | `Login` | No |
 | `/register` | `Register` | No |
 | `/dashboard` | `Dashboard` | Yes |
 | `/mentors` | `Mentors` | Yes |
 | `/mentors/:id` | `MentorDetail` | Yes |
+| `/mentors/:id/book` | `BookSessionPage` | Yes |
 | `/bookings` | `Bookings` | Yes |
 | `/bookings/:id` | `BookingDetail` | Yes |
 | `/availability` | `AvailabilityManager` | Yes |
 | `/time-slots` | `TimeSlotManager` | Yes |
 | `/profile/me` | `MenteeProfileForm` | Yes |
+| `/profile/mentee` | redirect to `/profile/me` | No |
 | `/profile/mentor` | `MentorProfileForm` | Yes |
 | `/admin/users` | `AdminUsers` | Yes |
 | `/admin/users/create` | `AdminCreateUser` | Yes |
@@ -588,6 +605,7 @@ Active locale is persisted in `localStorage['language']` and loaded on first ren
 | Group | Components | Role |
 |---|---|---|
 | `layout/` | `Header`, `Sidebar`, `ProtectedRoute` | App shell — navigation, auth guard |
+| `home/` | `HomePage` | Public landing page |
 | `auth/` | `Login`, `Register` | Unauthenticated entry points |
 | `dashboard/` | `Dashboard` | Role-aware hub (sessions, stats, recommendations) |
 | `mentors/` | `Mentors`, `MentorDetail` | Mentor marketplace with filter + pagination |
@@ -617,4 +635,4 @@ Role-based UI visibility:
 | Internationalisation | — (API returns raw data) | Three-locale LanguageContext |
 | Database access | Prisma ORM (MySQL) | — |
 | Type safety | Domain value objects + Zod parsing | TypeScript interfaces in `types/` |
-| CORS | `localhost:3001`, `localhost:3000`, `credentials: true` | — |
+| CORS | `localhost:3001`, `localhost:3000`, `localhost:3002`, `credentials: true` | — |

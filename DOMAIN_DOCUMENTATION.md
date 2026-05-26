@@ -1,6 +1,6 @@
 # Domain Documentation — Ment Platform
 
-> Last updated: April 27, 2026
+> Last updated: May 26, 2026
 
 ---
 
@@ -451,6 +451,8 @@ Use-cases live in `src/use-cases/` and represent the **application's commands an
 - Orchestrates domain objects and repositories
 - Returns a domain result or throws a typed application error
 
+> Implementation note: Not all feature areas are use-case based yet. Scheduling and booking flows (`availabilityService`, `timeSlotService`, `bookingService`) are currently implemented as direct Prisma service modules and are not fully migrated into the DDD/use-case layer.
+
 ### Identity & Access
 
 | Use-Case | Input | Core logic |
@@ -528,14 +530,14 @@ Use-cases live in `src/use-cases/` and represent the **application's commands an
 
 - Only one profile per user (`userId` is `@unique`)
 - Profile only appears in public listings when `verificationStatus === VERIFIED`
-- `rejectionReason` is required when status is set to `REJECTED`
+- `rejectionReason` is optional in the current implementation when status is set to `REJECTED`
 - `avgRating` and `totalReviews` are computed fields — not directly mutable by users
 
 ### Booking
 
 - A `TimeSlot` can have at most one `Booking` (`timeSlotId @unique`)
 - `hourlyRate`, `duration`, and `totalAmount` are **snapshotted** at booking time — subsequent mentor price changes do not retroactively affect booked sessions
-- A `Review` can only be created for a `Booking` with status `COMPLETED`
+- Intended rule: a `Review` should only be created for a `Booking` with status `COMPLETED` (review creation endpoints are not implemented yet)
 - Only one review per booking (`bookingId @unique` on `Review`)
 
 ### RefreshToken
@@ -545,7 +547,8 @@ Use-cases live in `src/use-cases/` and represent the **application's commands an
 
 ### Availability & Time Slots
 
-- `TimeSlot` records are derived from `Availability` — they do not exist independently
+- `TimeSlot` records are primarily derived from `Availability` (bulk generation and computed bookable flows)
+- Booking flow can also create a concrete `TimeSlot` on demand when requested time is within mentor availability
 - A slot can only be booked when `status === AVAILABLE`
 - Booking a slot transitions its status to `BOOKED`
 
