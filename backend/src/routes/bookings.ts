@@ -1,7 +1,21 @@
 import type { BookingStatus } from "@prisma/client";
 import { type NextFunction, type Request, type Response, Router } from "express";
+import { PrismaAvailabilityRepository } from "../infra/repositories/PrismaAvailabilityRepository";
+import { PrismaBookingRepository } from "../infra/repositories/PrismaBookingRepository";
+import { PrismaMentorRepository } from "../infra/repositories/PrismaMentorProfileRepository";
+import { PrismaTimeSlotRepository } from "../infra/repositories/PrismaTimeSlotRepository";
+import { PrismaUserRepository } from "../infra/repositories/PrismaUserRepository";
+import { PrismaTransaction } from "../infra/transaction/PrismaTransaction";
 import { requireAuth } from "../middleware/auth";
-import { bookingService } from "../services/bookingService";
+import { CancelBookingByMenteeUseCase } from "../use-cases/booking/CancelBookingByMenteeUseCase";
+import { CancelBookingByMentorUseCase } from "../use-cases/booking/CancelBookingByMentorUseCase";
+import { CompleteBookingUseCase } from "../use-cases/booking/CompleteBookingUseCase";
+import { ConfirmBookingUseCase } from "../use-cases/booking/ConfirmBookingUseCase";
+import { CreateBookingUseCase } from "../use-cases/booking/CreateBookingUseCase";
+import { GetBookingByIdUseCase } from "../use-cases/booking/GetBookingByIdUseCase";
+import { GetBookingsForMenteeUseCase } from "../use-cases/booking/GetBookingsForMenteeUseCase";
+import { GetBookingsForMentorUseCase } from "../use-cases/booking/GetBookingsForMentorUseCase";
+import { UpdateMeetingLinkUseCase } from "../use-cases/booking/UpdateMeetingLinkUseCase";
 
 const router = Router();
 
@@ -32,7 +46,16 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 			return res.status(400).json({ error: "Invalid endTime" });
 		}
 
-		const booking = await bookingService.createBooking({
+		const useCase = new CreateBookingUseCase(
+			new PrismaTransaction(),
+			new PrismaMentorRepository(),
+			new PrismaUserRepository(),
+			new PrismaAvailabilityRepository(),
+			new PrismaTimeSlotRepository(),
+			new PrismaBookingRepository(),
+		);
+
+		const booking = await useCase.execute({
 			menteeId,
 			mentorId,
 			timeSlotId,
@@ -59,7 +82,8 @@ router.get("/mentee/:menteeId", async (req: Request, res: Response, next: NextFu
 
 		// TODO: Add authorization check - user should only access their own bookings
 
-		const bookings = await bookingService.getBookingsForMentee(menteeId, {
+		const bookings = await new GetBookingsForMenteeUseCase(new PrismaBookingRepository()).execute({
+			menteeId,
 			status,
 			startDate,
 			endDate,
@@ -83,7 +107,8 @@ router.get("/mentor/:mentorId", async (req: Request, res: Response, next: NextFu
 
 		// TODO: Add authorization check - user should only access their own bookings
 
-		const bookings = await bookingService.getBookingsForMentor(mentorId, {
+		const bookings = await new GetBookingsForMentorUseCase(new PrismaBookingRepository()).execute({
+			mentorId,
 			status,
 			startDate,
 			endDate,
@@ -104,7 +129,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 
 		// TODO: Add authorization check - only mentee or mentor involved should access
 
-		const booking = await bookingService.getBookingById(bookingId);
+		const booking = await new GetBookingByIdUseCase(new PrismaBookingRepository()).execute(bookingId);
 		res.json(booking);
 	} catch (error) {
 		next(error);
@@ -121,7 +146,7 @@ router.patch("/:id/confirm", async (req: Request, res: Response, next: NextFunct
 
 		// TODO: Add proper authorization check
 
-		const booking = await bookingService.confirmBooking(bookingId, mentorId);
+		const booking = await new ConfirmBookingUseCase(new PrismaBookingRepository()).execute(bookingId, mentorId);
 		res.json(booking);
 	} catch (error) {
 		next(error);
@@ -138,7 +163,11 @@ router.patch("/:id/cancel-mentee", async (req: Request, res: Response, next: Nex
 
 		// TODO: Add proper authorization check
 
-		const booking = await bookingService.cancelBookingByMentee(bookingId, menteeId);
+		const booking = await new CancelBookingByMenteeUseCase(
+			new PrismaTransaction(),
+			new PrismaBookingRepository(),
+			new PrismaTimeSlotRepository(),
+		).execute(bookingId, menteeId);
 		res.json(booking);
 	} catch (error) {
 		next(error);
@@ -155,7 +184,11 @@ router.patch("/:id/cancel-mentor", async (req: Request, res: Response, next: Nex
 
 		// TODO: Add proper authorization check
 
-		const booking = await bookingService.cancelBookingByMentor(bookingId, mentorId);
+		const booking = await new CancelBookingByMentorUseCase(
+			new PrismaTransaction(),
+			new PrismaBookingRepository(),
+			new PrismaTimeSlotRepository(),
+		).execute(bookingId, mentorId);
 		res.json(booking);
 	} catch (error) {
 		next(error);
@@ -171,7 +204,7 @@ router.patch("/:id/complete", async (req: Request, res: Response, next: NextFunc
 
 		// TODO: Add proper authorization check - should be after session time has passed
 
-		const booking = await bookingService.completeBooking(bookingId);
+		const booking = await new CompleteBookingUseCase(new PrismaBookingRepository()).execute(bookingId);
 		res.json(booking);
 	} catch (error) {
 		next(error);
@@ -192,7 +225,11 @@ router.patch("/:id/meeting-link", async (req: Request, res: Response, next: Next
 
 		// TODO: Add proper authorization check
 
-		const booking = await bookingService.updateMeetingLink(bookingId, mentorId, meetingLink);
+		const booking = await new UpdateMeetingLinkUseCase(new PrismaBookingRepository()).execute(
+			bookingId,
+			mentorId,
+			meetingLink,
+		);
 		res.json(booking);
 	} catch (error) {
 		next(error);

@@ -42,10 +42,10 @@
 
 The system is structured as a **monorepo** with two independently deployable applications:
 
-| App | Path | Runtime |
-|---|---|---|
-| REST API | `backend/` | Node.js / Express |
-| SPA | `frontend-app/` | React / Browser |
+| App      | Path            | Runtime           |
+| -------- | --------------- | ----------------- |
+| REST API | `backend/`      | Node.js / Express |
+| SPA      | `frontend-app/` | React / Browser   |
 
 ---
 
@@ -79,19 +79,19 @@ Browser (React SPA)
 
 ### 3.1 Tech Stack
 
-| Concern | Technology | Version |
-|---|---|---|
-| Runtime | Node.js + TypeScript | TS 5.x, target ES2020, CommonJS |
-| Web framework | Express | 5.1 |
-| ORM | Prisma | 6.19 |
-| Database | MySQL | — (via `DATABASE_URL`) |
-| Auth tokens | jsonwebtoken | 8.5 |
-| Password hashing | bcryptjs | 3 |
-| Input validation | Zod | 4 |
-| Logging | Pino + pino-pretty | 9 |
-| ID generation | uuid (v7 entities, v4 tokens) | — |
-| Linting / Formatting | Biome | 2 |
-| Dev tooling | nodemon + ts-node | — |
+| Concern              | Technology                    | Version                         |
+| -------------------- | ----------------------------- | ------------------------------- |
+| Runtime              | Node.js + TypeScript          | TS 5.x, target ES2020, CommonJS |
+| Web framework        | Express                       | 5.1                             |
+| ORM                  | Prisma                        | 6.19                            |
+| Database             | MySQL                         | — (via `DATABASE_URL`)          |
+| Auth tokens          | jsonwebtoken                  | 8.5                             |
+| Password hashing     | bcryptjs                      | 3                               |
+| Input validation     | Zod                           | 4                               |
+| Logging              | Pino + pino-pretty            | 9                               |
+| ID generation        | uuid (v7 entities, v4 tokens) | —                               |
+| Linting / Formatting | Biome                         | 2                               |
+| Dev tooling          | nodemon + ts-node             | —                               |
 
 **Token strategy:** Dual-token auth — short-lived **access token (15 min)** + long-lived **refresh token (7 days)**, both as JWTs. Refresh tokens are persisted in the DB (`RefreshToken` table) and can be individually revoked.
 
@@ -198,12 +198,12 @@ The backend follows **Domain-Driven Design (DDD)** combined with **Clean Archite
 
 **Key design choices:**
 
-| Pattern | Implementation |
-|---|---|
-| Repository | Every aggregate has a domain interface + Prisma impl; injected via constructor |
-| Value Objects | `Email`, `UserId`, `HashedPassword`, `AccessToken`, `RefreshTokenId` — immutable, validated at construction |
-| Entity factories | `private constructor` + `static create()` — prevents invalid state |
-| Manual DI | No IoC container; repositories/services are instantiated per controller call |
+| Pattern              | Implementation                                                                                                         |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Repository           | Every aggregate has a domain interface + Prisma impl; injected via constructor                                         |
+| Value Objects        | `Email`, `UserId`, `HashedPassword`, `AccessToken`, `RefreshTokenId` — immutable, validated at construction            |
+| Entity factories     | `private constructor` + `static create()` — prevents invalid state                                                     |
+| Manual DI            | No IoC container; repositories/services are instantiated per controller call                                           |
 | Ambient transactions | `AsyncLocalStorage` propagates the Prisma `TransactionClient`; repos pick it up automatically via `PrismaClientGetway` |
 
 > **Migration note:** The `Availability`, `Booking`, and `TimeSlot` feature areas use direct-Prisma services (`services/availabilityService.ts`, `bookingService.ts`, `timeSlotService.ts`) rather than the full DDD pattern. These are identified areas for future refactoring.
@@ -216,103 +216,103 @@ All routes are prefixed and mounted in `src/index.ts`.
 
 #### Auth — `/auth`
 
-| Method | Path | Auth required | Description |
-|---|---|---|---|
-| POST | `/auth/register` | — | Register new user |
-| POST | `/auth/login` | — | Login, returns access + refresh tokens |
-| POST | `/auth/refresh` | — | Rotate session (new token pair) |
-| POST | `/auth/logout` | — | Revoke refresh token (expects `refreshToken` in body) |
+| Method | Path             | Auth required | Description                                           |
+| ------ | ---------------- | ------------- | ----------------------------------------------------- |
+| POST   | `/auth/register` | —             | Register new user                                     |
+| POST   | `/auth/login`    | —             | Login, returns access + refresh tokens                |
+| POST   | `/auth/refresh`  | —             | Rotate session (new token pair)                       |
+| POST   | `/auth/logout`   | —             | Revoke refresh token (expects `refreshToken` in body) |
 
 #### Profiles — `/profiles`
 
-| Method | Path | Auth required | Description |
-|---|---|---|---|
-| GET | `/profiles/me` | ✅ | Current user + mentor profile |
-| PUT | `/profiles/me` | ✅ | Update bio/goals |
-| GET | `/profiles/mentors` | — | Public mentor listing (filterable) |
-| GET | `/profiles/mentors/:id` | — | Single public mentor profile |
-| GET | `/profiles/categories` | — | Public category list |
-| GET | `/profiles/skills` | — | Public skill list |
-| POST | `/profiles/mentor` | ✅ | Create own mentor profile |
-| PUT | `/profiles/mentor` | ✅ | Update own mentor profile |
-| POST | `/profiles/mentor/skills` | ✅ | Add skill to own profile |
-| DELETE | `/profiles/mentor/skills/:skillId` | ✅ | Remove skill from own profile |
-| POST | `/profiles/mentor/categories` | ✅ | Add category to own profile |
-| DELETE | `/profiles/mentor/categories/:categoryId` | ✅ | Remove category from own profile |
+| Method | Path                                      | Auth required | Description                        |
+| ------ | ----------------------------------------- | ------------- | ---------------------------------- |
+| GET    | `/profiles/me`                            | ✅            | Current user + mentor profile      |
+| PUT    | `/profiles/me`                            | ✅            | Update bio/goals                   |
+| GET    | `/profiles/mentors`                       | —             | Public mentor listing (filterable) |
+| GET    | `/profiles/mentors/:id`                   | —             | Single public mentor profile       |
+| GET    | `/profiles/categories`                    | —             | Public category list               |
+| GET    | `/profiles/skills`                        | —             | Public skill list                  |
+| POST   | `/profiles/mentor`                        | ✅            | Create own mentor profile          |
+| PUT    | `/profiles/mentor`                        | ✅            | Update own mentor profile          |
+| POST   | `/profiles/mentor/skills`                 | ✅            | Add skill to own profile           |
+| DELETE | `/profiles/mentor/skills/:skillId`        | ✅            | Remove skill from own profile      |
+| POST   | `/profiles/mentor/categories`             | ✅            | Add category to own profile        |
+| DELETE | `/profiles/mentor/categories/:categoryId` | ✅            | Remove category from own profile   |
 
 #### Admin — `/admin` (all routes require Auth + Admin role)
 
 **Users**
 
-| Method | Path | Description |
-|---|---|---|
-| GET | `/admin/users` | Paginated list (filter by role, search) |
-| GET | `/admin/users/:id` | Single user with mentor profile |
-| POST | `/admin/users` | Create user |
-| PUT | `/admin/users/:id` | Update user |
-| DELETE | `/admin/users/:id` | Delete user |
+| Method | Path               | Description                             |
+| ------ | ------------------ | --------------------------------------- |
+| GET    | `/admin/users`     | Paginated list (filter by role, search) |
+| GET    | `/admin/users/:id` | Single user with mentor profile         |
+| POST   | `/admin/users`     | Create user                             |
+| PUT    | `/admin/users/:id` | Update user                             |
+| DELETE | `/admin/users/:id` | Delete user                             |
 
 **Mentors**
 
-| Method | Path | Description |
-|---|---|---|
-| GET | `/admin/mentors` | All mentors (filter by verificationStatus) |
-| GET | `/admin/mentors/:id` | Single mentor by profile ID |
-| GET | `/admin/mentors/by-user/:userId` | Mentor by user ID |
-| POST | `/admin/mentors/by-user/:userId` | Create mentor profile for user |
-| PUT | `/admin/mentors/by-user/:userId` | Update mentor profile |
-| PATCH | `/admin/mentors/:id/verification` | Verify or reject mentor |
-| POST | `/admin/mentors/by-user/:userId/skills` | Add skill |
-| DELETE | `/admin/mentors/by-user/:userId/skills/:skillId` | Remove skill |
-| POST | `/admin/mentors/by-user/:userId/categories` | Add category |
-| DELETE | `/admin/mentors/by-user/:userId/categories/:categoryId` | Remove category |
+| Method | Path                                                    | Description                                |
+| ------ | ------------------------------------------------------- | ------------------------------------------ |
+| GET    | `/admin/mentors`                                        | All mentors (filter by verificationStatus) |
+| GET    | `/admin/mentors/:id`                                    | Single mentor by profile ID                |
+| GET    | `/admin/mentors/by-user/:userId`                        | Mentor by user ID                          |
+| POST   | `/admin/mentors/by-user/:userId`                        | Create mentor profile for user             |
+| PUT    | `/admin/mentors/by-user/:userId`                        | Update mentor profile                      |
+| PATCH  | `/admin/mentors/:id/verification`                       | Verify or reject mentor                    |
+| POST   | `/admin/mentors/by-user/:userId/skills`                 | Add skill                                  |
+| DELETE | `/admin/mentors/by-user/:userId/skills/:skillId`        | Remove skill                               |
+| POST   | `/admin/mentors/by-user/:userId/categories`             | Add category                               |
+| DELETE | `/admin/mentors/by-user/:userId/categories/:categoryId` | Remove category                            |
 
 **Skills**
 
-| Method | Path |
-|---|---|
-| GET | `/admin/skills` |
-| POST | `/admin/skills` |
+| Method | Path            |
+| ------ | --------------- |
+| GET    | `/admin/skills` |
+| POST   | `/admin/skills` |
 
 #### Bookings — `/bookings` (all require Auth)
 
-| Method | Path | Description |
-|---|---|---|
-| POST | `/bookings` | Create booking |
-| GET | `/bookings/mentee/:menteeId` | Bookings for mentee |
-| GET | `/bookings/mentor/:mentorId` | Bookings for mentor |
-| GET | `/bookings/:id` | Single booking |
-| PATCH | `/bookings/:id/confirm` | Confirm booking |
-| PATCH | `/bookings/:id/cancel-mentee` | Cancel booking by mentee |
-| PATCH | `/bookings/:id/cancel-mentor` | Cancel booking by mentor |
-| PATCH | `/bookings/:id/complete` | Mark booking completed |
-| PATCH | `/bookings/:id/meeting-link` | Update meeting link |
+| Method | Path                          | Description              |
+| ------ | ----------------------------- | ------------------------ |
+| POST   | `/bookings`                   | Create booking           |
+| GET    | `/bookings/mentee/:menteeId`  | Bookings for mentee      |
+| GET    | `/bookings/mentor/:mentorId`  | Bookings for mentor      |
+| GET    | `/bookings/:id`               | Single booking           |
+| PATCH  | `/bookings/:id/confirm`       | Confirm booking          |
+| PATCH  | `/bookings/:id/cancel-mentee` | Cancel booking by mentee |
+| PATCH  | `/bookings/:id/cancel-mentor` | Cancel booking by mentor |
+| PATCH  | `/bookings/:id/complete`      | Mark booking completed   |
+| PATCH  | `/bookings/:id/meeting-link`  | Update meeting link      |
 
 #### Availability — `/availability` (all require Auth)
 
-| Method | Path | Description |
-|---|---|---|
-| POST | `/availability` | Create single availability slot |
-| POST | `/availability/weekly` | Set full weekly schedule |
-| GET | `/availability/mentor/:mentorId` | All availabilities for mentor |
-| GET | `/availability/mentor/:mentorId/recurring` | Recurring only |
-| GET | `/availability/mentor/:mentorId/specific` | One-off dates only |
-| GET | `/availability/:id` | Single availability |
-| PATCH | `/availability/:id` | Update availability |
-| DELETE | `/availability/:id` | Delete availability |
+| Method | Path                                       | Description                     |
+| ------ | ------------------------------------------ | ------------------------------- |
+| POST   | `/availability`                            | Create single availability slot |
+| POST   | `/availability/weekly`                     | Set full weekly schedule        |
+| GET    | `/availability/mentor/:mentorId`           | All availabilities for mentor   |
+| GET    | `/availability/mentor/:mentorId/recurring` | Recurring only                  |
+| GET    | `/availability/mentor/:mentorId/specific`  | One-off dates only              |
+| GET    | `/availability/:id`                        | Single availability             |
+| PATCH  | `/availability/:id`                        | Update availability             |
+| DELETE | `/availability/:id`                        | Delete availability             |
 
 #### Time Slots — `/time-slots` (all require Auth)
 
-| Method | Path | Description |
-|---|---|---|
-| POST | `/time-slots/generate` | Generate concrete slots from availability |
-| GET | `/time-slots/mentor/:mentorId/available` | Available slots (with date filter) |
-| GET | `/time-slots/mentor/:mentorId/bookable` | Computed bookable slots |
-| GET | `/time-slots/mentor/:mentorId` | All slots for mentor |
-| GET | `/time-slots/:id` | Single slot |
-| PATCH | `/time-slots/:id/status` | Override slot status |
-| DELETE | `/time-slots/:id` | Delete one slot |
-| DELETE | `/time-slots/bulk` | Bulk delete slots in date range |
+| Method | Path                                     | Description                               |
+| ------ | ---------------------------------------- | ----------------------------------------- |
+| POST   | `/time-slots/generate`                   | Generate concrete slots from availability |
+| GET    | `/time-slots/mentor/:mentorId/available` | Available slots (with date filter)        |
+| GET    | `/time-slots/mentor/:mentorId/bookable`  | Computed bookable slots                   |
+| GET    | `/time-slots/mentor/:mentorId`           | All slots for mentor                      |
+| GET    | `/time-slots/:id`                        | Single slot                               |
+| PATCH  | `/time-slots/:id/status`                 | Override slot status                      |
+| DELETE | `/time-slots/:id`                        | Delete one slot                           |
+| DELETE | `/time-slots/bulk`                       | Bulk delete slots in date range           |
 
 ---
 
@@ -387,12 +387,14 @@ Error
 ```
 
 Use-case level application errors live in `use-cases/errors/`:
+
 - `InvalidEmailOrPasswordError`
 - `UserAlreadyExistsError`
 - `InvalidRefreshTokenError`
 - `RefreshTokenRevokedError`
 
 The global `ErrorHandler` middleware:
+
 - Inspects `instanceof BaseError` → uses `error.statusCode` and `error.code`
 - Logs `warn` for 4xx, `error` for 5xx with structured context (correlationId, user)
 - Returns `{ code, message, instance }` JSON — consistent API error contract
@@ -422,15 +424,15 @@ Request
 
 ### 4.1 Tech Stack
 
-| Dependency | Version | Purpose |
-|---|---|---|
-| React | 19.2.0 | UI library |
-| TypeScript | 4.9.5 | Type safety |
-| react-router-dom | 7.9.6 | Client-side routing |
-| axios | 1.13.2 | HTTP client |
-| react-scripts (CRA) | 5.0.1 | Build toolchain |
-| @testing-library/react | 16.3.0 | Component testing |
-| web-vitals | 2.1.4 | Performance metrics |
+| Dependency             | Version | Purpose             |
+| ---------------------- | ------- | ------------------- |
+| React                  | 19.2.0  | UI library          |
+| TypeScript             | 4.9.5   | Type safety         |
+| react-router-dom       | 7.9.6   | Client-side routing |
+| axios                  | 1.13.2  | HTTP client         |
+| react-scripts (CRA)    | 5.0.1   | Build toolchain     |
+| @testing-library/react | 16.3.0  | Component testing   |
+| web-vitals             | 2.1.4   | Performance metrics |
 
 **No UI component library** — all styles are custom CSS. **No external state management** — React Context API only. **No form library** — all forms are controlled components via `useState`.
 
@@ -490,10 +492,16 @@ Provider nesting in `App.tsx`:
 
 ```jsx
 <BrowserRouter>
-  <LanguageProvider>       // i18n context
-    <UIProvider>           // UI state (layout helpers)
-      <AuthProvider>       // auth state
-        <AppContent />     // layout + Routes
+  <LanguageProvider>
+    {" "}
+    // i18n context
+    <UIProvider>
+      {" "}
+      // UI state (layout helpers)
+      <AuthProvider>
+        {" "}
+        // auth state
+        <AppContent /> // layout + Routes
       </AuthProvider>
     </UIProvider>
   </LanguageProvider>
@@ -504,26 +512,26 @@ Provider nesting in `App.tsx`:
 
 **Route table:**
 
-| Path | Component | Protected |
-|---|---|---|
-| `/` | `HomePage` (or redirect to `/dashboard` if logged in) | No |
-| `/login` | `Login` | No |
-| `/register` | `Register` | No |
-| `/dashboard` | `Dashboard` | Yes |
-| `/mentors` | `Mentors` | Yes |
-| `/mentors/:id` | `MentorDetail` | Yes |
-| `/mentors/:id/book` | `BookSessionPage` | Yes |
-| `/bookings` | `Bookings` | Yes |
-| `/bookings/:id` | `BookingDetail` | Yes |
-| `/availability` | `AvailabilityManager` | Yes |
-| `/time-slots` | `TimeSlotManager` | Yes |
-| `/profile/me` | `MenteeProfileForm` | Yes |
-| `/profile/mentee` | redirect to `/profile/me` | No |
-| `/profile/mentor` | `MentorProfileForm` | Yes |
-| `/admin/users` | `AdminUsers` | Yes |
-| `/admin/users/create` | `AdminCreateUser` | Yes |
-| `/admin/users/:id` | `AdminUserDetail` | Yes |
-| `/admin/mentors` | `AdminMentors` | Yes |
+| Path                  | Component                                             | Protected |
+| --------------------- | ----------------------------------------------------- | --------- |
+| `/`                   | `HomePage` (or redirect to `/dashboard` if logged in) | No        |
+| `/login`              | `Login`                                               | No        |
+| `/register`           | `Register`                                            | No        |
+| `/dashboard`          | `Dashboard`                                           | Yes       |
+| `/mentors`            | `Mentors`                                             | Yes       |
+| `/mentors/:id`        | `MentorDetail`                                        | Yes       |
+| `/mentors/:id/book`   | `BookSessionPage`                                     | Yes       |
+| `/bookings`           | `Bookings`                                            | Yes       |
+| `/bookings/:id`       | `BookingDetail`                                       | Yes       |
+| `/availability`       | `AvailabilityManager`                                 | Yes       |
+| `/time-slots`         | `TimeSlotManager`                                     | Yes       |
+| `/profile/me`         | `MenteeProfileForm`                                   | Yes       |
+| `/profile/mentee`     | redirect to `/profile/me`                             | No        |
+| `/profile/mentor`     | `MentorProfileForm`                                   | Yes       |
+| `/admin/users`        | `AdminUsers`                                          | Yes       |
+| `/admin/users/create` | `AdminCreateUser`                                     | Yes       |
+| `/admin/users/:id`    | `AdminUserDetail`                                     | Yes       |
+| `/admin/mentors`      | `AdminMentors`                                        | Yes       |
 
 `ProtectedRoute` only checks `isAuthenticated`. Role-based access is enforced inside components and via sidebar visibility — not at the router level.
 
@@ -531,12 +539,12 @@ Provider nesting in `App.tsx`:
 
 ### 4.4 State Management
 
-| Scope | Mechanism |
-|---|---|
-| Auth user | `AuthContext` — React Context + `useState` |
-| Active locale | `LanguageContext` — React Context + `useState` |
-| Page/server data | Local `useState` + `useEffect` per component |
-| No global data cache | — |
+| Scope                | Mechanism                                      |
+| -------------------- | ---------------------------------------------- |
+| Auth user            | `AuthContext` — React Context + `useState`     |
+| Active locale        | `LanguageContext` — React Context + `useState` |
+| Page/server data     | Local `useState` + `useEffect` per component   |
+| No global data cache | —                                              |
 
 Every page component fetches independently on mount (`useEffect(() => { fetchData() }, [deps])`). There is no shared server-state cache (no React Query / SWR).
 
@@ -577,14 +585,14 @@ Logout:
 
 `src/services/api.ts` is a shared Axios instance (`baseURL: http://localhost:3000`) wrapping all API calls. All feature-specific service files import from this instance.
 
-| Service file | Responsibility |
-|---|---|
-| `authService.ts` | Login, register, logout, current user hydration |
-| `profileService.ts` | Own profile + mentor profile read/write + skill/category management |
-| `mentorService.ts` | Public mentor directory (listing + detail) |
-| `bookingService.ts` | Full booking lifecycle (create, confirm, cancel, complete, meeting link) |
-| `availabilityService.ts` | Availability CRUD + time-slot generation |
-| `adminService.ts` | Admin user CRUD + mentor verification actions |
+| Service file             | Responsibility                                                           |
+| ------------------------ | ------------------------------------------------------------------------ |
+| `authService.ts`         | Login, register, logout, current user hydration                          |
+| `profileService.ts`      | Own profile + mentor profile read/write + skill/category management      |
+| `mentorService.ts`       | Public mentor directory (listing + detail)                               |
+| `bookingService.ts`      | Full booking lifecycle (create, confirm, cancel, complete, meeting link) |
+| `availabilityService.ts` | Availability CRUD + time-slot generation                                 |
+| `adminService.ts`        | Admin user CRUD + mentor verification actions                            |
 
 ---
 
@@ -602,21 +610,22 @@ Active locale is persisted in `localStorage['language']` and loaded on first ren
 
 ### 4.8 Component Architecture
 
-| Group | Components | Role |
-|---|---|---|
-| `layout/` | `Header`, `Sidebar`, `ProtectedRoute` | App shell — navigation, auth guard |
-| `home/` | `HomePage` | Public landing page |
-| `auth/` | `Login`, `Register` | Unauthenticated entry points |
-| `dashboard/` | `Dashboard` | Role-aware hub (sessions, stats, recommendations) |
-| `mentors/` | `Mentors`, `MentorDetail` | Mentor marketplace with filter + pagination |
-| `bookings/` | `Bookings`, `BookingDetail`, `BookingModal` | Full booking lifecycle UI |
-| `availability/` | `AvailabilityManager`, `TimeSlotManager` | Mentor scheduling tools |
-| `profile/` | `MenteeProfileForm`, `MentorProfileForm` | Profile editing (role-dependent forms) |
-| `admin/` | `AdminUsers`, `AdminUserDetail`, `AdminCreateUser`, `AdminMentors` | Admin management panel |
-| `common/` | `ConfirmDialog`, `AlertDialog` | Reusable modal dialogs |
-| `language/` | `LanguageSwitcher` | Locale selector |
+| Group           | Components                                                         | Role                                              |
+| --------------- | ------------------------------------------------------------------ | ------------------------------------------------- |
+| `layout/`       | `Header`, `Sidebar`, `ProtectedRoute`                              | App shell — navigation, auth guard                |
+| `home/`         | `HomePage`                                                         | Public landing page                               |
+| `auth/`         | `Login`, `Register`                                                | Unauthenticated entry points                      |
+| `dashboard/`    | `Dashboard`                                                        | Role-aware hub (sessions, stats, recommendations) |
+| `mentors/`      | `Mentors`, `MentorDetail`                                          | Mentor marketplace with filter + pagination       |
+| `bookings/`     | `Bookings`, `BookingDetail`, `BookingModal`                        | Full booking lifecycle UI                         |
+| `availability/` | `AvailabilityManager`, `TimeSlotManager`                           | Mentor scheduling tools                           |
+| `profile/`      | `MenteeProfileForm`, `MentorProfileForm`                           | Profile editing (role-dependent forms)            |
+| `admin/`        | `AdminUsers`, `AdminUserDetail`, `AdminCreateUser`, `AdminMentors` | Admin management panel                            |
+| `common/`       | `ConfirmDialog`, `AlertDialog`                                     | Reusable modal dialogs                            |
+| `language/`     | `LanguageSwitcher`                                                 | Locale selector                                   |
 
 Role-based UI visibility:
+
 - `Sidebar` shows **Mentor Tools** section only for `role === "MENTOR"` and **Admin** section only for `role === "ADMIN"`.
 - `Header` shows verification status banners for mentors (`PENDING` / `REJECTED` / `VERIFIED` + no availability).
 - `Dashboard` fetches different data depending on role (bookings-as-mentor vs bookings-as-mentee + recommended mentors).
@@ -625,14 +634,14 @@ Role-based UI visibility:
 
 ## 5. Cross-Cutting Concerns
 
-| Concern | Backend | Frontend |
-|---|---|---|
-| Auth | JWT Bearer (access + refresh) | localStorage tokens + Axios interceptor |
-| Authorisation | `requireAuth` + `requireAdmin` middleware | Role checks inside components + `ProtectedRoute` |
-| Validation | Zod schemas via `validateBodyWith()` | HTML `required` attributes + try/catch on submit |
-| Error handling | Global `ErrorHandler` middleware, structured JSON errors | Component-level `error` state string |
-| Logging | Pino structured logs (server-side) | None (console at best) |
-| Internationalisation | — (API returns raw data) | Three-locale LanguageContext |
-| Database access | Prisma ORM (MySQL) | — |
-| Type safety | Domain value objects + Zod parsing | TypeScript interfaces in `types/` |
-| CORS | `localhost:3001`, `localhost:3000`, `localhost:3002`, `credentials: true` | — |
+| Concern              | Backend                                                                   | Frontend                                         |
+| -------------------- | ------------------------------------------------------------------------- | ------------------------------------------------ |
+| Auth                 | JWT Bearer (access + refresh)                                             | localStorage tokens + Axios interceptor          |
+| Authorisation        | `requireAuth` + `requireAdmin` middleware                                 | Role checks inside components + `ProtectedRoute` |
+| Validation           | Zod schemas via `validateBodyWith()`                                      | HTML `required` attributes + try/catch on submit |
+| Error handling       | Global `ErrorHandler` middleware, structured JSON errors                  | Component-level `error` state string             |
+| Logging              | Pino structured logs (server-side)                                        | None (console at best)                           |
+| Internationalisation | — (API returns raw data)                                                  | Three-locale LanguageContext                     |
+| Database access      | Prisma ORM (MySQL)                                                        | —                                                |
+| Type safety          | Domain value objects + Zod parsing                                        | TypeScript interfaces in `types/`                |
+| CORS                 | `localhost:3001`, `localhost:3000`, `localhost:3002`, `credentials: true` | —                                                |
