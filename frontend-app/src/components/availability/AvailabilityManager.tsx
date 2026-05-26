@@ -143,26 +143,21 @@ export const AvailabilityManager: React.FC = () => {
     });
   }, []);
 
-  const getStartOfWeek = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const day = date.getDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    date.setDate(date.getDate() + diff);
-    date.setHours(0, 0, 0, 0);
-    return date;
-  };
+  const weekDates = useMemo(() => {
+    if (!calendarAnchorDate) return [] as Date[];
 
-  const getWeekDates = (anchorDate: string) => {
-    if (!anchorDate) return [] as Date[];
-    const start = getStartOfWeek(anchorDate);
+    const start = new Date(calendarAnchorDate);
+    const day = start.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    start.setDate(start.getDate() + diff);
+    start.setHours(0, 0, 0, 0);
+
     return Array.from({ length: 7 }, (_, idx) => {
       const date = new Date(start);
       date.setDate(start.getDate() + idx);
       return date;
     });
-  };
-
-  const weekDates = getWeekDates(calendarAnchorDate);
+  }, [calendarAnchorDate]);
 
   const toHourKey = (date: Date) =>
     `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}`;

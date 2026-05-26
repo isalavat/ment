@@ -5,6 +5,12 @@ This repository contains two deployable apps:
 - `backend/` (Node.js + Express + Prisma API)
 - `frontend-app/` (React single-page app)
 
+## Current Architecture Status
+
+- Backend feature modules for booking, availability, and time-slots are implemented with use-cases + domain ports + Prisma adapters.
+- Legacy direct Prisma service modules for those features were removed.
+- Backend auth middleware no longer logs raw bearer tokens.
+
 ## Deploy Notes
 
 If you are deploying this project for the first time, read these docs in order:
@@ -24,6 +30,13 @@ From repo root, run apps in separate terminals:
 cd backend
 npm install
 npm run dev
+```
+
+Optional backend quality checks:
+
+```bash
+npx biome check .
+npm run build
 ```
 
 ### Frontend
@@ -48,6 +61,7 @@ npm start
 Use these backend environment parameters during deployment.
 
 Reference template for non-production environments:
+
 - [backend/.env.demo](backend/.env.demo)
 
 | Parameter             | Required | Purpose                                                            | Example                                  |

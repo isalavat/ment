@@ -1,7 +1,16 @@
 import { SlotStatus } from "@prisma/client";
 import { type NextFunction, type Request, type Response, Router } from "express";
+import { PrismaTimeSlotManagementRepository } from "../infra/repositories/PrismaTimeSlotManagementRepository";
+import { TimeSlotGenerationPrismaService } from "../infra/services/TimeSlotGenerationPrismaService";
 import { requireAuth } from "../middleware/auth";
-import { timeSlotService } from "../services/timeSlotService";
+import { BulkDeleteTimeSlotsUseCase } from "../use-cases/time-slot/BulkDeleteTimeSlotsUseCase";
+import { DeleteTimeSlotUseCase } from "../use-cases/time-slot/DeleteTimeSlotUseCase";
+import { GenerateTimeSlotsUseCase } from "../use-cases/time-slot/GenerateTimeSlotsUseCase";
+import { GetAllSlotsForMentorUseCase } from "../use-cases/time-slot/GetAllSlotsForMentorUseCase";
+import { GetAvailableSlotsUseCase } from "../use-cases/time-slot/GetAvailableSlotsUseCase";
+import { GetComputedBookableSlotsUseCase } from "../use-cases/time-slot/GetComputedBookableSlotsUseCase";
+import { GetTimeSlotByIdUseCase } from "../use-cases/time-slot/GetTimeSlotByIdUseCase";
+import { UpdateTimeSlotStatusUseCase } from "../use-cases/time-slot/UpdateTimeSlotStatusUseCase";
 
 const router = Router();
 
@@ -23,7 +32,7 @@ router.post("/generate", async (req: Request, res: Response, next: NextFunction)
 
 		// TODO: Add authorization check - verify user is the mentor
 
-		const result = await timeSlotService.generateTimeSlots({
+		const result = await new GenerateTimeSlotsUseCase(new TimeSlotGenerationPrismaService()).execute({
 			mentorId,
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
@@ -45,7 +54,11 @@ router.get("/mentor/:mentorId/available", async (req: Request, res: Response, ne
 		const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
 		const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
 
-		const slots = await timeSlotService.getAvailableSlots(mentorId, startDate, endDate);
+		const slots = await new GetAvailableSlotsUseCase(new PrismaTimeSlotManagementRepository()).execute(
+			mentorId,
+			startDate,
+			endDate,
+		);
 
 		res.json(slots);
 	} catch (error) {
@@ -70,7 +83,7 @@ router.get("/mentor/:mentorId/bookable", async (req: Request, res: Response, nex
 		const stepMinutes = req.query.stepMinutes ? parseInt(req.query.stepMinutes as string, 10) : 15;
 		const durationMinutes = req.query.durationMinutes ? parseInt(req.query.durationMinutes as string, 10) : 60;
 
-		const slots = await timeSlotService.getComputedBookableSlots({
+		const slots = await new GetComputedBookableSlotsUseCase(new TimeSlotGenerationPrismaService()).execute({
 			mentorId,
 			startDate,
 			endDate,
@@ -96,7 +109,12 @@ router.get("/mentor/:mentorId", async (req: Request, res: Response, next: NextFu
 
 		// TODO: Add authorization check for non-public data
 
-		const slots = await timeSlotService.getAllSlotsForMentor(mentorId, startDate, endDate, status);
+		const slots = await new GetAllSlotsForMentorUseCase(new PrismaTimeSlotManagementRepository()).execute(
+			mentorId,
+			startDate,
+			endDate,
+			status,
+		);
 
 		res.json(slots);
 	} catch (error) {
@@ -111,7 +129,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const slotId = req.params.id;
 
-		const slot = await timeSlotService.getSlotById(slotId);
+		const slot = await new GetTimeSlotByIdUseCase(new PrismaTimeSlotManagementRepository()).execute(slotId);
 
 		res.json(slot);
 	} catch (error) {
@@ -140,7 +158,11 @@ router.patch("/:id/status", async (req: Request, res: Response, next: NextFuncti
 
 		// TODO: Add authorization check
 
-		const slot = await timeSlotService.updateSlotStatus(slotId, status, mentorId);
+		const slot = await new UpdateTimeSlotStatusUseCase(new PrismaTimeSlotManagementRepository()).execute(
+			slotId,
+			status,
+			mentorId,
+		);
 
 		res.json(slot);
 	} catch (error) {
@@ -158,7 +180,7 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction) =>
 
 		// TODO: Add authorization check
 
-		const result = await timeSlotService.deleteSlot(slotId, mentorId);
+		const result = await new DeleteTimeSlotUseCase(new PrismaTimeSlotManagementRepository()).execute(slotId, mentorId);
 
 		res.json(result);
 	} catch (error) {
@@ -181,7 +203,11 @@ router.delete("/bulk", async (req: Request, res: Response, next: NextFunction) =
 
 		// TODO: Add authorization check
 
-		const result = await timeSlotService.bulkDeleteSlots(mentorId, new Date(startDate), new Date(endDate));
+		const result = await new BulkDeleteTimeSlotsUseCase(new PrismaTimeSlotManagementRepository()).execute(
+			mentorId,
+			new Date(startDate),
+			new Date(endDate),
+		);
 
 		res.json(result);
 	} catch (error) {
