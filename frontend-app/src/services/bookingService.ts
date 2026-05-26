@@ -57,7 +57,7 @@ export const bookingService = {
   // Cancel booking (mentee)
   async cancelBookingByMentee(
     bookingId: string,
-    menteeId: string
+    menteeId: string,
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/cancel-mentee`, {
       menteeId,
@@ -68,7 +68,7 @@ export const bookingService = {
   // Cancel booking (mentor)
   async cancelBookingByMentor(
     bookingId: string,
-    mentorId: string
+    mentorId: string,
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/cancel-mentor`, {
       mentorId,
@@ -86,7 +86,7 @@ export const bookingService = {
   async updateMeetingLink(
     bookingId: string,
     mentorId: string,
-    meetingLink: string
+    meetingLink: string,
   ): Promise<Booking> {
     const response = await api.patch(`/bookings/${bookingId}/meeting-link`, {
       mentorId,
@@ -99,13 +99,49 @@ export const bookingService = {
   async getAvailableTimeSlots(
     mentorId: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
   ): Promise<TimeSlot[]> {
     const params: any = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
 
     const response = await api.get(`/time-slots/mentor/${mentorId}/available`, {
+      params,
+    });
+    return response.data;
+  },
+
+  // Get all mentor slots for calendar rendering (available/booked/unavailable)
+  async getMentorTimeSlots(
+    mentorId: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<TimeSlot[]> {
+    const params: any = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await api.get(`/time-slots/mentor/${mentorId}`, {
+      params,
+    });
+    return response.data;
+  },
+
+  // Compute bookable slots from availability rules (no pre-generated slots required)
+  async getComputedBookableSlots(
+    mentorId: string,
+    startDate?: string,
+    endDate?: string,
+    stepMinutes?: number,
+    durationMinutes?: number
+  ): Promise<TimeSlot[]> {
+    const params: any = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (stepMinutes) params.stepMinutes = stepMinutes;
+    if (durationMinutes) params.durationMinutes = durationMinutes;
+
+    const response = await api.get(`/time-slots/mentor/${mentorId}/bookable`, {
       params,
     });
     return response.data;

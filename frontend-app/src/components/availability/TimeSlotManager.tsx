@@ -11,6 +11,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { availabilityService } from "../../services/availabilityService";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { PageShell } from "../common/PageShell";
+import { WeekTimelineGrid } from "../common/WeekTimelineGrid";
 import "./TimeSlotManager.css";
 
 export const TimeSlotManager: React.FC = () => {
@@ -20,6 +21,9 @@ export const TimeSlotManager: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [clearingRange, setClearingRange] = useState(false);
+  const [updatingSlotId, setUpdatingSlotId] = useState<string | null>(null);
+  const [timelineAnchorDate, setTimelineAnchorDate] = useState("");
 
   // Generate slots form
   const [generateForm, setGenerateForm] = useState({
@@ -33,6 +37,11 @@ export const TimeSlotManager: React.FC = () => {
     startDate: "",
     endDate: "",
     status: "",
+  });
+
+  const [bulkDeleteForm, setBulkDeleteForm] = useState({
+    startDate: "",
+    endDate: "",
   });
 
   useEffect(() => {
@@ -51,7 +60,34 @@ export const TimeSlotManager: React.FC = () => {
       endDate: nextMonth.toISOString().split("T")[0],
       status: "",
     });
+
+    setBulkDeleteForm({
+      startDate: today.toISOString().split("T")[0],
+      endDate: nextMonth.toISOString().split("T")[0],
+    });
+    setTimelineAnchorDate(today.toISOString().split("T")[0]);
   }, []);
+
+  const getStartOfWeek = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const day = date.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    date.setDate(date.getDate() + diff);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const getWeekDates = (anchor: string) => {
+    if (!anchor) return [] as Date[];
+    const start = getStartOfWeek(anchor);
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      return date;
+    });
+  };
+
+  const weekDates = getWeekDates(timelineAnchorDate);
 
   const fetchTimeSlots = useCallback(async () => {
     if (!user?.mentorProfileId) return;
@@ -67,7 +103,9 @@ export const TimeSlotManager: React.FC = () => {
       );
       setTimeSlots(data);
     } catch (err: any) {
-      setError(err.response?.data?.error || t.availability.slots.errors.loadFailed);
+      setError(
+        err.response?.data?.error || t.availability.slots.errors.loadFailed,
+      );
       console.error("Error loading time slots:", err);
     } finally {
       setLoading(false);
@@ -101,7 +139,9 @@ export const TimeSlotManager: React.FC = () => {
       alert(result.message || t.availability.slots.generatedSuccess);
       void fetchTimeSlots();
     } catch (err: any) {
-      alert(err.response?.data?.error || t.availability.slots.errors.generateFailed);
+      alert(
+        err.response?.data?.error || t.availability.slots.errors.generateFailed,
+      );
       console.error("Error generating time slots:", err);
     } finally {
       setGenerating(false);
@@ -116,10 +156,80 @@ export const TimeSlotManager: React.FC = () => {
       await availabilityService.deleteTimeSlot(slotId, user.mentorProfileId);
       void fetchTimeSlots();
     } catch (err: any) {
-      alert(err.response?.data?.error || t.availability.slots.errors.deleteFailed);
+      alert(
+        err.response?.data?.error || t.availability.slots.errors.deleteFailed,
+      );
       console.error("Error deleting time slot:", err);
     }
   };
+
+  const handleToggleSlotStatus = async (slot: any) => {
+    if (!user?.mentorProfileId || slot.status === "BOOKED") return;
+    const nextStatus =
+      slot.status === "AVAILABLE" ? "UNAVAILABLE" : "AVAILABLE";
+    setUpdatingSlotId(slot.id);
+    try {
+      await availabilityService.updateTimeSlotStatus(
+        slot.id,
+        user.mentorProfileId,
+        nextStatus,
+      );
+      void fetchTimeSlots();
+    } catch (err: any) {
+      alert(
+        err.response?.data?.error ||
+          t.availability.slots.errors.updateStatusFailed,
+      );
+      console.error("Error updating time slot status:", err);
+    } finally {
+      setUpdatingSlotId(null);
+    }
+  };
+
+  const handleBulkDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.mentorProfileId) return;
+    if (!window.confirm(t.availability.slots.bulkDeleteConfirm)) return;
+
+    setClearingRange(true);
+    try {
+      const result = await availabilityService.bulkDeleteTimeSlots(
+        user.mentorProfileId,
+        bulkDeleteForm.startDate,
+        bulkDeleteForm.endDate,
+      );
+      alert(result.message || t.availability.slots.bulkDeleteSuccess);
+      void fetchTimeSlots();
+    } catch (err: any) {
+      alert(
+        err.response?.data?.error ||
+          t.availability.slots.errors.bulkDeleteFailed,
+      );
+      console.error("Error bulk deleting slots:", err);
+    } finally {
+      setClearingRange(false);
+    }
+  };
+
+  const getRangeDays = (startDate: string, endDate: string) => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    if (end < start) return 0;
+    const diffMs = end.getTime() - start.getTime();
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  const generateRangeDays = getRangeDays(
+    generateForm.startDate,
+    generateForm.endDate,
+  );
+  const bulkDeleteRangeDays = getRangeDays(
+    bulkDeleteForm.startDate,
+    bulkDeleteForm.endDate,
+  );
 
   const localeCode =
     locale === "ru" ? "ru-RU" : locale === "ky" ? "ky-KG" : "en-US";
@@ -175,7 +285,9 @@ export const TimeSlotManager: React.FC = () => {
         title={t.availability.slots.title}
         subtitle={t.availability.slots.mentorSetupRequired}
       >
-        <div className="error-message">{t.availability.slots.needMentorProfileFirst}</div>
+        <div className="error-message">
+          {t.availability.slots.needMentorProfileFirst}
+        </div>
       </PageShell>
     );
   }
@@ -196,7 +308,9 @@ export const TimeSlotManager: React.FC = () => {
           <h2 className="timeslot-overview-title">
             {t.availability.slots.overviewTitle}
           </h2>
-          <p className="timeslot-overview-text">{t.availability.slots.overviewText}</p>
+          <p className="timeslot-overview-text">
+            {t.availability.slots.overviewText}
+          </p>
         </div>
         <div className="timeslot-overview-metrics">
           <div className="timeslot-overview-metric">
@@ -242,7 +356,9 @@ export const TimeSlotManager: React.FC = () => {
         <form onSubmit={handleGenerateSlots} className="card-body">
           <div className="timeslot-generate-grid">
             <div className="form-group">
-              <label className="form-label">{t.availability.slots.startDate}</label>
+              <label className="form-label">
+                {t.availability.slots.startDate}
+              </label>
               <input
                 type="date"
                 className="form-input"
@@ -257,7 +373,9 @@ export const TimeSlotManager: React.FC = () => {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">{t.availability.slots.endDate}</label>
+              <label className="form-label">
+                {t.availability.slots.endDate}
+              </label>
               <input
                 type="date"
                 className="form-input"
@@ -269,7 +387,9 @@ export const TimeSlotManager: React.FC = () => {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">{t.availability.slots.slotDuration}</label>
+              <label className="form-label">
+                {t.availability.slots.slotDuration}
+              </label>
               <select
                 className="form-select"
                 value={generateForm.slotDuration}
@@ -299,7 +419,82 @@ export const TimeSlotManager: React.FC = () => {
                 ? t.availability.slots.generating
                 : t.availability.slots.generateButton}
             </button>
-            <p className="timeslot-generate-hint">{t.availability.slots.generateHint}</p>
+            <div className="timeslot-preview-row">
+              <span className="timeslot-preview-chip">
+                {t.availability.slots.previewDuration}:{" "}
+                {generateForm.slotDuration} {t.availability.slots.minutes}
+              </span>
+              <span className="timeslot-preview-chip">
+                {t.availability.slots.previewRange}: {generateRangeDays}{" "}
+                {t.availability.slots.days}
+              </span>
+            </div>
+            <p className="timeslot-generate-hint">
+              {t.availability.slots.generateHint}
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <div className="card timeslot-bulk-card">
+        <div className="card-header">
+          <h2 className="card-title">{t.availability.slots.bulkDeleteTitle}</h2>
+        </div>
+        <form onSubmit={handleBulkDelete} className="card-body">
+          <p className="timeslot-generate-hint">
+            {t.availability.slots.bulkDeleteHint}
+          </p>
+          <div className="timeslot-generate-grid">
+            <div className="form-group">
+              <label className="form-label">
+                {t.availability.slots.startDate}
+              </label>
+              <input
+                type="date"
+                className="form-input"
+                value={bulkDeleteForm.startDate}
+                onChange={(e) =>
+                  setBulkDeleteForm({
+                    ...bulkDeleteForm,
+                    startDate: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">
+                {t.availability.slots.endDate}
+              </label>
+              <input
+                type="date"
+                className="form-input"
+                value={bulkDeleteForm.endDate}
+                onChange={(e) =>
+                  setBulkDeleteForm({
+                    ...bulkDeleteForm,
+                    endDate: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+          </div>
+          <div className="timeslot-generate-footer">
+            <span className="timeslot-preview-chip">
+              {t.availability.slots.previewRange}: {bulkDeleteRangeDays}{" "}
+              {t.availability.slots.days}
+            </span>
+            <button
+              type="submit"
+              className="btn btn-outline btn-danger"
+              disabled={clearingRange}
+            >
+              <Trash2 size={16} />
+              {clearingRange
+                ? t.availability.slots.clearing
+                : t.availability.slots.clearRangeButton}
+            </button>
           </div>
         </form>
       </div>
@@ -310,14 +505,18 @@ export const TimeSlotManager: React.FC = () => {
             <Filter size={16} />
           </span>
           <div>
-            <div className="timeslot-filters-title">{t.availability.slots.filterTitle}</div>
+            <div className="timeslot-filters-title">
+              {t.availability.slots.filterTitle}
+            </div>
             <div className="timeslot-filters-subtitle">
               {t.availability.slots.filterSubtitle}
             </div>
           </div>
         </div>
         <div className="form-group">
-          <label className="form-label">{t.availability.slots.filterDateRange}</label>
+          <label className="form-label">
+            {t.availability.slots.filterDateRange}
+          </label>
           <div className="timeslot-filter-range">
             <input
               type="date"
@@ -349,8 +548,75 @@ export const TimeSlotManager: React.FC = () => {
             <option value="">{t.availability.slots.allStatuses}</option>
             <option value="AVAILABLE">{t.availability.status.available}</option>
             <option value="BOOKED">{t.availability.status.booked}</option>
-            <option value="UNAVAILABLE">{t.availability.status.unavailable}</option>
+            <option value="UNAVAILABLE">
+              {t.availability.status.unavailable}
+            </option>
           </select>
+        </div>
+      </div>
+
+      <div className="card timeslot-timeline-card">
+        <div className="card-header">
+          <h2 className="card-title">{t.availability.slots.timelineTitle}</h2>
+        </div>
+        <div className="card-body">
+          <div className="timeslot-week-nav">
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                const current = new Date(timelineAnchorDate);
+                current.setDate(current.getDate() - 7);
+                const start = getStartOfWeek(
+                  current.toISOString().split("T")[0],
+                );
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                setTimelineAnchorDate(current.toISOString().split("T")[0]);
+                setFilterForm({
+                  ...filterForm,
+                  startDate: start.toISOString().split("T")[0],
+                  endDate: end.toISOString().split("T")[0],
+                });
+              }}
+            >
+              {t.common.back}
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                const current = new Date(timelineAnchorDate);
+                current.setDate(current.getDate() + 7);
+                const start = getStartOfWeek(
+                  current.toISOString().split("T")[0],
+                );
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                setTimelineAnchorDate(current.toISOString().split("T")[0]);
+                setFilterForm({
+                  ...filterForm,
+                  startDate: start.toISOString().split("T")[0],
+                  endDate: end.toISOString().split("T")[0],
+                });
+              }}
+            >
+              {t.common.next}
+            </button>
+          </div>
+          <WeekTimelineGrid
+            weekDates={weekDates}
+            slots={timeSlots}
+            onSlotClick={(slot) => {
+              if (!updatingSlotId) {
+                void handleToggleSlotStatus(slot);
+              }
+            }}
+            interactiveStatuses={["AVAILABLE", "UNAVAILABLE"]}
+            hourStart={0}
+            hourEnd={24}
+            hourHeight={24}
+          />
         </div>
       </div>
 
@@ -382,7 +648,8 @@ export const TimeSlotManager: React.FC = () => {
                 </span>
                 {slot.booking && (
                   <div className="timeslot-booking-info">
-                    {t.availability.slots.bookedBy}: {slot.booking.mentee?.user?.firstName}{" "}
+                    {t.availability.slots.bookedBy}:{" "}
+                    {slot.booking.mentee?.user?.firstName}{" "}
                     {slot.booking.mentee?.user?.lastName}
                   </div>
                 )}

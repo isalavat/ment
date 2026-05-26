@@ -54,6 +54,37 @@ router.get("/mentor/:mentorId/available", async (req: Request, res: Response, ne
 });
 
 /**
+ * GET /time-slots/mentor/:mentorId/bookable - Compute bookable slots from availability
+ */
+router.get("/mentor/:mentorId/bookable", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const mentorId = req.params.mentorId;
+		const startDate = req.query.startDate ? new Date(req.query.startDate as string) : new Date();
+		const endDate = req.query.endDate
+			? new Date(req.query.endDate as string)
+			: (() => {
+					const date = new Date();
+					date.setDate(date.getDate() + 14);
+					return date;
+				})();
+		const stepMinutes = req.query.stepMinutes ? parseInt(req.query.stepMinutes as string, 10) : 15;
+		const durationMinutes = req.query.durationMinutes ? parseInt(req.query.durationMinutes as string, 10) : 60;
+
+		const slots = await timeSlotService.getComputedBookableSlots({
+			mentorId,
+			startDate,
+			endDate,
+			stepMinutes,
+			durationMinutes,
+		});
+
+		res.json(slots);
+	} catch (error) {
+		next(error);
+	}
+});
+
+/**
  * GET /time-slots/mentor/:mentorId - Get all slots for a mentor
  */
 router.get("/mentor/:mentorId", async (req: Request, res: Response, next: NextFunction) => {

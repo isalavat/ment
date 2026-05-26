@@ -14,6 +14,7 @@ export const MentorProfileForm: React.FC = () => {
   const { user, login } = useAuth();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -85,13 +86,20 @@ export const MentorProfileForm: React.FC = () => {
         setRejectionReason(userData.mentorProfile.rejectionReason ?? null);
         setIsEditing(true);
         if (user) {
-          const updatedAuthUser = {
-            ...user,
-            mentorHasSkills: updatedSkills.length > 0,
-            mentorHasCategories: updatedCategories.length > 0,
-          };
-          localStorage.setItem("user", JSON.stringify(updatedAuthUser));
-          login(updatedAuthUser);
+          const mentorHasSkills = updatedSkills.length > 0;
+          const mentorHasCategories = updatedCategories.length > 0;
+          if (
+            user.mentorHasSkills !== mentorHasSkills ||
+            user.mentorHasCategories !== mentorHasCategories
+          ) {
+            const updatedAuthUser = {
+              ...user,
+              mentorHasSkills,
+              mentorHasCategories,
+            };
+            localStorage.setItem("user", JSON.stringify(updatedAuthUser));
+            login(updatedAuthUser);
+          }
         }
       }
     } catch (err: any) {
@@ -113,7 +121,7 @@ export const MentorProfileForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     setError(null);
 
     try {
@@ -129,7 +137,7 @@ export const MentorProfileForm: React.FC = () => {
     } catch (err: any) {
       setError(err.response?.data?.error || t.profile.errors.failedToSave);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -189,9 +197,17 @@ export const MentorProfileForm: React.FC = () => {
       if (updatedProfile.skills) {
         setSelectedSkills(updatedProfile.skills);
         if (user) {
+          const mentorHasSkills = updatedProfile.skills.length > 0;
+          if (user.mentorHasSkills === mentorHasSkills) {
+            setNewSkillName("");
+            setSelectedSkillId("");
+            setSuccess(t.profile.common.skillAdded);
+            await loadSkills();
+            return;
+          }
           const updatedAuthUser = {
             ...user,
-            mentorHasSkills: updatedProfile.skills.length > 0,
+            mentorHasSkills,
           };
           localStorage.setItem("user", JSON.stringify(updatedAuthUser));
           login(updatedAuthUser);
@@ -214,9 +230,14 @@ export const MentorProfileForm: React.FC = () => {
       const newSkills = selectedSkills.filter((s) => s.skill.id !== skillId);
       setSelectedSkills(newSkills);
       if (user) {
+        const mentorHasSkills = newSkills.length > 0;
+        if (user.mentorHasSkills === mentorHasSkills) {
+          setSuccess(t.profile.common.skillRemoved);
+          return;
+        }
         const updatedAuthUser = {
           ...user,
-          mentorHasSkills: newSkills.length > 0,
+          mentorHasSkills,
         };
         localStorage.setItem("user", JSON.stringify(updatedAuthUser));
         login(updatedAuthUser);
@@ -245,7 +266,6 @@ export const MentorProfileForm: React.FC = () => {
         </div>
       }
     >
-
       {error && <div className="alert alert-danger mb-md">{error}</div>}
 
       {success && <div className="alert alert-success mb-md">{success}</div>}
@@ -531,16 +551,16 @@ export const MentorProfileForm: React.FC = () => {
                 type="button"
                 onClick={() => navigate("/dashboard")}
                 className="btn btn-outline"
-                disabled={loading}
+                disabled={loading || submitting}
               >
                 {t.profile.common.cancel}
               </button>
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={loading}
+                disabled={loading || submitting}
               >
-                {loading
+                {submitting
                   ? t.profile.common.saving
                   : isEditing
                     ? t.profile.mentor.updateProfile

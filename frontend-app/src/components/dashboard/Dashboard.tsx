@@ -290,7 +290,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Upcoming Sessions */}
-          <div className="card dashboard-section-card">
+          <div className="card dashboard-section-card dashboard-secondary-section">
             <div className="card-header">
               <h2 className="card-title">{t.dashboard.upcomingSessions}</h2>
             </div>
@@ -695,7 +695,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Recent Activity & Recommended Mentors */}
-          <div className="grid grid-2">
+          <div className="grid grid-2 dashboard-secondary-grid">
             {/* Recent Activity */}
             <div className="card dashboard-section-card">
               <div className="card-header">

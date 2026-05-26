@@ -193,6 +193,11 @@ export const en = {
       hourlyRate: "Hourly Rate",
       contact: "Contact",
       categories: "Categories",
+      slotPreviewTitle: "Availability Preview",
+      slotPreviewSubtitle:
+        "Pick a date to see open slots before starting booking.",
+      slotPreviewEmpty: "No open slots for this date.",
+      moreSlots: "more slots",
     },
   },
   profile: {
@@ -575,6 +580,23 @@ export const en = {
       totalWindows: "Total windows",
       setWeeklySchedule: "Set Weekly Schedule",
       addSingleSlot: "Add Single Slot",
+      calendarQuickCreate: "Calendar quick create",
+      calendarTitle: "Create availability by tapping time blocks",
+      calendarSubtitle:
+        "Pick a week and tap an open hour to add a one-time availability window.",
+      stepTwo: "Step 2",
+      generateSlotsTitle: "Generate your bookable slots",
+      generateSlotsSubtitle:
+        "After setting availability, generate slots and review them in one move.",
+      generateAndReviewSlots: "Generate and Review Slots",
+      openTimeSlotManager: "Open Time Slot Manager",
+      advancedOptions: "Advanced options",
+      showAdvanced: "Show",
+      hideAdvanced: "Hide",
+      advancedHint:
+        "Manual tools for exceptional cases. Calendar quick create is recommended.",
+      needAvailabilityBeforeGenerating:
+        "Add availability first, then generate your bookable slots.",
       weeklyModalSubtitle: "Build your recurring week in one pass.",
       to: "to",
       createSchedule: "Create Schedule",
@@ -590,6 +612,8 @@ export const en = {
       loading: "Loading availabilities...",
       emptyState:
         "No availabilities set yet. Create your schedule to start receiving bookings.",
+      emptyStateHint:
+        "Tip: Start with Weekly Schedule for the fastest setup, then generate slots below.",
       currentAvailabilities: "Current Availabilities",
       items: "items",
       selectAtLeastOneDay: "Please select at least one day",
@@ -621,8 +645,17 @@ export const en = {
       generateButton: "Generate Time Slots",
       generateHint:
         "This will create bookable slots based on your availability settings",
+      previewDuration: "Duration",
+      previewRange: "Range",
+      days: "days",
+      bulkDeleteTitle: "Clear Available Slots by Date Range",
+      bulkDeleteHint:
+        "Removes AVAILABLE slots in this range while keeping already booked slots intact.",
+      clearRangeButton: "Clear Date Range",
+      clearing: "Clearing...",
       filterTitle: "Refine visible slots",
       filterSubtitle: "Use date bounds and status to narrow the grid.",
+      timelineTitle: "Weekly Timeline",
       filterDateRange: "Filter by Date Range",
       status: "Status",
       allStatuses: "All Statuses",
@@ -634,10 +667,15 @@ export const en = {
       bookedBy: "Booked by",
       generatedSuccess: "Time slots generated successfully",
       deleteConfirm: "Delete this time slot?",
+      bulkDeleteConfirm:
+        "Clear available slots for this date range? Booked slots will be kept.",
+      bulkDeleteSuccess: "Available slots were cleared for the selected range",
       errors: {
         loadFailed: "Failed to load time slots",
         generateFailed: "Failed to generate time slots",
         deleteFailed: "Failed to delete time slot",
+        bulkDeleteFailed: "Failed to clear slots for this range",
+        updateStatusFailed: "Failed to update slot status",
       },
     },
   },

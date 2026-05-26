@@ -13,6 +13,7 @@ export const MenteeProfileForm: React.FC = () => {
   const { user, login } = useAuth();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     bio: "",
@@ -40,7 +41,7 @@ export const MenteeProfileForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     setError(null);
 
     try {
@@ -52,7 +53,7 @@ export const MenteeProfileForm: React.FC = () => {
     } catch (err: any) {
       setError(err.response?.data?.error || t.profile.errors.failedToSave);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -150,16 +151,16 @@ export const MenteeProfileForm: React.FC = () => {
                 type="button"
                 onClick={() => navigate("/dashboard")}
                 className="btn btn-outline"
-                disabled={loading}
+                disabled={loading || submitting}
               >
                 {t.profile.common.cancel}
               </button>
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={loading}
+                disabled={loading || submitting}
               >
-                {loading
+                {submitting
                   ? t.profile.common.saving
                   : t.profile.mentee.updateProfile}
               </button>

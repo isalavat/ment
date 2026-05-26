@@ -1,5 +1,6 @@
-import type { Prisma } from "@prisma/client";
+import { type Prisma, SlotStatus } from "@prisma/client";
 import { prisma } from "../../prisma/client";
+import { timeSlotService } from "./timeSlotService";
 
 interface CreateAvailabilityData {
 	mentorId: string;
@@ -16,6 +17,43 @@ interface UpdateAvailabilityData {
 	endTime?: string;
 	isRecurring?: boolean;
 	specificDate?: Date;
+}
+
+const AUTO_SLOT_HORIZON_DAYS = 60;
+const AUTO_SLOT_DURATION_MINUTES = 60;
+
+function getAutoSyncRange() {
+	const startDate = new Date();
+	startDate.setHours(0, 0, 0, 0);
+
+	const endDate = new Date(startDate);
+	endDate.setDate(endDate.getDate() + AUTO_SLOT_HORIZON_DAYS);
+	endDate.setHours(23, 59, 59, 999);
+
+	return { startDate, endDate };
+}
+
+async function reconcileGeneratedSlotsForMentor(mentorId: string) {
+	const { startDate, endDate } = getAutoSyncRange();
+
+	// Keep booked/unavailable history intact and only rebuild currently available inventory.
+	await prisma.timeSlot.deleteMany({
+		where: {
+			mentorId,
+			status: SlotStatus.AVAILABLE,
+			startTime: {
+				gte: startDate,
+				lte: endDate,
+			},
+		},
+	});
+
+	await timeSlotService.generateTimeSlots({
+		mentorId,
+		startDate,
+		endDate,
+		slotDuration: AUTO_SLOT_DURATION_MINUTES,
+	});
 }
 
 export const availabilityService = {
@@ -58,7 +96,7 @@ export const availabilityService = {
 			throw new Error("Mentor not found");
 		}
 
-		return prisma.availability.create({
+		const availability = await prisma.availability.create({
 			data: {
 				mentorId,
 				dayOfWeek: isRecurring && dayOfWeek !== undefined ? dayOfWeek : 0,
@@ -68,6 +106,10 @@ export const availabilityService = {
 				specificDate,
 			},
 		});
+
+		await reconcileGeneratedSlotsForMentor(mentorId);
+
+		return availability;
 	},
 
 	/**
@@ -144,10 +186,14 @@ export const availabilityService = {
 			throw new Error("dayOfWeek must be between 0 (Sunday) and 6 (Saturday)");
 		}
 
-		return prisma.availability.update({
+		const updatedAvailability = await prisma.availability.update({
 			where: { id },
 			data,
 		});
+
+		await reconcileGeneratedSlotsForMentor(mentorId);
+
+		return updatedAvailability;
 	},
 
 	/**
@@ -169,6 +215,8 @@ export const availabilityService = {
 		await prisma.availability.delete({
 			where: { id },
 		});
+
+		await reconcileGeneratedSlotsForMentor(mentorId);
 
 		return { success: true, message: "Availability deleted" };
 	},
@@ -264,6 +312,8 @@ export const availabilityService = {
 				isRecurring: true,
 			})),
 		});
+
+		await reconcileGeneratedSlotsForMentor(mentorId);
 
 		return {
 			count: created.count,

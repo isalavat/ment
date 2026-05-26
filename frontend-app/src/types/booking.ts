@@ -56,6 +56,8 @@ export interface Booking {
 export interface CreateBookingData {
   menteeId: string;
   mentorId: string;
-  timeSlotId: string;
+  timeSlotId?: string;
+  startTime?: string;
+  endTime?: string;
   notes?: string;
 }

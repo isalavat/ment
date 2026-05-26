@@ -163,6 +163,24 @@ body {
     padding: var(--space-md) var(--space-md)
       calc(var(--mobile-nav-height) + var(--space-lg));
   }
+
+  .page-shell {
+    gap: var(--space-sm);
+    overflow-x: clip;
+  }
+
+  .page-shell .card,
+  .page-shell .table-container,
+  .page-shell [class*="-card"],
+  .page-shell [class*="-grid"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .page-shell .btn,
+  .page-shell .tab-button {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 768px) {
@@ -201,5 +219,22 @@ body {
   .page-title {
     font-size: clamp(1.55rem, 1.05rem + 2.6vw, 1.95rem);
     line-height: 1.08;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-header {
+    margin-bottom: 6px;
+  }
+
+  .page-title {
+    font-size: clamp(1.45rem, 1.15rem + 1.2vw, 1.75rem);
+    line-height: 1.1;
+  }
+
+  .page-subtitle {
+    font-size: var(--font-size-sm);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
   }
 }

@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { CalendarRange, Clock3, Sparkles, Ticket, X } from "lucide-react";
 import { bookingService } from "../../services/bookingService";
+import {
+  availabilityService,
+  Availability,
+} from "../../services/availabilityService";
 import { TimeSlot } from "../../types/booking";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { AlertDialog } from "../common/AlertDialog";
+import { WeekTimelineGrid } from "../common/WeekTimelineGrid";
+import { DateTimeRangePicker } from "../common/DateTimeRangePicker";
 import "./BookingModal.css";
 
 interface BookingModalProps {
@@ -14,6 +20,8 @@ interface BookingModalProps {
   hourlyRate: number;
   currency: string;
   menteeId: string;
+  initialDate?: string;
+  inline?: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -25,17 +33,64 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   hourlyRate,
   currency,
   menteeId,
+  initialDate,
+  inline = false,
   onClose,
   onSuccess,
 }) => {
   const { t } = useLanguage();
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [legacyTimeSlots, setLegacyTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [calendarSlots, setCalendarSlots] = useState<TimeSlot[]>([]);
+  const [bookingDraft, setBookingDraft] = useState({
+    startDate: "",
+    startTime: "09:00",
+    endDate: "",
+    endTime: "10:00",
+  });
+  const [activePicker, setActivePicker] = useState<"start" | "end" | null>(
+    null,
+  );
+  const [pickerDraft, setPickerDraft] = useState({ date: "", time: "09:00" });
+  const [pickerMonth, setPickerMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+
+  const getWeekStart = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const day = date.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    date.setDate(date.getDate() + diff);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const getWeekDates = (dateStr: string) => {
+    if (!dateStr) return [] as Date[];
+    const start = getWeekStart(dateStr);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return d;
+    });
+  };
+
+  const toHourKey = (date: Date) =>
+    `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}`;
+
+  const shiftSelectedWeek = (deltaDays: number) => {
+    const base = new Date(selectedDate);
+    base.setDate(base.getDate() + deltaDays);
+    setSelectedDate(base.toISOString().split("T")[0]);
+    setSelectedSlot(null);
+  };
 
   // Dialog states
   const [showConfirm, setShowConfirm] = useState(false);
@@ -51,32 +106,164 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   });
 
   useEffect(() => {
-    // Set default date to today
+    // Set default date to preview-selected date or fallback to today.
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0];
-    setSelectedDate(formattedDate);
-  }, []);
+    const baseDate = initialDate || formattedDate;
+    setSelectedDate(baseDate);
+    setBookingDraft((prev) => ({
+      ...prev,
+      startDate: baseDate,
+      endDate: baseDate,
+    }));
+  }, [initialDate]);
 
   const fetchTimeSlots = useCallback(async () => {
     if (!selectedDate) return;
     setLoading(true);
     setError("");
     try {
-      const startDate = new Date(selectedDate);
-      startDate.setHours(0, 0, 0, 0);
-
-      const endDate = new Date(selectedDate);
+      const startDate = getWeekStart(selectedDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6);
       endDate.setHours(23, 59, 59, 999);
 
-      const slots = await bookingService.getAvailableTimeSlots(
-        mentorId,
-        startDate.toISOString(),
-        endDate.toISOString(),
+      const [availabilities, computedSlots, legacySlots] = await Promise.all([
+        availabilityService.getAvailabilitiesForMentor(mentorId),
+        bookingService.getComputedBookableSlots(
+          mentorId,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          15,
+          60,
+        ),
+        bookingService.getAvailableTimeSlots(
+          mentorId,
+          startDate.toISOString(),
+          endDate.toISOString(),
+        ),
+      ]);
+
+      const weekDates = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        return d;
+      });
+      const cellMap = new Map<string, TimeSlot>();
+
+      // Mirror mentor-side view: template availability first.
+      availabilities.forEach((availability: Availability) => {
+        const [startHour] = availability.startTime.split(":").map(Number);
+        const [endHour] = availability.endTime.split(":").map(Number);
+
+        weekDates.forEach((day) => {
+          const dayIso = day.toISOString().split("T")[0];
+          const matchRecurring =
+            availability.isRecurring && availability.dayOfWeek === day.getDay();
+          const matchSpecific =
+            !availability.isRecurring &&
+            availability.specificDate?.split("T")[0] === dayIso;
+
+          if (!matchRecurring && !matchSpecific) return;
+
+          for (let hour = startHour; hour < endHour; hour += 1) {
+            const start = new Date(day);
+            start.setHours(hour, 0, 0, 0);
+            const end = new Date(start);
+            end.setHours(hour + 1, 0, 0, 0);
+            cellMap.set(toHourKey(start), {
+              id: `avail-${availability.id}-${toHourKey(start)}`,
+              mentorId,
+              startTime: start.toISOString(),
+              endTime: end.toISOString(),
+              status: "AVAILABLE",
+            });
+          }
+        });
+      });
+
+      // Overlay computed bookable slots as authoritative status.
+      computedSlots.forEach((slot) => {
+        const start = new Date(slot.startTime);
+        cellMap.set(toHourKey(start), slot);
+      });
+
+      setCalendarSlots(Array.from(cellMap.values()));
+      setLegacyTimeSlots(
+        legacySlots.filter((slot) => slot.status === "AVAILABLE"),
       );
-      setTimeSlots(slots);
+      setTimeSlots(computedSlots.filter((slot) => slot.status === "AVAILABLE"));
     } catch (err: any) {
-      setError(err.response?.data?.error || t.bookings.errors.loadSlotsFailed);
-      console.error("Error loading time slots:", err);
+      try {
+        // Fallback while backend booking still depends on generated slot IDs.
+        const startDate = getWeekStart(selectedDate);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999);
+
+        const [availabilities, legacySlots] = await Promise.all([
+          availabilityService.getAvailabilitiesForMentor(mentorId),
+          bookingService.getMentorTimeSlots(
+            mentorId,
+            startDate.toISOString(),
+            endDate.toISOString(),
+          ),
+        ]);
+
+        const weekDates = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date(startDate);
+          d.setDate(startDate.getDate() + i);
+          return d;
+        });
+        const cellMap = new Map<string, TimeSlot>();
+
+        availabilities.forEach((availability: Availability) => {
+          const [startHour] = availability.startTime.split(":").map(Number);
+          const [endHour] = availability.endTime.split(":").map(Number);
+
+          weekDates.forEach((day) => {
+            const dayIso = day.toISOString().split("T")[0];
+            const matchRecurring =
+              availability.isRecurring && availability.dayOfWeek === day.getDay();
+            const matchSpecific =
+              !availability.isRecurring &&
+              availability.specificDate?.split("T")[0] === dayIso;
+
+            if (!matchRecurring && !matchSpecific) return;
+
+            for (let hour = startHour; hour < endHour; hour += 1) {
+              const start = new Date(day);
+              start.setHours(hour, 0, 0, 0);
+              const end = new Date(start);
+              end.setHours(hour + 1, 0, 0, 0);
+              cellMap.set(toHourKey(start), {
+                id: `avail-${availability.id}-${toHourKey(start)}`,
+                mentorId,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
+                status: "AVAILABLE",
+              });
+            }
+          });
+        });
+
+        legacySlots.forEach((slot) => {
+          const start = new Date(slot.startTime);
+          cellMap.set(toHourKey(start), slot);
+        });
+
+        setCalendarSlots(Array.from(cellMap.values()));
+        const availableLegacySlots = legacySlots.filter(
+          (slot) => slot.status === "AVAILABLE",
+        );
+        setTimeSlots(availableLegacySlots);
+        setLegacyTimeSlots(availableLegacySlots);
+      } catch (fallbackErr: any) {
+        setError(
+          fallbackErr.response?.data?.error || t.bookings.errors.loadSlotsFailed,
+        );
+        console.error("Error loading time slots:", fallbackErr);
+      }
     } finally {
       setLoading(false);
     }
@@ -88,19 +275,52 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
   }, [selectedDate, fetchTimeSlots]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!selectedSlot) {
+  const handleSubmit = () => {
+    if (!selectedRangeSlot) {
       setError(t.bookings.errors.selectTimeSlot);
       return;
     }
 
+    setSelectedSlot(selectedRangeSlot);
+
     setShowConfirm(true);
   };
 
+  const resolveBookableSlotId = useCallback(() => {
+    return (
+      legacyTimeSlots.find((slot) => {
+        const start = new Date(slot.startTime);
+        const end = new Date(slot.endTime);
+
+        const slotStartDate = start.toISOString().split("T")[0];
+        const slotEndDate = end.toISOString().split("T")[0];
+        const slotStartTime = `${String(start.getHours()).padStart(2, "0")}:${String(
+          start.getMinutes(),
+        ).padStart(2, "0")}`;
+        const slotEndTime = `${String(end.getHours()).padStart(2, "0")}:${String(
+          end.getMinutes(),
+        ).padStart(2, "0")}`;
+
+        return (
+          slotStartDate === bookingDraft.startDate &&
+          slotStartTime === bookingDraft.startTime &&
+          slotEndDate === bookingDraft.endDate &&
+          slotEndTime === bookingDraft.endTime
+        );
+      }) || null
+    );
+  }, [
+    legacyTimeSlots,
+    bookingDraft.startDate,
+    bookingDraft.startTime,
+    bookingDraft.endDate,
+    bookingDraft.endTime,
+  ]);
+
   const confirmBooking = async () => {
     if (!selectedSlot) return;
+
+    const slotForBooking = resolveBookableSlotId() || selectedSlot;
 
     setSubmitting(true);
     setError("");
@@ -109,7 +329,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       await bookingService.createBooking({
         menteeId,
         mentorId,
-        timeSlotId: selectedSlot.id,
+        timeSlotId: slotForBooking.id.startsWith("computed-")
+          ? undefined
+          : slotForBooking.id,
+        startTime: selectedSlot.startTime,
+        endTime: selectedSlot.endTime,
         notes: notes || undefined,
       });
 
@@ -138,25 +362,293 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     return minutes;
   };
 
+  const weekDates = getWeekDates(selectedDate);
+  const availableSlotsSorted = [...timeSlots].sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+  );
+
+  const slotsForSelectedDate = availableSlotsSorted.filter(
+    (slot) =>
+      new Date(slot.startTime).toISOString().split("T")[0] === selectedDate,
+  );
+
+  const findSlotByRange = useCallback(
+    (
+      startDate: string,
+      startTime: string,
+      endDate: string,
+      endTime: string,
+    ) => {
+      return availableSlotsSorted.find((slot) => {
+        const start = new Date(slot.startTime);
+        const end = new Date(slot.endTime);
+        const slotStartDate = start.toISOString().split("T")[0];
+        const slotEndDate = end.toISOString().split("T")[0];
+        const slotStartTime = `${String(start.getHours()).padStart(2, "0")}:${String(
+          start.getMinutes(),
+        ).padStart(2, "0")}`;
+        const slotEndTime = `${String(end.getHours()).padStart(2, "0")}:${String(
+          end.getMinutes(),
+        ).padStart(2, "0")}`;
+        return (
+          slotStartDate === startDate &&
+          slotStartTime === startTime &&
+          slotEndDate === endDate &&
+          slotEndTime === endTime
+        );
+      });
+    },
+    [availableSlotsSorted],
+  );
+
+  const formatDateTimeLabel = (date: string, time: string) => {
+    if (!date) return "--";
+    const dt = new Date(`${date}T${time}:00`);
+    if (Number.isNaN(dt.getTime())) return "--";
+    return dt.toLocaleString([], {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const openPicker = (target: "start" | "end") => {
+    const sourceDate =
+      target === "start" ? bookingDraft.startDate : bookingDraft.endDate;
+    const sourceTime =
+      target === "start" ? bookingDraft.startTime : bookingDraft.endTime;
+    setPickerDraft({ date: sourceDate || selectedDate, time: sourceTime });
+    if (sourceDate) {
+      const [year, month] = sourceDate.split("-").map(Number);
+      setPickerMonth(new Date(year, month - 1, 1));
+    }
+    setActivePicker(target);
+  };
+
+  const pickerTimeOptions = useMemo(() => {
+    if (!pickerDraft.date) {
+      return [] as string[];
+    }
+
+    if (activePicker === "start") {
+      const values = availableSlotsSorted
+        .filter(
+          (slot) =>
+            new Date(slot.startTime).toISOString().split("T")[0] ===
+            pickerDraft.date,
+        )
+        .map((slot) => {
+          const d = new Date(slot.startTime);
+          return `${String(d.getHours()).padStart(2, "0")}:${String(
+            d.getMinutes(),
+          ).padStart(2, "0")}`;
+        });
+      return Array.from(new Set(values));
+    }
+
+    const values = availableSlotsSorted
+      .filter((slot) => {
+        const slotStart = new Date(slot.startTime);
+        const startDate = slotStart.toISOString().split("T")[0];
+        const startTime = `${String(slotStart.getHours()).padStart(2, "0")}:${String(
+          slotStart.getMinutes(),
+        ).padStart(2, "0")}`;
+        return (
+          startDate === bookingDraft.startDate &&
+          startTime === bookingDraft.startTime
+        );
+      })
+      .map((slot) => {
+        const d = new Date(slot.endTime);
+        return `${String(d.getHours()).padStart(2, "0")}:${String(
+          d.getMinutes(),
+        ).padStart(2, "0")}`;
+      });
+
+    return Array.from(new Set(values));
+  }, [
+    activePicker,
+    availableSlotsSorted,
+    pickerDraft.date,
+    bookingDraft.startDate,
+    bookingDraft.startTime,
+  ]);
+
+  const calendarCells = useMemo(() => {
+    const firstDay = new Date(
+      pickerMonth.getFullYear(),
+      pickerMonth.getMonth(),
+      1,
+    );
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const startDate = new Date(firstDay);
+    startDate.setDate(firstDay.getDate() - startOffset);
+
+    return Array.from({ length: 42 }, (_, idx) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + idx);
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const dd = String(date.getDate()).padStart(2, "0");
+      const iso = `${yyyy}-${mm}-${dd}`;
+      const hasAvailability = calendarSlots.some(
+        (slot) => new Date(slot.startTime).toISOString().split("T")[0] === iso,
+      );
+      const hasBookableSlot = availableSlotsSorted.some(
+        (slot) => new Date(slot.startTime).toISOString().split("T")[0] === iso,
+      );
+      return {
+        date,
+        iso,
+        inMonth: date.getMonth() === pickerMonth.getMonth(),
+        disabled: !hasAvailability,
+        hasBookableSlot,
+      };
+    });
+  }, [pickerMonth, availableSlotsSorted, calendarSlots]);
+
+  const pickerQuarterTimeOptions = useMemo(
+    () =>
+      pickerTimeOptions.filter((time) => Number(time.split(":")[1]) % 15 === 0),
+    [pickerTimeOptions],
+  );
+
+  useEffect(() => {
+    if (
+      !activePicker ||
+      !pickerDraft.date ||
+      pickerQuarterTimeOptions.length === 0
+    )
+      return;
+    if (pickerQuarterTimeOptions.includes(pickerDraft.time)) return;
+    setPickerDraft((prev) => ({ ...prev, time: pickerQuarterTimeOptions[0] }));
+  }, [
+    activePicker,
+    pickerDraft.date,
+    pickerDraft.time,
+    pickerQuarterTimeOptions,
+  ]);
+
+  function applyPicker(dateOverride?: string, timeOverride?: string) {
+    if (!activePicker) return;
+
+    const effectiveDate = dateOverride ?? pickerDraft.date;
+    const effectiveTime = timeOverride ?? pickerDraft.time;
+
+    if (!effectiveDate || !effectiveTime) return;
+
+    if (activePicker === "start") {
+      const startMatch = availableSlotsSorted.find((slot) => {
+        const start = new Date(slot.startTime);
+        const date = start.toISOString().split("T")[0];
+        const time = `${String(start.getHours()).padStart(2, "0")}:${String(
+          start.getMinutes(),
+        ).padStart(2, "0")}`;
+        return date === effectiveDate && time === effectiveTime;
+      });
+
+      if (!startMatch) {
+        setError(t.bookings.errors.selectTimeSlot);
+        return;
+      }
+
+      const end = new Date(startMatch.endTime);
+      const endDate = end.toISOString().split("T")[0];
+      const endTime = `${String(end.getHours()).padStart(2, "0")}:${String(
+        end.getMinutes(),
+      ).padStart(2, "0")}`;
+
+      setBookingDraft({
+        startDate: effectiveDate,
+        startTime: effectiveTime,
+        endDate,
+        endTime,
+      });
+      setSelectedDate(effectiveDate);
+      setSelectedSlot(startMatch);
+      setError("");
+      setActivePicker(null);
+      return;
+    }
+
+    const matched = findSlotByRange(
+      bookingDraft.startDate,
+      bookingDraft.startTime,
+      effectiveDate,
+      effectiveTime,
+    );
+
+    if (!matched) {
+      setError(t.bookings.errors.selectTimeSlot);
+      return;
+    }
+
+    setBookingDraft((prev) => ({
+      ...prev,
+      endDate: effectiveDate,
+      endTime: effectiveTime,
+    }));
+    setSelectedSlot(matched);
+    setError("");
+    setActivePicker(null);
+  }
+
+  const handlePickerTimeChange = (time: string) => {
+    if (!pickerDraft.date) return;
+    setPickerDraft((prev) => ({ ...prev, time }));
+    applyPicker(pickerDraft.date, time);
+  };
+
+  useEffect(() => {
+    if (!bookingDraft.startDate || !bookingDraft.endDate) return;
+    const matched = findSlotByRange(
+      bookingDraft.startDate,
+      bookingDraft.startTime,
+      bookingDraft.endDate,
+      bookingDraft.endTime,
+    );
+    if (matched) {
+      setSelectedSlot(matched);
+    }
+  }, [
+    bookingDraft.startDate,
+    bookingDraft.startTime,
+    bookingDraft.endDate,
+    bookingDraft.endTime,
+    timeSlots,
+    findSlotByRange,
+  ]);
+
   const calculateAmount = (slot: TimeSlot) => {
     const duration = getSlotDuration(slot);
     return (hourlyRate * (duration / 60)).toFixed(2);
   };
 
-  // Get min date (today)
-  const getMinDate = () => {
-    return new Date().toISOString().split("T")[0];
-  };
+  const selectedRangeSlot = useMemo(
+    () =>
+      findSlotByRange(
+        bookingDraft.startDate,
+        bookingDraft.startTime,
+        bookingDraft.endDate,
+        bookingDraft.endTime,
+      ),
+    [
+      bookingDraft.startDate,
+      bookingDraft.startTime,
+      bookingDraft.endDate,
+      bookingDraft.endTime,
+      findSlotByRange,
+    ],
+  );
 
-  // Get max date (3 months from now)
-  const getMaxDate = () => {
-    const maxDate = new Date();
-    maxDate.setMonth(maxDate.getMonth() + 3);
-    return maxDate.toISOString().split("T")[0];
-  };
+  const isCurrentRangeBookable = Boolean(selectedRangeSlot);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className={`modal-overlay ${inline ? "booking-inline-overlay" : ""}`}
+      onClick={inline ? undefined : onClose}
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
@@ -184,61 +676,94 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </p>
           </div>
 
-          {/* Date Selection */}
-          <div className="form-group">
-            <label className="form-label">{t.bookings.selectDate}</label>
-            <input
-              type="date"
-              className="form-input"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              min={getMinDate()}
-              max={getMaxDate()}
-            />
-          </div>
+          <DateTimeRangePicker
+            startLabel={t.availability.manager.startTime}
+            endLabel={t.availability.manager.endTime}
+            timeLabel={t.bookings.time}
+            startValue={formatDateTimeLabel(
+              bookingDraft.startDate,
+              bookingDraft.startTime,
+            )}
+            endValue={formatDateTimeLabel(
+              bookingDraft.endDate,
+              bookingDraft.endTime,
+            )}
+            activePicker={activePicker}
+            pickerMonth={pickerMonth}
+            calendarCells={calendarCells.map((cell) => ({
+              iso: cell.iso,
+              date: cell.date,
+              inMonth: cell.inMonth,
+              disabled: cell.disabled,
+              bookable: cell.hasBookableSlot,
+            }))}
+            selectedDate={pickerDraft.date}
+            timeOptions={pickerQuarterTimeOptions}
+            selectedTime={pickerDraft.time}
+            emptyTimeLabel={t.bookings.noTimeSlotsForDate}
+            onOpenPicker={openPicker}
+            onClosePicker={() => setActivePicker(null)}
+            onPrevMonth={() =>
+              setPickerMonth(
+                (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1),
+              )
+            }
+            onNextMonth={() =>
+              setPickerMonth(
+                (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
+              )
+            }
+            onSelectDate={(dateIso) =>
+              setPickerDraft((prev) => ({ ...prev, date: dateIso }))
+            }
+            onSelectTime={handlePickerTimeChange}
+          />
 
           {/* Time Slots */}
           <div className="form-group">
             <label className="form-label">
               {t.bookings.availableTimeSlots}
-              {timeSlots.length > 0 && (
+              {slotsForSelectedDate.length > 0 && (
                 <span className="slots-count">
-                  {` (${timeSlots.length} ${t.bookings.slotsAvailable})`}
+                  {` (${slotsForSelectedDate.length} ${t.bookings.slotsAvailable})`}
                 </span>
               )}
             </label>
+
+            <div className="booking-week-nav">
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => shiftSelectedWeek(-7)}
+              >
+                {t.common.back}
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => shiftSelectedWeek(7)}
+              >
+                {t.common.next}
+              </button>
+            </div>
 
             {loading ? (
               <div className="booking-loading">
                 {t.bookings.loadingAvailableSlots}
               </div>
-            ) : timeSlots.length === 0 ? (
+            ) : calendarSlots.length === 0 ? (
               <div className="booking-empty">
                 {t.bookings.noTimeSlotsForDate}
               </div>
             ) : (
-              <div className="time-slots-grid">
-                {timeSlots.map((slot) => (
-                  <button
-                    key={slot.id}
-                    type="button"
-                    className={`time-slot-card ${
-                      selectedSlot?.id === slot.id ? "selected" : ""
-                    }`}
-                    onClick={() => setSelectedSlot(slot)}
-                  >
-                    <div className="time-slot-time">
-                      {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                    </div>
-                    <div className="time-slot-duration">
-                      {getSlotDuration(slot)} {t.bookings.minutes}
-                    </div>
-                    <div className="time-slot-price">
-                      ${calculateAmount(slot)}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <WeekTimelineGrid
+                weekDates={weekDates}
+                slots={calendarSlots}
+                mergeAdjacentSlots
+                hourStart={0}
+                hourEnd={24}
+                hourHeight={24}
+              />
             )}
           </div>
 
@@ -296,6 +821,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         </div>
 
         <div className="modal-footer">
+          <span
+            className={`booking-bookable-indicator ${
+              isCurrentRangeBookable ? "valid" : "invalid"
+            }`}
+          >
+            {isCurrentRangeBookable
+              ? `${t.bookings.time}: ${t.availability.status.available}`
+              : `${t.bookings.time}: ${t.availability.status.unavailable}`}
+          </span>
           <button
             type="button"
             className="btn btn-outline"
@@ -308,7 +842,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             type="button"
             className="btn btn-primary"
             onClick={handleSubmit}
-            disabled={!selectedSlot || submitting}
+            disabled={!isCurrentRangeBookable || submitting}
           >
             {submitting
               ? t.bookings.bookingInProgress
